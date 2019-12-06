@@ -13,7 +13,7 @@ public class Control {
 
     @RequestMapping("/test1/test1")
     public String test1_test1() {
-        return ReadTextFile.read("src/main/resources/test1.txt");
+        return ReadTextFile.read();
     }
 }
 
