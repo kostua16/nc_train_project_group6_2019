@@ -1,10 +1,10 @@
-package com.edunetcracker.billingservice.crm;
+package com.examplenetcracker.billingservice.atc;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CrmApplicationTests {
+class AtcApplicationTests {
 
 	@Test
 	void contextLoads() {

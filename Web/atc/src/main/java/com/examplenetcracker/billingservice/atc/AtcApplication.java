@@ -1,13 +1,13 @@
-package com.edunetcracker.billingservice.crm;
+package com.examplenetcracker.billingservice.atc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CrmApplication {
+public class AtcApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CrmApplication.class, args);
+		SpringApplication.run(AtcApplication.class, args);
 	}
 
 }

@@ -1,10 +1,10 @@
-package com.edunetcracker.billingservice.ssp;
+package com.examplenetcracker.billingservice.crm;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SspApplicationTests {
+class CrmApplicationTests {
 
 	@Test
 	void contextLoads() {

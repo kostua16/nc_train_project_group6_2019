@@ -1,10 +1,10 @@
-package com.edunetcracker.billingservice.atc;
+package com.examplenetcracker.billingservice.ssp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AtcApplicationTests {
+class SspApplicationTests {
 
 	@Test
 	void contextLoads() {

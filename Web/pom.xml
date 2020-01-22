@@ -1,59 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.2.RELEASE</version>
+		<version>2.2.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.gmail.kostua16.trainings.demo_spring_boot_rest_service</groupId>
-	<artifactId>parent</artifactId>
+	<groupId>com.example-netcracker.billing-service</groupId>
+	<artifactId>web</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>parent</name>
-	<description>demo spring boot restservice.parent</description>
+	<name>web</name>
+	<description>веб часть</description>
 	<packaging>pom</packaging>
 
 	<properties>
 		<java.version>1.8</java.version>
-		<node.version>v12.14.0</node.version>
-		<npm.version>3.5.3</npm.version>
-		<yarn.version>v1.21.1</yarn.version>
-		<frontend-maven-plugin.version>1.9.0</frontend-maven-plugin.version>
 	</properties>
 
-
-
-
 	<modules>
-		<module>Web</module>
+		<module>act</module>
+		<module>crm</module>
+		<module>ssp</module>
 	</modules>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>copy-backend</id>
-						<phase>package</phase>
-						<goals><goal>copy-resources</goal></goals>
-						<configuration>
-							<outputDirectory>target</outputDirectory>
-							<resources>
-								<resource>
-									<directory>Web</directory>
-									<includes>
-										<include>pom.xml</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
