@@ -16,6 +16,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>parent</name>
   <description>parent</description>
+  <packaging>pom</packaging>
 
   <properties>
     <java.version>1.8</java.version>
