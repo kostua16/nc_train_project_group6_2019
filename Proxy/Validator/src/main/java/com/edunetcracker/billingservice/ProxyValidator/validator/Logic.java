@@ -2,28 +2,40 @@ package com.edunetcracker.billingservice.ProxyValidator.validator;
 
 
 import org.springframework.http.*;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 
 @RestController
 public class Logic {
 
-    @GetMapping("/validator/getBalance/{id}")
-    public ResponseEntity<Integer> getBalance(@PathVariable String id) {
-        //обращение к базе данных
-        //final String urlDataBase = "http://localhost:8080/DB/getBalance/" + id;
-        //RestTemplate restTemplate = new RestTemplate();
-        //ResponseEntity<Integer> responseDataBase = restTemplate.exchange(urlDataBase, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Integer.class);
+    @GetMapping("/validator/test/")
+    public String getTest(@RequestParam("str") String str) {
+        return "Test validator response. " + str;
+    }
 
-        //int result = responseDataBase.getBody();
-        int result = Rando.getRandInt(-2,3);
-        if(result<0){
-            return new ResponseEntity<Integer>((Integer)null, HttpStatus.NOT_FOUND);
+    @GetMapping("/validator/getBalance/")
+    public ResponseEntity<Long> getBalance(@RequestParam ("id") Long id) {
+        //обращение к proxy
+        final String urlDataBase = "http://localhost:8102/proxy/getBalance/"+"?id="+ + id;
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Long> responsePoxy = null;
+        try {
+            responsePoxy = restTemplate.exchange(urlDataBase, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
+        } catch (HttpClientErrorException.NotFound e){
+            return new ResponseEntity<>((Long)null, HttpStatus.NOT_FOUND);
         }
-        else
-        return new ResponseEntity<Integer>(result, HttpStatus.OK);
+        catch (HttpClientErrorException e){
+            return new ResponseEntity<>((Long)null, HttpStatus.NOT_FOUND);
+        }
+            //return responsePoxy;
+            return new ResponseEntity<>(responsePoxy.getBody(), responsePoxy.getStatusCode());
     }
 }

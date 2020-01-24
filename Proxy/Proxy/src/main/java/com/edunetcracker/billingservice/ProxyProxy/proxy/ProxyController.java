@@ -3,19 +3,33 @@ package com.edunetcracker.billingservice.ProxyProxy.proxy;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class ProxyController {
 
-    @GetMapping("/proxy/getBalance/{id}")
-    public ResponseEntity<Integer> getBalance(@PathVariable String id) {
-        //обращение к validator
-        final String urlDataBase = "http://localhost:8100/validator/getBalance/" + id;
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Integer> responseDataBase = restTemplate.exchange(urlDataBase, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Integer.class);
-        return responseDataBase;
+    @GetMapping("/proxy/test/")
+    public String getTest(@RequestParam("str") String str) {
+        return "Test proxy response. " + str;
+    }
+
+    @GetMapping("/proxy/getBalance/")
+    public ResponseEntity<Long> getBalance(@RequestParam("id") Long id) {
+        //обращение к базе данных
+        //final String urlDataBase = "http://localhost:8080/DB/getBalance/" + id;
+        //RestTemplate restTemplate = new RestTemplate();
+        //ResponseEntity<Integer> responseDataBase = restTemplate.exchange(urlDataBase, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Integer.class);
+
+        //int result = responseDataBase.getBody();
+        long result =  new Rando().getRandInt(-2L,3L);
+        if(result<0){
+            return new ResponseEntity<Long>((Long)null, HttpStatus.NOT_FOUND); //NOT_FOUND //BAD_REQUEST //INTERNAL_SERVER_ERROR
+            //return null;
+        }
+        else
+            return new ResponseEntity<Long>(result, HttpStatus.OK);
     }
 
 }
