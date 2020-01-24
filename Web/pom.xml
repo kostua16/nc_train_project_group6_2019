@@ -20,7 +20,7 @@
 	</properties>
 
 	<modules>
-		<module>act</module>
+		<module>atc</module>
 		<module>crm</module>
 		<module>ssp</module>
 	</modules>
