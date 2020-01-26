@@ -12,7 +12,6 @@
 	<artifactId>Proxy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Proxy</name>
-	<description> D </description>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -23,5 +22,14 @@
 		<module>Proxy</module>
 		<module>Validator</module>
 	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.2.4.RELEASE</version>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
