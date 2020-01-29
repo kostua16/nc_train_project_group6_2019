@@ -51,7 +51,7 @@ public class SspMessageController {
     public  Map<String, String> update(@PathVariable String id, @RequestBody Map<String, String> message) {
         Map<String, String> messageFromDb = getMessage(id); //маленькая База данных
 
-        messageFromDb.putAll(message);//обновим полями которые мы получили от пользователя
+        messageFromDb.putAll(message);//обновим поля которые мы получили от пользователя
         messageFromDb.put("id", id);//тот id по которому был произведён запрос
         return messageFromDb;
     }
