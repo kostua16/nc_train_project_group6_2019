@@ -12,12 +12,12 @@
 	<artifactId>ssp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ssp</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Личный кабинет клиента</description>
 	<packaging>jar</packaging>
 
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
