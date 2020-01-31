@@ -47,7 +47,7 @@ public class SspMessageController {
         return message; //возвращаем обновлённый message
     }
 
-    @PutMapping("{id}")//обновление текущий записи
+    @PutMapping("{id}")//обновление текущего обьекта
     public  Map<String, String> update(@PathVariable String id, @RequestBody Map<String, String> message) {
         Map<String, String> messageFromDb = getMessage(id); //маленькая База данных
 
