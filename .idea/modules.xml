@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/web/atc/atc.iml" filepath="$PROJECT_DIR$/web/atc/atc.iml" />
       <module fileurl="file://$PROJECT_DIR$/web/crm/crm.iml" filepath="$PROJECT_DIR$/web/crm/crm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/web/frontend/frontend.iml" filepath="$PROJECT_DIR$/web/frontend/frontend.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/nc_train_project_group6_2019.iml" filepath="$PROJECT_DIR$/.idea/nc_train_project_group6_2019.iml" />
       <module fileurl="file://$PROJECT_DIR$/web/ssp/ssp.iml" filepath="$PROJECT_DIR$/web/ssp/ssp.iml" />
       <module fileurl="file://$PROJECT_DIR$/web/web.iml" filepath="$PROJECT_DIR$/web/web.iml" />

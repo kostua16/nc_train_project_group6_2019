@@ -9,11 +9,13 @@
         <module name="crm" />
         <module name="atc" />
         <module name="ssp" />
+        <module name="frontend" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="atc" target="1.8" />
       <module name="crm" target="1.8" />
+      <module name="frontend" target="1.8" />
       <module name="ssp" target="1.8" />
       <module name="web" target="1.8" />
     </bytecodeTargetLevel>
@@ -22,6 +24,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="atc" options="-parameters" />
       <module name="crm" options="-parameters" />
+      <module name="frontend" options="-parameters" />
       <module name="ssp" options="-parameters" />
     </option>
   </component>

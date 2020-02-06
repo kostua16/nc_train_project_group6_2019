@@ -20,6 +20,7 @@
 		<module>atc</module>
 		<module>crm</module>
 		<module>ssp</module>
+		<module>frontend</module>
 	</modules>
 
 	<build>
