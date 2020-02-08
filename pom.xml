@@ -28,6 +28,7 @@
 
     <modules>
         <module>Web</module>
+        <module>Proxy</module>
     </modules>
 
 
