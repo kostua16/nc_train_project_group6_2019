@@ -29,6 +29,7 @@
     <modules>
         <module>Web</module>
         <module>Proxy</module>
+		<module>Billing</module>
     </modules>
 
 
