@@ -5,6 +5,39 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<p th:text="'Hello, ' + ${name} + '!'" />
+<input type="text" size="40" th:field="*{phoneNumber}">
+<table border="2">
+    <tr><td>Звонок</td><td>
+        <input type="text" size="10" th:field="*{Call}">
+    </td><td>m</td><td>
+
+        <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
+
+    </td></tr>
+    <tr><td>Интернет</td><td>
+        <input type="text" size="10" th:field="*{Call}">
+    </td><td>mb</td><td>
+
+        <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
+
+    </td></tr>
+    <tr><td>SMS</td><td>
+        <input type="text" size="10" th:field="*{Call}">
+    </td><td>Шт</td><td>
+
+        <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
+
+    </td></tr>
+    <tr><td>Баланс</td><td>
+        <input type="text" size="10" th:field="*{Call}">
+    </td><td>Руб</td><td>
+
+        <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
+
+    </td></tr>
+    <div class="Call">
+        <a href="/logIn"><button type="button" style="width: 80px; height: 20px">all spend</button></a>
+    </div>
+</table>
 </body>
 </html>
