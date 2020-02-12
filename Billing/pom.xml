@@ -16,7 +16,7 @@
 	<packaging>pom</packaging>
 	
 	<modules>
-        <module>Billing-App</module>
+        <!-- <module>Billing-App</module> -->
         <module>Billing-DB</module>
     </modules>
 

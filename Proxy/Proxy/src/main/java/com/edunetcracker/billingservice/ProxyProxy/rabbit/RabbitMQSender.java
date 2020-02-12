@@ -17,8 +17,8 @@ public class RabbitMQSender {
     @Value("${rabbit.rabbitmq.routingkey}")
     private String routing;
 
-    public void send(String message) {
-        rabbitTemplate.convertAndSend(exchange, routing, message);
+    public void send(Object message) {
+        rabbitTemplate.convertAndSend(exchange, "q2", message);
         System.out.println("Send msg = " + message);
     }
 
