@@ -1,12 +1,10 @@
 package com.edunetcracker.billingservice.ProxyProxy.rabbit;
 
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,18 +14,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${rabbit.rabbitmq.queue}")
-    String queueName;
+    //@Value("${rabbit.rabbitmq.queue}")
+    //String queueName;
 
     @Value("${rabbit.rabbitmq.exchange}")
     String exchange;
 
-    @Value("${rabbit.rabbitmq.routingkey}")
-    private String routing;
+    //@Value("${rabbit.rabbitmq.routingkey}")
+    //private String routing;
 
     @Bean
-    Queue queue() {
-        return new Queue(queueName, false);
+    Queue queue1() {
+        return new Queue("q1", false);
+    }
+
+    @Bean
+    Queue queue2() {
+        return new Queue("q2", false);
     }
 
     @Bean
@@ -36,15 +39,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    Binding binding(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(routing);
+    Binding binding1(Queue queue1, DirectExchange exchange) {
+        return BindingBuilder.bind(queue1).to(exchange).with("q1");
+    }
+    @Bean
+    Binding binding2(Queue queue2, DirectExchange exchange) {
+        return BindingBuilder.bind(queue2).to(exchange).with("q2");
     }
 
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
-
 
     @Bean
     public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {

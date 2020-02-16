@@ -11,15 +11,12 @@ public class RabbitMQSender {
     @Autowired
     private AmqpTemplate rabbitTemplate;
 
-    @Value("${rabbit.rabbitmq.exchange}")
-    private String exchange;
-
-    @Value("${rabbit.rabbitmq.routingkey}")
-    private String routing;
+    //@Value("${rabbit.rabbitmq.exchange}")
+    //private String exchange;
 
     public void send(Object message) {
-        rabbitTemplate.convertAndSend(exchange, "q2", message);
-        System.out.println("Send msg = " + message);
+        rabbitTemplate.convertAndSend("q2", message);
+        System.out.println("Send to q2. msg = " + message);
     }
 
 }
