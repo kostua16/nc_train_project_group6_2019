@@ -5,39 +5,44 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<input type="text" size="40" th:field="*{phoneNumber}">
+<div>
+<input type="tel" name="tel"   size="27" maxlength="11" th:field="*{phoneNumber}"
+       pattern="8[0-9]{10}" required placeholder="8917386858" ></p> <!-- ввод текста -->
+<a href="/logIn"><button type="button" style="width: 80px; height: 20px">All spend</button></a>
+</div>
 <table border="2">
-    <tr><td>Звонок</td><td>
-        <input type="text" size="10" th:field="*{Call}">
+    <tr><td>Звонок </td><td>
+        <input type="number" size="10" th:field="*{Call}">
     </td><td>m</td><td>
 
         <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
 
     </td></tr>
     <tr><td>Интернет</td><td>
-        <input type="text" size="10" th:field="*{Call}">
+        <input type="number" size="10" th:field="*{Call}">
     </td><td>mb</td><td>
 
         <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
 
     </td></tr>
     <tr><td>SMS</td><td>
-        <input type="text" size="10" th:field="*{Call}">
+        <input type="number" size="10" th:field="*{Call}">
     </td><td>Шт</td><td>
 
         <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
 
     </td></tr>
     <tr><td>Баланс</td><td>
-        <input type="text" size="10" th:field="*{Call}">
+        <input type="number" size="10" th:field="*{Call}">
     </td><td>Руб</td><td>
 
         <a href="/logIn"><button type="button" style="width: 80px; height: 20px">spend</button></a>
 
     </td></tr>
-    <div class="Call">
-        <a href="/logIn"><button type="button" style="width: 80px; height: 20px">all spend</button></a>
-    </div>
+
+
+
+
 </table>
 </body>
 </html>
