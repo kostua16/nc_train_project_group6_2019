@@ -3,6 +3,7 @@ package com.edunetcracker.billingservice.BillingDB.services;
 import com.edunetcracker.billingservice.BillingDB.entity.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,7 @@ import java.util.List;
 //TODO
 
 @Service
-public interface IAccountRepository {
+public interface IAccountRepository extends JpaRepository<Account, Long> {
 
     Page<Account> findByNameIsNotNull(Pageable pageable);
     Page<Account> findByNameContaining(String name, Pageable pageable);
