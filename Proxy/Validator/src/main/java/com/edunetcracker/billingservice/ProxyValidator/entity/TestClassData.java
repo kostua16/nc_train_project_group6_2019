@@ -1,4 +1,4 @@
-package com.edunetcracker.billingservice.ProxyProxy.entity;
+package com.edunetcracker.billingservice.ProxyValidator.entity;
 
 import java.io.Serializable;
 

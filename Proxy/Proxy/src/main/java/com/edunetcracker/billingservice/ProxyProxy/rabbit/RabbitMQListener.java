@@ -1,8 +1,11 @@
 package com.edunetcracker.billingservice.ProxyProxy.rabbit;
 
 import com.edunetcracker.billingservice.ProxyProxy.entity.TestClassData;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Delivery;
 import com.rabbitmq.client.RpcClient;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -10,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-//@EnableRabbit
+import java.util.Map;
+
+@EnableRabbit
 @Service
 public class RabbitMQListener {
 
@@ -18,28 +23,52 @@ public class RabbitMQListener {
     private RabbitTemplate rabbitTemplate;
     //private AmqpTemplate rabbitTemplate;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    RabbitMQMap rabbitMQMap;
+
     @Value("${rabbit.rabbitmq.exchange}")
     private String exchange;
 
-    public Object listen(){
-        Object o = rabbitTemplate.receiveAndConvert("q2");
-        System.out.println("Listen to q2. msg = " + (String)o);
+    //
+
+    /**
+     * _V2
+     * Listen all messages;
+     */
+    @RabbitListener(queues = "q2")
+    public void processQueue2(Message message) {
+        setMessage(message);
+    }
+
+
+    public void setMessage(Message message){
+        //  get ID and convert
+        String s = message.getMessageProperties().getMessageId();
+        //  Decoding message
+        //  JSON => Object(String)
+        Object o = rabbitTemplate.getMessageConverter().fromMessage(message);
+        rabbitMQMap.setMessageToMap(s, o);
+        System.out.println("Message: " + s + " send to map");
+    }
+
+    public Object listen(String id){
+        System.out.println("Message listen. Id = " + id);
+        //  Get message with delayed
+        //  If it is not available, wait 5 sec
+        Object o = rabbitMQMap.getMessageFromMapAndDelete(id);
+        if(o == null) {
+            System.out.println("Message: " + id + " not found");
+        }
         return o;
     }
 
-    //Message message = new Message();
-    //message.getMessageProperties().getCorrelationId();
-
-    /*
-    @RabbitListener(queues = "q1")
-    public Object processQueue1(Object message) {
-        System.out.println("Listen q1. msg = " + (String)message);
-        return message;
-    }
-    @RabbitListener(queues = "q2")
-    public Object processQueue2(Object message) {
-        System.out.println("Listen q2. msg = " + (String)message);  //without unpacking
-        return message;
-    }
-    */
+    //_V1
+    /*public Object listen(){
+        Object o = rabbitTemplate.receiveAndConvert("q2");
+        System.out.println("Listen to q2. msg = " + (String)o);
+        return o;
+    }*/
 }

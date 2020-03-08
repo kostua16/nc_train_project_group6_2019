@@ -1,7 +1,13 @@
 package com.edunetcracker.billingservice.ProxyValidator.validator;
 
 
+import com.edunetcracker.billingservice.ProxyValidator.cipher.Cipher;
 import com.edunetcracker.billingservice.ProxyValidator.entity.Account;
+import com.edunetcracker.billingservice.ProxyValidator.entity.TestClassData;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.lang.NonNull;
@@ -17,7 +23,15 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
@@ -34,7 +48,7 @@ public class ValidatorController {
         return "http://"+ hostProxy + ":" + portProxy;
     }
 
-    private ResponseEntity returnResponseFromUrl (String url){
+    private  ResponseEntity returnResponseFromUrl (String url) {
         ResponseEntity<Long> responsePoxy = null;
         try {
             responsePoxy = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
@@ -64,6 +78,55 @@ public class ValidatorController {
         //обращение к proxy
         final String urlDataBase = getUrlProxy() + "/proxy/getBalanceWithRabbitMessage/"+"?id="+ + id + "&message="+optionMessage;
         return returnResponseFromUrl(urlDataBase);
+    }
+
+    /**
+     * DomainName/validator/getMessageWithTestClassData/?message=ThisIsAMessage
+     * @param message - Message
+     * @return String message
+     */
+    @GetMapping("/validator/getMessageWithTestClassData/")
+    public ResponseEntity<String> getMessageWithTestClassData(@RequestParam("message") String message) {
+        //обращение к proxy
+        TestClassData testClassData = new TestClassData();
+        testClassData.a = message;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String urlDataBase;
+        try {
+            //  Create JSON (String) from Class,
+            //  and serializing a string
+            //  Class => StringJSON => String
+            String code = Cipher.enCode(objectMapper.writeValueAsString(testClassData));
+            //  Connection Message to URL Param
+            urlDataBase = getUrlProxy() + "/proxy/getMessageWithTestClassData/"+"?object="+code;
+            //  Getting a response
+            ResponseEntity<TestClassData> responsePoxy = null;
+            try {
+
+                responsePoxy = new RestTemplate().exchange(urlDataBase, HttpMethod.GET, new HttpEntity(new HttpHeaders()), TestClassData.class);
+
+                return new ResponseEntity<String>(responsePoxy.getBody().a, responsePoxy.getStatusCode());
+
+            } catch (HttpClientErrorException.NotFound e){
+
+                return new ResponseEntity<String>((String)null, HttpStatus.NOT_FOUND);
+            }
+            catch (HttpClientErrorException e){
+                e.printStackTrace();
+                return new ResponseEntity<String>((String) null, HttpStatus.NOT_FOUND);
+            }
+
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<String>((String) null, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConstraintViolationException.class) //@ExceptionHandler({1.class, 2.class, 3.class}) //для нескольких исключений
