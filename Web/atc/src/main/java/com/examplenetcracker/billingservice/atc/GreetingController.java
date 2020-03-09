@@ -15,4 +15,4 @@ public class GreetingController {
         return "greeting"; // возвращает html файлу с данным название
     }
 
-}
+}//автоваер на конструкторе
