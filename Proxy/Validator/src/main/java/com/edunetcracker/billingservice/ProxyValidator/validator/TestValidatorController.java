@@ -36,7 +36,7 @@ import java.util.UUID;
 
 @RestController
 @Validated
-public class ValidatorController {
+public class TestValidatorController {
 
     @Value("${app.proxy_proxy.host}")
     String hostProxy = "localhost";
@@ -81,7 +81,7 @@ public class ValidatorController {
     }
 
     /**
-     * DomainName/validator/getMessageWithTestClassData/?message=ThisIsAMessage
+     * http://localhost:8101/validator/getMessageWithTestClassData/?message=ThisIsAMessage
      * @param message - Message
      * @return String message
      */

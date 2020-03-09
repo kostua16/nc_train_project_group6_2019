@@ -12,14 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 
 @RestController
-public class ProxyController {
+public class TestProxyController {
 
     @Autowired
     RabbitMQSender rabbitMQSender;
@@ -67,7 +64,7 @@ public class ProxyController {
                 System.out.println("Я получить ID! " + mesId);
             }
 
-            Object o = rabbitMQListener.listen(mesId);
+            Object o = rabbitMQListener.listenWithMessageID(mesId);
 
             if(o!= null){
                 System.out.println("Я получить ответ! " +(String)o);
@@ -115,7 +112,7 @@ public class ProxyController {
                 System.out.println("Message ID: " + messageId);
                 //  Listen Rabbit
                 //  Listen "34fsagj=="
-                Object responseObjectMessage = rabbitMQListener.listen(messageId);
+                Object responseObjectMessage = rabbitMQListener.listenWithMessageID(messageId);
 
                 if(responseObjectMessage!=null) {
 

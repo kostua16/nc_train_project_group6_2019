@@ -1,5 +1,6 @@
 package com.edunetcracker.billingservice.ProxyProxy.rabbit;
 
+import com.edunetcracker.billingservice.ProxyProxy.cipher.Cipher;
 import com.edunetcracker.billingservice.ProxyProxy.entity.TestClassData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Delivery;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Map;
 
 @EnableRabbit
@@ -54,7 +56,39 @@ public class RabbitMQListener {
         System.out.println("Message: " + s + " send to map");
     }
 
-    public Object listen(String id){
+    public RabbitMQMessage listen(String id){
+        System.out.println("Message listen. Id = " + id);
+        //  Get message with delayed
+        //  If it is not available, wait 5 sec
+        Object o = rabbitMQMap.getMessageFromMapAndDelete(id);
+        if(o == null) {
+            System.out.println("Message: " + id + " not found");
+        }
+
+        //  Decoding String to JSON,                    //1
+        //  and receive Message class from JSON         //2
+        //  String => JSON => Class
+        Object deCode = null;                           //1
+        try {
+            deCode = Cipher.deCode( (String)o);         //1
+            RabbitMQMessage responseMessage = objectMapper.readValue( (String)deCode, RabbitMQMessage.class); //2
+            return  responseMessage;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        return null;
+    }
+
+
+
+
+    //////////////////////////////////////////////////////
+
+    public Object listenWithMessageID(String id){
         System.out.println("Message listen. Id = " + id);
         //  Get message with delayed
         //  If it is not available, wait 5 sec
