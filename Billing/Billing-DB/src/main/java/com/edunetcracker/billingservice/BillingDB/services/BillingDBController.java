@@ -4,6 +4,7 @@ import com.edunetcracker.billingservice.BillingDB.entity.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -35,8 +36,8 @@ public class BillingDBController {
 
     @GetMapping(path = "byNumber/{NUMBER}", produces = APPLICATION_JSON_VALUE)
     @Async
-    public CompletableFuture<ResponseEntity<Account>> getOneAccountByNumber(@PathVariable("NUMBER") @Valid @Min(100000) @NotNull Long number){
-        final Optional<Account> byNumber = repository.findByNumber(number);
+    public CompletableFuture<ResponseEntity<Account>> getOneAccountByNumber(@PathVariable("number") @Valid @Min(100000) @NotNull Long number){
+        final Optional<Account> byNumber = repository.findByNumber(number, PageRequest.of(0,2));
 
         if(logger.isDebugEnabled()){
             logger.debug("getOneAccountByNumber[number = {}, result = {}]", number, byNumber);
