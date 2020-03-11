@@ -1,0 +1,3 @@
+insert into ACCOUNT (NUMBER, BLOCK, BALANCE) values ('111111', '1', '-1000');
+insert into ACCOUNT (NUMBER, BLOCK, BALANCE) values ('222222', '0', '200');
+insert into ACCOUNT (NUMBER, BLOCK, BALANCE) values ('333333', '0', '110');
