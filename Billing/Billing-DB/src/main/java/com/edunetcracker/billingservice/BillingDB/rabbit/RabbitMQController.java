@@ -1,4 +1,4 @@
-package com.edunetcracker.billingservice.BillingApp.rabbit;
+package com.edunetcracker.billingservice.BillingDB.rabbit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ public class RabbitMQController {
     @Autowired
     RabbitMQSender rabbitMQSender;
 
-    // Возможно это должно быть в Billing DB
     @GetMapping("")
     public void getAccountInformation(@RequestParam("id") String stringId) {
 

@@ -1,4 +1,4 @@
-package com.edunetcracker.billingservice.BillingApp.rabbit;
+package com.edunetcracker.billingservice.BillingDB.rabbit;
 
 public interface RabbitMQMessageType {
     public static final String GET_ACCOUNT_INFORMATION ="GET_ACCOUNT_INFORMATION";

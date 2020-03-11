@@ -1,4 +1,4 @@
-package com.edunetcracker.billingservice.BillingApp.cipher;
+package com.edunetcracker.billingservice.BillingDB.cipher;
 
 import java.io.*;
 import java.util.Base64;

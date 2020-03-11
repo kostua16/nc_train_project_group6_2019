@@ -1,4 +1,4 @@
-package com.edunetcracker.billingservice.BillingApp.rabbit;
+package com.edunetcracker.billingservice.BillingDB.rabbit;
 
 import java.util.List;
 
