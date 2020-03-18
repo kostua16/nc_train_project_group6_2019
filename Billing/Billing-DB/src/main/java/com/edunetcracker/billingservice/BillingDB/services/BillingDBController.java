@@ -54,11 +54,11 @@ public class BillingDBController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Async
-    public CompletableFuture<ResponseEntity<AccountSearchResult>> searchBooks(@Valid SearchRequest request ){
+    public CompletableFuture<ResponseEntity<AccountSearchResult>> searchAccount(@Valid SearchRequest request ){
         AccountSearchResult result = new AccountSearchResult();
 
 
-        String searchType = request.getType("id");
+        String searchType = request.getType("number");
         String searchCriteria = request.getCriteria("contains");
         String searchQuery = request.getQuery();
         Pageable searchParameters = request.getPageParameters(searchType);
@@ -113,7 +113,7 @@ public class BillingDBController {
         }
 
         if(logger.isDebugEnabled()){
-            logger.debug("searchBooks[request = {}, result = {}]", request, result);
+            logger.debug("searchAccount[request = {}, result = {}]", request, result);
         }
 
         return CompletableFuture.completedFuture(SearchResult.responseEntity(result));
