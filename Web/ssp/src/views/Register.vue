@@ -9,13 +9,6 @@
             v-model.trim="email"
             :class="{invalid: ($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.email.email)}"
         >
-        <!--<input
-            id="email"
-            type="text"
-            v-model.trim="email" -trim убирает пробелы
-            :class="{класс для неправельности контрола invalid: ($v.email.$dirty и если не пустой)или($v.email.$dirty и это не имейл)}"
-            :class="{invalid: ($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.email.email)}"
-        > -->
         <label for="email">Email</label>
         <small
          class="helper-text invalid"
@@ -110,4 +103,3 @@ export default {
   }
 }
 </script>
-

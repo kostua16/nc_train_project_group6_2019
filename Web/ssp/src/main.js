@@ -9,8 +9,10 @@ import '../node_modules/materialize-css/dist/js/materialize'
 Vue.config.productionTip = false
 Vue.use(Vuelidate)
 
+
 new Vue({
   router,
   store,
   render: h => h(App)
 }).$mount('#app')
+
