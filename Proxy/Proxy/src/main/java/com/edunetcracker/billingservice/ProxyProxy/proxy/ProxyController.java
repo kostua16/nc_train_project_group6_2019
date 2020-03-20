@@ -1,10 +1,8 @@
 package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
-import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
+import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -16,15 +14,8 @@ public class ProxyController {
     @Autowired
     RabbitMQSender rabbitMQSender;
 
-    @Value("${app.billing.host}")
-    private String hostBilling = "localhost";
-
-    @Value("${app.billing.port}")
-    private String portBilling = "8080";
-
-    private String getUrlBilling (){
-        return "http://"+ hostBilling + ":" + portBilling;
-    }
+    @Autowired
+    private Helpers helpers;
 
     // request => response
     private ResponseEntity returnResponseFromUrl (String url) {
@@ -47,7 +38,7 @@ public class ProxyController {
 
     @GetMapping("/isConnect")
     public ResponseEntity<String> isConnect() {
-        String url = getUrlBilling() + "/isConnect";
+        String url = helpers.getUrlBilling() + "/isConnect";
         ResponseEntity<String> stringResponseEntity;
         String response = "Proxy response. ";
         try {
@@ -60,6 +51,7 @@ public class ProxyController {
 
     }
 
+    /*
     @GetMapping("/getAccount")
     public ResponseEntity<Account> getAccount(@RequestParam("id") Long id) {
 
@@ -77,4 +69,32 @@ public class ProxyController {
         rabbitMQSender.send(account);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @GetMapping("getTTT")
+    public Account getTTT() {
+
+        Account account = new Account();
+        account.number = 10l;
+        account.block = 1000l;
+        account.balance = 1000000l;
+        String url = "http://localhost:8102/qqq";
+        try {
+            ResponseEntity<Account> response = new RestTemplate().exchange(url, HttpMethod.PUT, new HttpEntity<>(account, new HttpHeaders()), Account.class);
+
+            Account responseAcc = response.getBody();
+            return responseAcc;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+    @PutMapping("qqq")
+    public Account qqqGetTTT(@RequestBody Account account) {
+
+        Account acc = account;
+        return acc;
+    }
+     */
 }

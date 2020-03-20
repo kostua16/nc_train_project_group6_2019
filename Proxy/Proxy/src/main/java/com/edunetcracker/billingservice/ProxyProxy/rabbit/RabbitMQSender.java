@@ -17,8 +17,8 @@ public class RabbitMQSender {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    //@Autowired
-    //ObjectMapper objectMapper;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Value("${rabbit.rabbitmq.queue2}")
     private String queue;
@@ -41,6 +41,16 @@ public class RabbitMQSender {
         */
         ///
         this.rabbitTemplate.convertAndSend(queue, o);
+    }
+    public void send(Object o, String messageType) throws JsonProcessingException {
+
+        String orderJson = objectMapper.writeValueAsString(o);
+        Message mes = MessageBuilder
+                .withBody(orderJson.getBytes())
+                .setContentType(MessageProperties.CONTENT_TYPE_JSON)
+                .setHeader(messageType, String.class)
+                .build();
+        this.rabbitTemplate.convertAndSend(queue, mes);
     }
 
 }
