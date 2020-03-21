@@ -1,4 +1,4 @@
-package com.examplenetcracker.billingservice.atc;
+package com.edunetcracker.billingservice.atc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

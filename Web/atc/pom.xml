@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.example-netcracker.billing-service</groupId>
+		<groupId>com.edu-netcracker.billing-service</groupId>
 		<artifactId>web</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../</relativePath>
@@ -21,6 +21,13 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.edu-netcracker.billing-service</groupId>
+			<artifactId>ssp</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
 		</dependency>
 
 		<dependency>

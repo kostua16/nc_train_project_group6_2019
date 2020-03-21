@@ -3,17 +3,19 @@
     <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.example-netcracker.billing-service</groupId>
+    <groupId>com.edu-netcracker.billing-service</groupId>
     <artifactId>web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
+
 
   <artifactId>ssp</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>ssp</name>
   <description>эмуляция станции</description>
   <packaging>jar</packaging>
+  
   <properties>
     <node.version>v12.14.0</node.version>
     <npm.version>3.5.3</npm.version>
