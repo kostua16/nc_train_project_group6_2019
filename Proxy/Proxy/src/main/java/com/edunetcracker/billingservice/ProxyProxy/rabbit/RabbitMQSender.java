@@ -42,6 +42,7 @@ public class RabbitMQSender {
         ///
         this.rabbitTemplate.convertAndSend(queue, o);
     }
+
     public void send(Object o, String messageType) throws JsonProcessingException {
 
         String orderJson = objectMapper.writeValueAsString(o);

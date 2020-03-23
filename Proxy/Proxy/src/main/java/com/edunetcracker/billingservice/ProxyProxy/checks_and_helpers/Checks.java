@@ -1,6 +1,7 @@
 package com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers;
 
 import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Tariff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,12 +42,25 @@ public class Checks {
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
             if (account == null) {
                 return true;
-            }
-            else{
+            } else {
                 return null;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        catch (Exception e) {
+    }
+
+    public Boolean isTariffExists(String tariffName) {
+        try {
+            String url = helpers.getUrlProxy() + "/getTariff/?name=" + tariffName;
+            Tariff tariff  = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Tariff.class).getBody();
+            if (tariff == null) {
+                return true;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -58,26 +72,79 @@ public class Checks {
             String url = helpers.getUrlProxy() + "/getBalance/?login=" + accountLogin;
             ResponseEntity<Long> responseBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
 
-            if(responseBalance.getBody()+amount >= 0L) {
+            if (responseBalance.getBody() + amount >= 0L) {
                 return true;
             }
 
             return false;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public Boolean canAccountCall(Long accountBalance, Long costCall) {
+    public Boolean canUseMoneyTransactions(Long accountBalance, Long cost) {
 
-
-        if(accountBalance - costCall >= 0L){
+        if (accountBalance - cost >= 0L) {
             return true;
         }
         return false;
     }
 
+    /**
+     * нехватка ресурса по тарифу
+     * accountResourceBalance - limit
+     * return 0 if all OK
+     */
+    public Long lackResources(Long accountResourceBalance, Long resources, Float costResource) {
+
+        long lackResources = (long) (resources * costResource) - accountResourceBalance;
+
+        if (lackResources > 0) {  // <, если бы из баланса вычитали
+            return lackResources;
+        }
+        return 0L;
+
+    }
+
+    //  если известно, что ресурс = 1
+    public Long lackResources(Long accountResourceBalance, Long costResource) {
+
+        long lackResources = costResource - accountResourceBalance;
+
+        if (lackResources > 0) {  // <, если бы из баланса вычитали
+            return lackResources;
+        }
+        return 0L;
+
+    }
+
+    /**
+     * нехватка ресурса по тарифу
+     * return 0 if all OK
+     */
+    public Long lackBalance(Long lackResources, Long accountBalance, Float defaultCostResource) {
+
+        //  если нехватка баланса
+        Long result = (long) (lackResources * defaultCostResource) - accountBalance;
+        if (result > 0L) {    // <, если бы из баланса вычитали
+            //  если нехватка баланса, возвращает нехватающую сумму
+            return result;
+        }
+        return 0L;
+
+    }
+
+    public Long lackBalance(Long lackResources, Long accountBalance, Long defaultCostResource) {
+
+        //  если нехватка баланса
+        Long result = lackResources * defaultCostResource - accountBalance;
+        if (result > 0L) {    // <, если бы из баланса вычитали
+            //  если нехватка баланса, возвращает нехватающую сумму
+            return result;
+        }
+        return 0L;
+
+    }
 
 }

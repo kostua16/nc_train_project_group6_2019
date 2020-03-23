@@ -21,12 +21,12 @@ public class Helpers {
 
 
     /*************helpers**************/
-    public String getUrlBilling (){
-        return "http://"+ hostBilling + ":" + portBilling;
+    public String getUrlBilling() {
+        return "http://" + hostBilling + ":" + portBilling;
     }
 
-    public String getUrlProxy (){
-        return "http://"+ hostProxy + ":" + portProxy;
+    public String getUrlProxy() {
+        return "http://" + hostProxy + ":" + portProxy;
     }
 
 

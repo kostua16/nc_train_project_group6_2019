@@ -37,17 +37,15 @@ public class BalanceController {
                     ResponseEntity responseBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
 
                     return new ResponseEntity<>((Long) responseBalance.getBody(), HttpStatus.OK);
-                }
-                else {
-                    return new ResponseEntity<>((Long) null,HttpStatus.NOT_FOUND);
+                } else {
+                    return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
                 }
             } else {
                 return new ResponseEntity<>((Long) null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>((Long) null ,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>((Long) null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
 
@@ -55,7 +53,7 @@ public class BalanceController {
 
     // add +/- amount
     @PutMapping("addToBalance")
-    public ResponseEntity<Boolean> updateAccount(@RequestParam("login") String login,
+    public ResponseEntity<Boolean> addToBalance(@RequestParam("login") String login,
                                                  @RequestParam("amount") Long amount) {
         try {
             Boolean accountExists = checks.isAccountExists(login);
@@ -63,23 +61,20 @@ public class BalanceController {
             // если существует, то добавить
             if (accountExists) {
                 // если можно +/-
-                if(checks.isAddAmountFeasible(login, amount)) {
+                if (checks.isAddAmountFeasible(login, amount)) {
                     rabbitMQSender.send(amount, RabbitMQMessageType.ADD_BALANCE);
                     return new ResponseEntity<>(true, HttpStatus.OK);
                 }
                 return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
-            }
-            else {
+            } else {
                 return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
-
 
 
 }

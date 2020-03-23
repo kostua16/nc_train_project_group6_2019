@@ -18,16 +18,15 @@ public class ProxyController {
     private Helpers helpers;
 
     // request => response
-    private ResponseEntity returnResponseFromUrl (String url) {
+    private ResponseEntity returnResponseFromUrl(String url) {
         try {
             ResponseEntity<String> responsePoxy = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), String.class);
             return new ResponseEntity<>(responsePoxy.getBody(), responsePoxy.getStatusCode());
 
-        } catch (HttpClientErrorException.NotFound e){
-            return new ResponseEntity<>((String)null, HttpStatus.NOT_FOUND);
-        }
-        catch (HttpClientErrorException e){
-            return new ResponseEntity<>((String)null, HttpStatus.NOT_FOUND);
+        } catch (HttpClientErrorException.NotFound e) {
+            return new ResponseEntity<>((String) null, HttpStatus.NOT_FOUND);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>((String) null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -44,8 +43,7 @@ public class ProxyController {
         try {
             stringResponseEntity = returnResponseFromUrl(url);
             return new ResponseEntity<String>((response + stringResponseEntity.getBody()), HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<String>(("Only " + response), HttpStatus.OK);
         }
 

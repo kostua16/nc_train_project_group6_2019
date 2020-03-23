@@ -27,7 +27,7 @@ public class LoginController {
     @GetMapping("login")
     public ResponseEntity<String> login(@RequestParam("login") String login/*,
                                         @RequestParam("password") String password*/) {
-        try{
+        try {
             String url = helpers.getUrlProxy() + "/getAccount/?login=" + login;// + "&password=" + password;
 
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
@@ -46,8 +46,7 @@ public class LoginController {
             } else {
                 return new ResponseEntity<>((String) null, HttpStatus.NOT_FOUND);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>((String) null, HttpStatus.INTERNAL_SERVER_ERROR);  //500
         }

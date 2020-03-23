@@ -39,24 +39,22 @@ public class AccountController {
                     ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
 
                     return new ResponseEntity<>((Account) responseAccount.getBody(), HttpStatus.OK);
-                }
-                else {
-                    return new ResponseEntity<>((Account) null,HttpStatus.NOT_FOUND);
+                } else {
+                    return new ResponseEntity<>((Account) null, HttpStatus.NOT_FOUND);
                 }
             } else {
                 return new ResponseEntity<>((Account) null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>((Account) null ,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>((Account) null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
 
     }
 
     @PostMapping("createAccount")
-    public ResponseEntity<Boolean> createAccount (@RequestBody Account account) {
+    public ResponseEntity<Boolean> createAccount(@RequestBody Account account) {
         try {
             //существует или нет
             Boolean accountExists = checks.isAccountExists(account.getLogin());
@@ -66,16 +64,14 @@ public class AccountController {
                 if (accountExists) {
                     return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 
-                }
-                else {
+                } else {
                     rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
                     return new ResponseEntity<>(true, HttpStatus.CREATED);
                 }
             } else {
                 return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -83,11 +79,11 @@ public class AccountController {
 
     @PutMapping("updateAccount")
     public ResponseEntity<Boolean> updateAccount(@RequestParam("login") String login,
-                                                @RequestBody Account newAccountData) {
+                                                 @RequestBody Account newAccountData) {
         try {
             Boolean accountExists = checks.isAccountExists(login);
 
-            newAccountData.setLogin(login);// не всякий случай
+            newAccountData.setLogin(login);// на всякий случай
 
             // если существует, то обновить
             if (accountExists) {
@@ -96,12 +92,10 @@ public class AccountController {
                 //return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
                 rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
                 return new ResponseEntity<>(true, HttpStatus.OK);
-            }
-            else {
+            } else {
                 return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -109,7 +103,7 @@ public class AccountController {
     }
 
     @DeleteMapping("deleteAccount")
-    public ResponseEntity<Boolean> deleteAccount(@RequestParam("login") String login){
+    public ResponseEntity<Boolean> deleteAccount(@RequestParam("login") String login) {
 
         try {
             Boolean accountExists = checks.isAccountExists(login);
@@ -124,14 +118,11 @@ public class AccountController {
             } else {
                 return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 
 
 }

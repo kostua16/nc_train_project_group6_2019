@@ -27,46 +27,95 @@ public class CallController {
     public ResponseEntity<Boolean> callToMinutes(@RequestParam("login") String login) {
         try {
             ////
-            String url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
-            Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
-            ////
-            url = helpers.getUrlProxy() + "/callCost/?login=" + login;
-            Long accountCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+            String url;
 
-            // есди звонить может
-            if(checks.canAccountCall(accountBalance, accountCallCost)) {
-                rabbitMQSender.send(login, RabbitMQMessageType.CALL);
-                return new ResponseEntity<>(true , HttpStatus.OK);
+            url = helpers.getUrlProxy() + "/callBalance/?login=" + login;
+            Long accountResourceBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+
+            url = helpers.getUrlProxy() + "/callCost/?login=" + login;
+            Float accountCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+
+            Long lackResources = checks.lackResources(accountResourceBalance, 60L, accountCallCost);
+
+            // если закончились средства тарифа
+            if (lackResources > 0L) {
+                url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
+                Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+                ////
+                url = helpers.getUrlProxy() + "/defaultCallCost/?login=" + login;
+                Float defaultCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+
+                Long debt = checks.lackBalance(lackResources, accountBalance, defaultCallCost);
+                //  если деньги есть
+                // возможно стоит послать два сообщения кролику на использование
+                // доступных ресурсов и использование чистого баланса клиента
+                if (debt == 0L) {
+                    rabbitMQSender.send(login, RabbitMQMessageType.CALL_ONE_MINUTE);
+                    return new ResponseEntity<>(true, HttpStatus.OK);
+                }
+
             }
             rabbitMQSender.send(login, RabbitMQMessageType.STOP_CALL);
-            return new ResponseEntity<>(false , HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>((Boolean) null , HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>((Boolean) null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
 
 
     }
+
+    //  цена единицы звонка по тарифу
     @GetMapping("callCost")
-    public ResponseEntity<Long> callCost(@RequestParam("login") String login) {
+    public ResponseEntity<Float> callCost(@RequestParam("login") String login) {
         try {
             String url = helpers.getUrlBilling() + "/callCost/?login=" + login;
-            ResponseEntity<Long> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
-            if(responseCallCost != null) {
-                return new ResponseEntity<>(responseCallCost.getBody() , responseCallCost.getStatusCode());
+            ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
+            if (responseCallCost != null) {
+                return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
             }
-            return new ResponseEntity<>((Long) null , HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
+            return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>((Long) null , HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>((Float) null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
+    //  цена единицы звонка без тарифа
+    @GetMapping("defaultCallCost")
+    public ResponseEntity<Float> defaultCallCost(@RequestParam("login") String login) {
+        try {
+            String url = helpers.getUrlBilling() + "/defaultCallCost/?login=" + login;
+            ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
+            if (responseCallCost != null) {
+                return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
+            }
+            return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>((Float) null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
+
+    }
+
+    //  количество доступных единиц звонка
+    @GetMapping("callBalance")
+    public ResponseEntity<Long> callBalance(@RequestParam("login") String login) {
+        try {
+            String url = helpers.getUrlBilling() + "/callBalance/?login=" + login;
+            ResponseEntity<Long> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
+            if (responseCallCost != null) {
+                return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
+            }
+            return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>((Long) null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 
 }
