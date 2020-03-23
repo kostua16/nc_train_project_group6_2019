@@ -1,25 +1,31 @@
 package com.edunetcracker.billingservice.ProxyValidator.entity;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 public class Account {
 
-    @Size(min = 0)
-    @NotNull
-    private Long id = null;
-    @NotNull
+    private String login = null;
+
+    private String password = null;
+
     private String name = null;
-    @NotNull
+
     private Long balance = null;
 
 
-    public Long getId() {
-        return id;
+    ///////////////////////////////////////
+    public String getLogin() {
+        return login;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getName() {
@@ -37,4 +43,5 @@ public class Account {
     public void setBalance(Long balance) {
         this.balance = balance;
     }
+
 }

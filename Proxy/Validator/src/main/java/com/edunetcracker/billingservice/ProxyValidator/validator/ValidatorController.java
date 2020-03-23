@@ -56,7 +56,7 @@ public class ValidatorController {
         else return "Only " + response;
     }
 
-    @GetMapping("/getAccount")
+    /*@GetMapping("/getAccount")
     public ResponseEntity<Account> getAccount(@RequestParam ("id") @Min(1) @NotNull Long id) {
 
         String url = getUrlProxy() + "/getAccount?id=" + id;
@@ -72,7 +72,7 @@ public class ValidatorController {
             e.printStackTrace();
             return new ResponseEntity<Account>((Account) null, HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
     /*
     @PostMapping("/postAccount")
     public void postAccount(@RequestParam ("id") @Min(1) @NotNull Long id,
@@ -84,12 +84,12 @@ public class ValidatorController {
     }
     */
     //?
-    @GetMapping("/postAccount")
+    /*@GetMapping("/postAccount")
     public ResponseEntity postAccount(@RequestParam("account") @Validated Account account) {
         String url = getUrlProxy() + "/postAccount?account=" + account;
         new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
+    }*/
 
     //переопределиние реагирования на ошибку BAD_REQUEST
     @ExceptionHandler(ConstraintViolationException.class) //@ExceptionHandler({1.class, 2.class, 3.class}) //для нескольких исключений
