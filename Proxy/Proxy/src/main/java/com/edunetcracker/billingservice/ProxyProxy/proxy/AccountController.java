@@ -35,6 +35,7 @@ public class AccountController {
             if (accountExists != null) {
                 if (accountExists) {
                     //String url = getUrlBilling() + "/getAccount/?login=" + login + "&password=" + password;
+                    //TODO GET
                     String url = helpers.getUrlBilling() + "/getAccount/?login=" + login;
                     ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
 
@@ -65,6 +66,7 @@ public class AccountController {
                     return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 
                 } else {
+                    //TODO RABBIT
                     rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
                     return new ResponseEntity<>(true, HttpStatus.CREATED);
                 }
@@ -90,6 +92,7 @@ public class AccountController {
                 //String url = helpers.getUrlBilling() + "/updateAccount";
                 //ResponseEntity<Boolean> isExist = new RestTemplate().exchange(url, HttpMethod.PUT, new HttpEntity<>(newAccountData, new HttpHeaders()), Boolean.class);
                 //return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
+                //TODO RABBIT
                 rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
                 return new ResponseEntity<>(true, HttpStatus.OK);
             } else {
@@ -113,6 +116,7 @@ public class AccountController {
 //                String url = helpers.getUrlBilling() + "/deleteAccount";
 //                ResponseEntity<Boolean> isExist = new RestTemplate().exchange(url, HttpMethod.DELETE, new HttpEntity(new HttpHeaders()), Boolean.class);
 //                return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
+                //TODO RABBIT
                 rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
                 return new ResponseEntity<>(true, HttpStatus.OK);
             } else {

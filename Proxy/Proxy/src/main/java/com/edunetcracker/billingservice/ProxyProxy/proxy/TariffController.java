@@ -34,6 +34,7 @@ public class TariffController {
             //да - получить, нет - ошибка
             if (accountExists != null) {
                 if (accountExists) {
+                    //TODO GET
                     String url = helpers.getUrlBilling() + "/getTariff/?name=" + name;
                     ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Tariff.class);
 
@@ -64,6 +65,7 @@ public class TariffController {
                     return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 
                 } else {
+                    //TODO RABBIT
                     rabbitMQSender.send(tariff, RabbitMQMessageType.CREATE_TARIFF);
                     return new ResponseEntity<>(true, HttpStatus.CREATED);
                 }
@@ -86,6 +88,7 @@ public class TariffController {
 
             // если существует, то обновить
             if (tariffExists) {
+                //TODO RABBIT
                 rabbitMQSender.send(newTariff, RabbitMQMessageType.UPDATE_TARIFF);
                 return new ResponseEntity<>(true, HttpStatus.OK);
             } else {
@@ -106,6 +109,7 @@ public class TariffController {
 
             // если существует, то удалить
             if (tariffExists) {
+                //TODO RABBIT
                 rabbitMQSender.send(name, RabbitMQMessageType.DELETE_TARIFF);
                 return new ResponseEntity<>(true, HttpStatus.OK);
             } else {

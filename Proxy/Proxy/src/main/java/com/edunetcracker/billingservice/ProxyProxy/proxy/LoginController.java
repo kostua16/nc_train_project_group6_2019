@@ -29,7 +29,7 @@ public class LoginController {
                                         @RequestParam("password") String password*/) {
         try {
             String url = helpers.getUrlProxy() + "/getAccount/?login=" + login;// + "&password=" + password;
-
+            //TODO GET
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
             //  если account есть
             if (account != null) {

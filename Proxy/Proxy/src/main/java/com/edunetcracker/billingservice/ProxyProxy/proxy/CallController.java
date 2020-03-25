@@ -50,6 +50,7 @@ public class CallController {
                 // возможно стоит послать два сообщения кролику на использование
                 // доступных ресурсов и использование чистого баланса клиента
                 if (debt == 0L) {
+                    //TODO RABBIT
                     rabbitMQSender.send(login, RabbitMQMessageType.CALL_ONE_MINUTE);
                     return new ResponseEntity<>(true, HttpStatus.OK);
                 }
@@ -70,6 +71,7 @@ public class CallController {
     @GetMapping("callCost")
     public ResponseEntity<Float> callCost(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/callCost/?login=" + login;
             ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
             if (responseCallCost != null) {
@@ -87,6 +89,7 @@ public class CallController {
     @GetMapping("defaultCallCost")
     public ResponseEntity<Float> defaultCallCost(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/defaultCallCost/?login=" + login;
             ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
             if (responseCallCost != null) {
@@ -105,6 +108,7 @@ public class CallController {
     @GetMapping("callBalance")
     public ResponseEntity<Long> callBalance(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/callBalance/?login=" + login;
             ResponseEntity<Long> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
             if (responseCallCost != null) {

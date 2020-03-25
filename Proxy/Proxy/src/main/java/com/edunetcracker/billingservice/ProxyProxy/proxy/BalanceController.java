@@ -33,6 +33,7 @@ public class BalanceController {
             //да - получить, нет - ошибка
             if (accountExists != null) {
                 if (accountExists) {
+                    //TODO GET
                     String url = helpers.getUrlBilling() + "/getBalance/?login=" + login;
                     ResponseEntity responseBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
 
@@ -62,6 +63,7 @@ public class BalanceController {
             if (accountExists) {
                 // если можно +/-
                 if (checks.isAddAmountFeasible(login, amount)) {
+                    //TODO RABBIT
                     rabbitMQSender.send(amount, RabbitMQMessageType.ADD_BALANCE);
                     return new ResponseEntity<>(true, HttpStatus.OK);
                 }

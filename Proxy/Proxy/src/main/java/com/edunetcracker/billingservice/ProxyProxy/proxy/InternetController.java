@@ -53,6 +53,7 @@ public class InternetController {
                 // возможно стоит послать два сообщения кролику на использование
                 // доступных ресурсов и использование чистого баланса клиента
                 if (debt == 0L) {
+                    //TODO RABBIT
                     rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
                     return new ResponseEntity<>(true, HttpStatus.OK);
                 }
@@ -73,6 +74,7 @@ public class InternetController {
     @GetMapping("internetCost")
     public ResponseEntity<Float> internetCost(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/internetCost/?login=" + login;
             ResponseEntity<Float> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
             if (response != null) {
@@ -90,6 +92,7 @@ public class InternetController {
     @GetMapping("defaultInternetCost")
     public ResponseEntity<Float> defaultInternetCost(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/defaultInternetCost/?login=" + login;
             ResponseEntity<Float> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
             if (response != null) {
@@ -108,6 +111,7 @@ public class InternetController {
     @GetMapping("internetBalance")
     public ResponseEntity<Long> internetBalance(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/internetBalance/?login=" + login;
             ResponseEntity<Long> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
             if (response != null) {

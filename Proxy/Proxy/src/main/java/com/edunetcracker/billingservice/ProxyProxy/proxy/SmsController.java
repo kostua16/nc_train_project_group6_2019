@@ -70,6 +70,7 @@ public class SmsController {
     @GetMapping("smsCost")
     public ResponseEntity<Float> smsCost(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/smsCost/?login=" + login;
             ResponseEntity<Float> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
             if (response != null) {
@@ -87,6 +88,7 @@ public class SmsController {
     @GetMapping("defaultSMSCost")
     public ResponseEntity<Float> defaultSMSCost(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/defaultSMSCost/?login=" + login;
             ResponseEntity<Float> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
             if (response != null) {
@@ -105,6 +107,7 @@ public class SmsController {
     @GetMapping("smsBalance")
     public ResponseEntity<Long> smsBalance(@RequestParam("login") String login) {
         try {
+            //TODO GET
             String url = helpers.getUrlBilling() + "/smsBalance/?login=" + login;
             ResponseEntity<Long> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
             if (response != null) {
