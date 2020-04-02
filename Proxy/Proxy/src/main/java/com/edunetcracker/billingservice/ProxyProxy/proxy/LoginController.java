@@ -1,7 +1,10 @@
 package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
+import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Login;
+import com.edunetcracker.billingservice.ProxyProxy.session.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,64 +20,67 @@ public class LoginController {
     //@Autowired
     //private RabbitMQSender rabbitMQSender;
 
-    //@Autowired
-    //private SessionService sessionService;
+    @Autowired
+    private SessionService sessionService;
 
     @Autowired
     private Helpers helpers;
 
+    @Autowired
+    private Checks checks;
+
     //  return session "id"
     @GetMapping("login")
-    public ResponseEntity<String> login(@RequestParam("login") String login/*,
-                                        @RequestParam("password") String password*/) {
+    public ResponseEntity<String> login(@RequestParam("login") String login,
+                                        @RequestParam("password") String password) {
         try {
-            String url = helpers.getUrlProxy() + "/getAccount/?login=" + login;// + "&password=" + password;
-            //TODO GET
-            Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
-            //  если account есть
-            if (account != null) {
-                String session = UUID.randomUUID().toString();
-                return new ResponseEntity<>(session, HttpStatus.OK);
+            if(checks.isAccountExists(login)) {//если есть аккаунт
+                if (new Login(login, password) == getAccountLoginAndPassword(login)) {//если правильный пароль
 
-               /* String session = sessionService.newSession(new Login(login, password));
-
-                //да - если пользователь ещё не вошёл
-                if(session != null) {
+                    String session = sessionService.newSession(new Login(login, password));
                     return new ResponseEntity<>(session, HttpStatus.OK);
+
                 }
-                return new ResponseEntity<>((String) null, HttpStatus.INTERNAL_SERVER_ERROR);*/
-            } else {
-                return new ResponseEntity<>((String) null, HttpStatus.NOT_FOUND);
+                else return new ResponseEntity<>((String) null, HttpStatus.NOT_FOUND);
             }
+            else return new ResponseEntity<>((String) null, HttpStatus.NOT_FOUND);
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>((String) null, HttpStatus.INTERNAL_SERVER_ERROR);  //500
         }
-
-
     }
-    /*
-    //  return authorization status (true/false)
-    @GetMapping("authorize")
-    public ResponseEntity<Boolean> authorize (@RequestParam("login") String login,
-                                              @RequestParam("password") String password) {
-        try{
-            String url = helpers.getUrlBilling() + "/authorize/?login=" + login + "&password=" + password;
-            //  должен вернуть
-            Boolean is = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
 
-            if (is != null) {
-                return new ResponseEntity<>(is, HttpStatus.OK); //200
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR); //404
+    @GetMapping("logout")
+    public ResponseEntity<Boolean> logout(@RequestParam("token") String token) {
+        try {
+            if(sessionService.getLogin(token) != null) {
+                sessionService.deleteSession(token);
+                return new ResponseEntity<>( true, HttpStatus.OK);
             }
-        }
-        catch (Exception e){
+            else {
+                return new ResponseEntity<>( false, HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);  //500
+            return new ResponseEntity<>( false, HttpStatus.NOT_FOUND);
         }
     }
 
-    */
 
+    public Login getAccountLoginAndPassword(@RequestParam("login") String login) {
+        try {
+            //TODO
+            String url = helpers.getUrlBilling() + "/getAccount/?login=" + login;
+            ResponseEntity<Account> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
+            Login login1 = new Login(responseAccount.getBody().getLogin(),responseAccount.getBody().getPassword());
+            return login1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+
+    }
 }

@@ -5,6 +5,7 @@ import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
+import com.edunetcracker.billingservice.ProxyProxy.session.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,9 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class AccountController {
+
+    @Autowired
+    private SessionService sessionService;
 
     @Autowired
     private RabbitMQSender rabbitMQSender;
@@ -22,57 +26,62 @@ public class AccountController {
     @Autowired
     private Checks checks;
 
-
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     @GetMapping("getAccount")
-    public ResponseEntity<Account> getAccount(@RequestParam("login") String login /*,
-                                              @RequestParam("password") String password*/) {
+    public ResponseEntity<Account> getAccount(@RequestParam("token") String token ) {
         try {
-            //существует или нет
-            Boolean accountExists = checks.isAccountExists(login);
-            //да - получить, нет - ошибка
-            if (accountExists != null) {
-                if (accountExists) {
-                    //String url = getUrlBilling() + "/getAccount/?login=" + login + "&password=" + password;
+            if (sessionService.inSession(token)) {
+                String login = sessionService.getLogin(token).getLogin();
+
+                if (checks.isAccountExists(login)) {
                     //TODO GET
                     String url = helpers.getUrlBilling() + "/getAccount/?login=" + login;
                     ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
 
                     return new ResponseEntity<>((Account) responseAccount.getBody(), HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>((Account) null, HttpStatus.NOT_FOUND);
                 }
-            } else {
-                return new ResponseEntity<>((Account) null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            return new ResponseEntity<>((Account) null, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>((Account) null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping("getAccountForName")
+    public ResponseEntity<Account> getAccountForName(@RequestParam("token") String token,
+                                                     @RequestParam("login") String login ) {
+        try {
+            if(sessionService.inSession(token)) {
+                if (checks.isAccountExists(login)) {
+                    //TODO GET
+                    String url = helpers.getUrlBilling() + "/getAccount/?login=" + login;
+                    ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
 
-
+                    return new ResponseEntity<>((Account) responseAccount.getBody(), HttpStatus.OK);
+                }
+            }
+            return new ResponseEntity<>((Account) null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>((Account) null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("createAccount")
-    public ResponseEntity<Boolean> createAccount(@RequestBody Account account) {
+    public ResponseEntity<Boolean> createAccount(@RequestParam("token") String token,
+                                                 @RequestBody Account account) {
         try {
-            //существует или нет
-            Boolean accountExists = checks.isAccountExists(account.getLogin());
-
-            //да - ошибка, нет - создать
-            if (accountExists != null) {
-                if (accountExists) {
-                    return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
-
-                } else {
+            if(sessionService.inSession(token)) {
+                String login = sessionService.getLogin(token).getLogin();
+                if (checks.isAccountExists(login)) {
                     //TODO RABBIT
                     rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
                     return new ResponseEntity<>(true, HttpStatus.CREATED);
+
                 }
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,24 +89,21 @@ public class AccountController {
     }
 
     @PutMapping("updateAccount")
-    public ResponseEntity<Boolean> updateAccount(@RequestParam("login") String login,
+    public ResponseEntity<Boolean> updateAccount(@RequestParam("token") String token,
                                                  @RequestBody Account newAccountData) {
         try {
-            Boolean accountExists = checks.isAccountExists(login);
-
-            newAccountData.setLogin(login);// на всякий случай
-
-            // если существует, то обновить
-            if (accountExists) {
-                //String url = helpers.getUrlBilling() + "/updateAccount";
-                //ResponseEntity<Boolean> isExist = new RestTemplate().exchange(url, HttpMethod.PUT, new HttpEntity<>(newAccountData, new HttpHeaders()), Boolean.class);
-                //return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
-                //TODO RABBIT
-                rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
-                return new ResponseEntity<>(true, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+            if(sessionService.inSession(token)) {
+                String login = newAccountData.getLogin(); //sessionService.getLogin(token).getLogin();
+                if (checks.isAccountExists(login)) {
+                    //String url = helpers.getUrlBilling() + "/updateAccount";
+                    //ResponseEntity<Boolean> isExist = new RestTemplate().exchange(url, HttpMethod.PUT, new HttpEntity<>(newAccountData, new HttpHeaders()), Boolean.class);
+                    //return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
+                    //TODO RABBIT
+                    rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
+                    return new ResponseEntity<>(true, HttpStatus.OK);
+                }
             }
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -106,22 +112,39 @@ public class AccountController {
     }
 
     @DeleteMapping("deleteAccount")
-    public ResponseEntity<Boolean> deleteAccount(@RequestParam("login") String login) {
+    public ResponseEntity<Boolean> deleteAccount(@RequestParam("token") String token) {
 
         try {
-            Boolean accountExists = checks.isAccountExists(login);
-
-            // если существует, то удалить
-            if (accountExists) {
+            if(sessionService.inSession(token)) {
+                String login = sessionService.getLogin(token).getLogin();
+                if (checks.isAccountExists(login)) {
 //                String url = helpers.getUrlBilling() + "/deleteAccount";
 //                ResponseEntity<Boolean> isExist = new RestTemplate().exchange(url, HttpMethod.DELETE, new HttpEntity(new HttpHeaders()), Boolean.class);
 //                return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
-                //TODO RABBIT
-                rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
-                return new ResponseEntity<>(true, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+                    //TODO RABBIT
+                    rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
+                    return new ResponseEntity<>(true, HttpStatus.OK);
+                }
             }
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("deleteAccountForName")
+    public ResponseEntity<Boolean> deleteAccountForName(@RequestParam("token") String token,
+                                                        @RequestParam("login") String login ) {
+        try {
+            if(sessionService.inSession(token)) {
+                if (checks.isAccountExists(login)) {
+                    //TODO RABBIT
+                    rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
+                    return new ResponseEntity<>(true, HttpStatus.OK);
+                }
+            }
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);

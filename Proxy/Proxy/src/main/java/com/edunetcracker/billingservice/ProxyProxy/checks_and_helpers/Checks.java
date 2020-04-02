@@ -40,14 +40,13 @@ public class Checks {
         try {
             String url = helpers.getUrlProxy() + "/getAccount/?login=" + accountLogin;
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
-            if (account == null) {
-                return true;
-            } else {
-                return null;
-            }
+            if (account == null)
+                return false;
+
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 
@@ -55,14 +54,13 @@ public class Checks {
         try {
             String url = helpers.getUrlProxy() + "/getTariff/?name=" + tariffName;
             Tariff tariff  = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Tariff.class).getBody();
-            if (tariff == null) {
-                return true;
-            } else {
-                return null;
-            }
+            if (tariff == null)
+                return false;
+
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 
