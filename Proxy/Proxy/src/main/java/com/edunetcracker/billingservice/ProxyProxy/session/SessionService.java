@@ -15,23 +15,32 @@ public class SessionService {
 
     public String newSession(Login login) {
 
+        String session = generateSession();
         // если сессии для пользователя нет
         if (!loginMap.containsKey(login)) {
-            String session = generateSession();
             loginMap.put(login, session);
             sessionMap.put(session, login);
             return session;
         }
-
-        return null;
+        sessionMap.remove(loginMap.get(login));
+        loginMap.put(login, session);
+        sessionMap.put(session, login);
+        return session;
     }
 
     public String getSession(Login login) {
-        return loginMap.get(login);
+        if(loginMap.containsKey(login)) {
+            return loginMap.get(login);
+        }
+        return null;
+
     }
 
     public Login getLogin(String session) {
-        return sessionMap.get(session);
+        if(sessionMap.containsKey(session)) {
+            return sessionMap.get(session);
+        }
+        return null;
     }
 
     public void deleteSession(String session) {
@@ -42,6 +51,17 @@ public class SessionService {
         }
     }
 
+    public Boolean inSession(String session) {
+        return sessionMap.containsKey(session);
+    }
+    /*public Boolean isLogin(Login login, String session) {
+        Login login1 = getLogin(session);
+        if(login.getLogin() == login1.getLogin() &&
+                login.getPassword() == login1.getPassword() ) {
+            return  true;
+        }
+        return  false;
+    }*/
     private String generateSession() {
         //return UUID.randomUUID().toString() + UUID.randomUUID().toString();
         return UUID.randomUUID().toString();

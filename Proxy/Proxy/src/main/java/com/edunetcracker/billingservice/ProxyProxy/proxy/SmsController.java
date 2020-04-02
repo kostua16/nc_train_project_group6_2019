@@ -4,6 +4,7 @@ import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
+import com.edunetcracker.billingservice.ProxyProxy.session.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,9 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class SmsController {
+
+    @Autowired
+    private SessionService sessionService;
 
     @Autowired
     private RabbitMQSender rabbitMQSender;
@@ -26,34 +30,39 @@ public class SmsController {
     // +проверки на использование внепакетных услуг
     // + входит ли услуга в список доступных
     @GetMapping("requestSMS")
-    public ResponseEntity<Boolean> requestSMS(@RequestParam("login") String login) {
+    public ResponseEntity<Boolean> requestSMS(@RequestParam("token") String token) {
         try {
-            String url;
-            url = helpers.getUrlProxy() + "/smsBalance/?login=" + login;
-            Long smsBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+            if (sessionService.inSession(token)) {
+                String login = sessionService.getLogin(token).getLogin();
 
-            url = helpers.getUrlProxy() + "/smsCost/?login=" + login;
-            Float smsCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+                if (checks.isAccountExists(login)) {
+                    //String url = helpers.getUrlProxy() + "/smsBalance/?login=" + login;
+                    Long smsBalance = smsBalance(login).getBody();//new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
 
-            Long lackResources = checks.lackResources(smsBalance, smsCost.longValue());  //  resources = 1
+                    //url = helpers.getUrlProxy() + "/smsCost/?login=" + login;
+                    Float smsCost = smsCost(login).getBody(); //new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
 
-            // если закончились средства тарифа
-            if (lackResources > 0L) {
-                url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
-                Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
-                ////
-                url = helpers.getUrlProxy() + "/defaultSMSCost/?login=" + login;
-                Float defaultInternetCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+                    Long lackResources = checks.lackResources(smsBalance, smsCost.longValue());  //  resources = 1
 
-                Long debt = checks.lackBalance(lackResources, accountBalance, defaultInternetCost);
-                //  если деньги есть
-                // возможно стоит послать два сообщения кролику на использование
-                // доступных ресурсов и использование чистого баланса клиента
-                if (debt == 0L) {
-                    rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
-                    return new ResponseEntity<>(true, HttpStatus.OK);
+                    // если закончились средства тарифа
+                    if (lackResources > 0L) {
+                        String url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
+                        Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+                        ////
+                        //url = helpers.getUrlProxy() + "/defaultSMSCost/?login=" + login;
+                        Float defaultInternetCost = defaultSMSCost(login).getBody();//new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+
+                        Long debt = checks.lackBalance(lackResources, accountBalance, defaultInternetCost);
+                        //  если деньги есть
+                        // возможно стоит послать два сообщения кролику на использование
+                        // доступных ресурсов и использование чистого баланса клиента
+                        if (debt == 0L) {
+                            rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
+                            return new ResponseEntity<>(true, HttpStatus.OK);
+                        }
+
+                    }
                 }
-
             }
             //rabbitMQSender.send(login, RabbitMQMessageType.STOP_CALL);
             return new ResponseEntity<>(false, HttpStatus.FORBIDDEN);

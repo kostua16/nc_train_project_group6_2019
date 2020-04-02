@@ -4,6 +4,7 @@ import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
+import com.edunetcracker.billingservice.ProxyProxy.session.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,9 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class InternetController {
+
+    @Autowired
+    private SessionService sessionService;
 
     @Autowired
     private RabbitMQSender rabbitMQSender;
@@ -26,34 +30,43 @@ public class InternetController {
     // +проверки на использование внепакетных услуг
     // + входит ли услуга в список доступных
     @GetMapping("useInternet")
-    public ResponseEntity<Boolean> useInternet(@RequestParam("login") String login/*,
-                                               @RequestParam("byte") Long bytes*/) {  //!!
+    public ResponseEntity<Boolean> useInternet(@RequestParam("token") String token) {
         try {
-            ////
-            String url;
+            if (sessionService.inSession(token)) {
+                String login = sessionService.getLogin(token).getLogin();
+                String url;
+                if (checks.isAccountExists(login)) {
 
-            url = helpers.getUrlProxy() + "/internetBalance/?login=" + login;
-            Long internetBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
 
-            url = helpers.getUrlProxy() + "/internetCost/?login=" + login;
-            Float internetCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+                    /*url = helpers.getUrlProxy() + "/internetBalance/?login=" + login;
+                    Long internetBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
 
-            Long lackResources = checks.lackResources(internetBalance, 1024L, internetCost);  //  resources = bytes
+                    url = helpers.getUrlProxy() + "/internetCost/?login=" + login;
+                    Float internetCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+                    */
+                    Long internetBalance = internetBalance(login).getBody();
+                    Float internetCost = internetCost(login).getBody();
+                    Long lackResources = checks.lackResources(internetBalance, 1024L, internetCost);  //  resources = bytes
 
-            // если закончились средства тарифа
-            if (lackResources > 0L) {
-                url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
-                Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
-                ////
-                url = helpers.getUrlProxy() + "/defaultInternetCost/?login=" + login;
-                Float defaultInternetCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
+                    // если закончились средства тарифа
+                    if (lackResources > 0L) {
+                        url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
+                        Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+                        ////url = helpers.getUrlProxy() + "/defaultInternetCost/?login=" + login;
+                        Float defaultInternetCost = defaultInternetCost(login).getBody();//new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
 
-                Long debt = checks.lackBalance(lackResources, accountBalance, defaultInternetCost);
-                //  если деньги есть
-                // возможно стоит послать два сообщения кролику на использование
-                // доступных ресурсов и использование чистого баланса клиента
-                if (debt == 0L) {
-                    //TODO RABBIT
+                        Long debt = checks.lackBalance(lackResources, accountBalance, defaultInternetCost);
+                        //  если деньги есть
+                        // возможно стоит послать два сообщения кролику на использование
+                        // доступных ресурсов и использование чистого баланса клиента
+                        if (debt == 0L) {
+                            //TODO RABBIT
+                            rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
+                            return new ResponseEntity<>(true, HttpStatus.OK);
+                        } else
+                        rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_STOP_USE_KILOBYTE);
+                        return new ResponseEntity<>(true, HttpStatus.OK);
+                    }
                     rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
                     return new ResponseEntity<>(true, HttpStatus.OK);
                 }
@@ -66,13 +79,30 @@ public class InternetController {
             e.printStackTrace();
             return new ResponseEntity<>((Boolean) null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-
     }
 
+    @GetMapping("stopUseInternet")
+    public ResponseEntity<Boolean> stopUseInternet(@RequestParam("token") String token) {
+        try {
+            if(sessionService.inSession(token)) {
+                String login = sessionService.getLogin(token).getLogin();
+                if (checks.isAccountExists(login)) {
+                    //TODO RABBIT
+                    rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_STOP_USE_KILOBYTE);
+                    return new ResponseEntity<>(true, HttpStatus.OK);
+                }
+            }
+            return new ResponseEntity<>(false, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>((Boolean) null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     //  цена байта по тарифу
-    @GetMapping("internetCost")
-    public ResponseEntity<Float> internetCost(@RequestParam("login") String login) {
+    //@GetMapping("internetCost")
+    public ResponseEntity<Float> internetCost(/*@RequestParam("login")*/ String login) {
         try {
             //TODO GET
             String url = helpers.getUrlBilling() + "/internetCost/?login=" + login;
@@ -89,8 +119,8 @@ public class InternetController {
     }
 
     //  цена байта без тарифа
-    @GetMapping("defaultInternetCost")
-    public ResponseEntity<Float> defaultInternetCost(@RequestParam("login") String login) {
+    //@GetMapping("defaultInternetCost")
+    public ResponseEntity<Float> defaultInternetCost(/*@RequestParam("login")*/ String login) {
         try {
             //TODO GET
             String url = helpers.getUrlBilling() + "/defaultInternetCost/?login=" + login;
@@ -108,8 +138,8 @@ public class InternetController {
     }
 
     //  количество доступного трафика
-    @GetMapping("internetBalance")
-    public ResponseEntity<Long> internetBalance(@RequestParam("login") String login) {
+    //@GetMapping("internetBalance")
+    public ResponseEntity<Long> internetBalance(/*@RequestParam("login")*/ String login) {
         try {
             //TODO GET
             String url = helpers.getUrlBilling() + "/internetBalance/?login=" + login;

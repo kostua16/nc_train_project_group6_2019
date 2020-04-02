@@ -19,4 +19,5 @@ public interface RabbitMQMessageType {
     public static final String STOP_CALL ="STOP_CALL";
     //
     public static final String INTERNET_USE_KILOBYTE ="INTERNET_USE_KILOBYTE";
+    public static final String INTERNET_STOP_USE_KILOBYTE ="INTERNET_STOP_USE_KILOBYTE";
 }
