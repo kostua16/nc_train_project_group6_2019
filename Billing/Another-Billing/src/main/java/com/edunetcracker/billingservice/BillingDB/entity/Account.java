@@ -1,14 +1,14 @@
-package com.edunetcracker.billingservice.ProxyProxy.entity;
+package com.edunetcracker.billingservice.BillingDB.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.springframework.lang.Nullable;
 
-//@Entity
-//@Table(name="test_account")
+import javax.persistence.*;
+
+@Entity
+@Table(name="test_account")
 public class Account {
 
-    //@Id
+    @Id
     private String login;
 
     private String password;

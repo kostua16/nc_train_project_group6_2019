@@ -8,16 +8,21 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
-	
+
 	<artifactId>Billing</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Billing</name>
 	<description>Billing part of the billing-service</description>
 	<packaging>pom</packaging>
-	
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
 	<modules>
         <!-- <module>Billing-App</module> -->
-        <module>Billing-DB</module>
+		<!--<module>Billing-DB</module> -->
+        <module>Danil-Billing</module>
     </modules>
 
 	<build>
