@@ -22,7 +22,7 @@
 	<modules>
         <!-- <module>Billing-App</module> -->
 		<!--<module>Billing-DB</module> -->
-        <module>Danil-Billing</module>
+        <module>Another-Billing</module>
     </modules>
 
 	<build>
