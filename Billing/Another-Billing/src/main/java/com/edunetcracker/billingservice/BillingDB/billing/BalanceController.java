@@ -4,13 +4,14 @@ import com.edunetcracker.billingservice.BillingDB.entity.Account;
 import com.edunetcracker.billingservice.BillingDB.services.IAccountRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class AccountController {
+public class BalanceController {
 
     @Autowired
     IAccountRepository AccountRepository = null;
@@ -20,18 +21,11 @@ public class AccountController {
 
     /***************************************************************************************/
 
-    @GetMapping("getAccountByLogin")
-    public ResponseEntity<Account> getAccountByLogin(@RequestParam("login") String login) {
+    @GetMapping("getBalanceByLogin")
+    public ResponseEntity<Long> getBalanceByLogin(@RequestParam("login") String login) {
 
         Account account = AccountRepository.findAccountByLogin(login);
-        return new ResponseEntity<>(account, HttpStatus.OK);
+        System.out.println("acc b = " + account.getBalance());
+        return new ResponseEntity<>(account.getBalance(), HttpStatus.OK);
     }
-
-    @GetMapping("getAllAccount")
-    public ResponseEntity<List<Account>> getAllAccount() {
-
-        List<Account> accounts = AccountRepository.findAll();
-        return new ResponseEntity<>(accounts, HttpStatus.OK);
-    }
-
 }

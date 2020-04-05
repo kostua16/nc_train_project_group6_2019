@@ -17,37 +17,20 @@ public class Checks {
     Helpers helpers;
 
     /*************checks**************/
-    // true - exist, false - not exist, null - error
-    // check login in billing
-    /*
-    public Boolean isAccountExists(Account account){
-        try {
-            String url = getUrlBilling() + "/isAccountExists";
-            Boolean isExist = new RestTemplate().exchange(url, HttpMethod.PUT, new HttpEntity<>(account, new HttpHeaders()), Boolean.class).getBody(); //GET не работает
-            if (isExist != null) {
-                return  isExist;
-            }
-            else{
-                return null;
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }*/
     public Boolean isAccountExists(String accountLogin) {
         try {
             String url = helpers.getUrlProxy() + "/getAccount/?login=" + accountLogin;
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
+            //System.out.println("Acc = " + account);
+            //System.out.println("Acc b = " + account.getBalance());
             if (account == null) {
-                return true;
+                return false;
             } else {
-                return null;
+                return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 

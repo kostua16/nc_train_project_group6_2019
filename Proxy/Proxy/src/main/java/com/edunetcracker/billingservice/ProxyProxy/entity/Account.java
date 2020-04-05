@@ -1,14 +1,9 @@
 package com.edunetcracker.billingservice.ProxyProxy.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-//@Entity
-//@Table(name="test_account")
 public class Account {
 
-    //@Id
+
     private String login;
 
     private String password;
@@ -17,6 +12,7 @@ public class Account {
 
     private Long balance;
 
+    // private String rang;         // user, administrator...
 
     ///////////////////////////////////////
     public String getLogin() {

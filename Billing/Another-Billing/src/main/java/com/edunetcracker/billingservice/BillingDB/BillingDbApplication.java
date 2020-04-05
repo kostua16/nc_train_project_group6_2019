@@ -1,6 +1,5 @@
 package com.edunetcracker.billingservice.BillingDB;
 
-import com.edunetcracker.billingservice.BillingDB.entity.Account;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

@@ -1,11 +1,11 @@
 package com.edunetcracker.billingservice.BillingDB.entity;
 
-import org.springframework.lang.Nullable;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
-@Table(name="test_account")
+@Table(name = "test_account")
 public class Account {
 
     @Id
@@ -17,6 +17,7 @@ public class Account {
 
     private Long balance;
 
+    // private String rang;         // user, administrator...
 
     ///////////////////////////////////////
     public String getLogin() {

@@ -2,8 +2,10 @@ package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -25,56 +27,25 @@ public class BalanceController {
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     @GetMapping("getBalance")
-    public ResponseEntity<Long> getBalance(@RequestParam("login") String login /*,
-                                              @RequestParam("password") String password*/) {
-        try {
-            //существует или нет
-            Boolean accountExists = checks.isAccountExists(login);
-            //да - получить, нет - ошибка
-            if (accountExists != null) {
-                if (accountExists) {
-                    //TODO GET
-                    String url = helpers.getUrlBilling() + "/getBalance/?login=" + login;
-                    ResponseEntity responseBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
+    public ResponseEntity<Long> getBalance(@RequestParam("login") String login) {
 
-                    return new ResponseEntity<>((Long) responseBalance.getBody(), HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
-                }
-            } else {
-                return new ResponseEntity<>((Long) null, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Long) null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        String url = "http://localhost:8202/getBalanceByLogin/?login=" + login;
+        ResponseEntity responseBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
+        return new ResponseEntity<>((Long) responseBalance.getBody(), HttpStatus.OK);
 
     }
 
     // add +/- amount
     @PutMapping("addToBalance")
     public ResponseEntity<Boolean> addToBalance(@RequestParam("login") String login,
-                                                 @RequestParam("amount") Long amount) {
-        try {
-            Boolean accountExists = checks.isAccountExists(login);
+                                                @RequestParam("amount") Long amount) throws JsonProcessingException {
 
-            // если существует, то добавить
-            if (accountExists) {
-                // если можно +/-
-                if (checks.isAddAmountFeasible(login, amount)) {
-                    //TODO RABBIT
-                    rabbitMQSender.send(amount, RabbitMQMessageType.ADD_BALANCE);
-                    return new ResponseEntity<>(true, HttpStatus.OK);
-                }
-                return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Account account = new Account();
+        account.setLogin(login);
+        account.setBalance(amount);
+        rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+        return new ResponseEntity<>(true, HttpStatus.OK);
+
 
     }
 

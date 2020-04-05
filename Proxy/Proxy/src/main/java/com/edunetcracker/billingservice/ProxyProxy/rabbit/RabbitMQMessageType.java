@@ -14,8 +14,12 @@ public interface RabbitMQMessageType {
     public static final String UPDATE_TARIFF ="UPDATE_TARIFF";
     public static final String DELETE_TARIFF ="DELETE_TARIFF";
     //
+    public static final String CREATE_CALL ="CREATE_CALL";
+    public static final String UPDATE_CALL ="UPDATE_CALL";
+    public static final String DELETE_CALL ="DELETE_CALL";
     public static final String CALL ="CALL";
     public static final String CALL_ONE_MINUTE ="CALL_ONE_MINUTE";
+    public static final String CALL_ONE_SECOND ="CALL_ONE_SECOND";
     public static final String STOP_CALL ="STOP_CALL";
     //
     public static final String INTERNET_USE_KILOBYTE ="INTERNET_USE_KILOBYTE";

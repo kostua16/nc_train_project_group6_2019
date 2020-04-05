@@ -1,6 +1,14 @@
 package com.edunetcracker.billingservice.BillingDB.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "test_tariff")
 public class Tariff {
+    @Id
+    private String login;
 
     private String name;
 

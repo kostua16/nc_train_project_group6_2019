@@ -5,10 +5,14 @@ import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @RestController
 public class AccountController {
@@ -26,107 +30,50 @@ public class AccountController {
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     @GetMapping("getAccount")
-    public ResponseEntity<Account> getAccount(@RequestParam("login") String login /*,
-                                              @RequestParam("password") String password*/) {
-        try {
-            //существует или нет
-            Boolean accountExists = checks.isAccountExists(login);
-            //да - получить, нет - ошибка
-            if (accountExists != null) {
-                if (accountExists) {
-                    //String url = getUrlBilling() + "/getAccount/?login=" + login + "&password=" + password;
-                    //TODO GET
-                    String url = helpers.getUrlBilling() + "/getAccount/?login=" + login;
-                    ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
+    public ResponseEntity<Account> getAccount(@RequestParam("login") String login) throws JsonProcessingException {
+        String url = "http://localhost:8202/getAccountByLogin/?login="+login;
+        ResponseEntity<Account> responseEntity = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
+        return responseEntity;
+    }
 
-                    return new ResponseEntity<>((Account) responseAccount.getBody(), HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>((Account) null, HttpStatus.NOT_FOUND);
-                }
-            } else {
-                return new ResponseEntity<>((Account) null, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Account) null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-
+    @GetMapping("getAllAccount")
+    public ResponseEntity<List<Account>> getAllAccount() throws JsonProcessingException {
+        String url = "http://localhost:8202/getAllAccount";
+        ResponseEntity<List<Account>> responseEntity = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), new ParameterizedTypeReference<List<Account>>() {});
+        return responseEntity;
     }
 
     @PostMapping("createAccount")
-    public ResponseEntity<Boolean> createAccount(@RequestBody Account account) {
-        try {
-            //существует или нет
-            Boolean accountExists = checks.isAccountExists(account.getLogin());
+    public Boolean createAccount(@RequestParam("login") String login
+                                                /*@RequestBody Account account*/) throws JsonProcessingException {
+        Account account = new Account();
+        account.setLogin(login);
+        account.setBalance(1000L);
+        rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
 
-            //да - ошибка, нет - создать
-            if (accountExists != null) {
-                if (accountExists) {
-                    return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
-
-                } else {
-                    //TODO RABBIT
-                    rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
-                    return new ResponseEntity<>(true, HttpStatus.CREATED);
-                }
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return true;
     }
 
     @PutMapping("updateAccount")
-    public ResponseEntity<Boolean> updateAccount(@RequestParam("login") String login,
-                                                 @RequestBody Account newAccountData) {
-        try {
-            Boolean accountExists = checks.isAccountExists(login);
+    public String updateAccount(@RequestParam("login") String login,
+                                @RequestParam("password") String password
+                                /*@RequestBody Account newAccountData*/) throws JsonProcessingException {
+        String url = "http://localhost:8202/getAccount/?login="+login;
+        ResponseEntity<Account> responseEntity = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
+        Account account = responseEntity.getBody();
+        account.setPassword("new_"+password);
+        rabbitMQSender.send(account, RabbitMQMessageType.UPDATE_ACCOUNT);
 
-            newAccountData.setLogin(login);// на всякий случай
-
-            // если существует, то обновить
-            if (accountExists) {
-                //String url = helpers.getUrlBilling() + "/updateAccount";
-                //ResponseEntity<Boolean> isExist = new RestTemplate().exchange(url, HttpMethod.PUT, new HttpEntity<>(newAccountData, new HttpHeaders()), Boolean.class);
-                //return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
-                //TODO RABBIT
-                rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
-                return new ResponseEntity<>(true, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return "Good";
 
     }
 
     @DeleteMapping("deleteAccount")
-    public ResponseEntity<Boolean> deleteAccount(@RequestParam("login") String login) {
+    public String deleteAccount(@RequestParam("login") String login) throws JsonProcessingException {
 
-        try {
-            Boolean accountExists = checks.isAccountExists(login);
+        rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
 
-            // если существует, то удалить
-            if (accountExists) {
-//                String url = helpers.getUrlBilling() + "/deleteAccount";
-//                ResponseEntity<Boolean> isExist = new RestTemplate().exchange(url, HttpMethod.DELETE, new HttpEntity(new HttpHeaders()), Boolean.class);
-//                return new ResponseEntity<>(isExist.getBody(), isExist.getStatusCode());
-                //TODO RABBIT
-                rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
-                return new ResponseEntity<>(true, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return "Good";
     }
-
 
 }
