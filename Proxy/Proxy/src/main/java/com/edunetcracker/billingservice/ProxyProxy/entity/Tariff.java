@@ -1,6 +1,8 @@
 package com.edunetcracker.billingservice.ProxyProxy.entity;
 
+
 public class Tariff {
+    private String login;
 
     private String name;
 

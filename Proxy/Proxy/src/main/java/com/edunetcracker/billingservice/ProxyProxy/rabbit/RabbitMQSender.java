@@ -50,6 +50,9 @@ public class RabbitMQSender {
                 .withBody(orderJson.getBytes())
                 .setContentType(MessageProperties.CONTENT_TYPE_JSON)
                 .setHeader(messageType, String.class)
+                .setType(messageType)
+                //.setMessageId(messageType)
+                //.setHeader("__TypeId__", String.class)
                 .build();
         this.rabbitTemplate.convertAndSend(queue, mes);
     }

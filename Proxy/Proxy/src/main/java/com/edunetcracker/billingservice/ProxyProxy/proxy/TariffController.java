@@ -38,7 +38,7 @@ public class TariffController {
 
                 if (checks.isTariffExists(name)) {
                     //TODO GET
-                    String url = helpers.getUrlBilling() + "/getTariff/?name=" + name;
+                    String url = helpers.getUrlBilling() + "/getTariffByName/?name=" + name;
                     ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Tariff.class);
 
                     return new ResponseEntity<>((Tariff) responseAccount.getBody(), HttpStatus.OK);
@@ -48,10 +48,8 @@ public class TariffController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>((Tariff) null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>((Tariff) null, HttpStatus.NOT_FOUND);
         }
-
-
     }
 
     @PostMapping("createTariff")
@@ -60,18 +58,18 @@ public class TariffController {
         try {
             if (sessionService.inSession(token)) {
                 if (checks.isTariffExists(tariff.getName())) {
-                    return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
 
                 } else {
                     //TODO RABBIT
                     rabbitMQSender.send(tariff, RabbitMQMessageType.CREATE_TARIFF);
-                    return new ResponseEntity<>(true, HttpStatus.CREATED);
+                    return new ResponseEntity<>(true, HttpStatus.OK);
                 }
             }
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -89,7 +87,7 @@ public class TariffController {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
 
     }
@@ -97,7 +95,6 @@ public class TariffController {
     @DeleteMapping("deleteTariff")
     public ResponseEntity<Boolean> deleteTariff(@RequestParam("token") String token,
                                                 @RequestParam("name") String name) {
-
         try {
             if (sessionService.inSession(token)) {
                 if (checks.isTariffExists(name)) {
@@ -109,9 +106,18 @@ public class TariffController {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
     }
-
+    //update all accounts by their tariff plans
+    @GetMapping("newMonth")
+    public Boolean newMonth() {
+        try {
+            return  true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

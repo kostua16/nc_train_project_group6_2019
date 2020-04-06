@@ -1,5 +1,7 @@
 package com.edunetcracker.billingservice.ProxyProxy.entity;
 
+import java.util.Objects;
+
 public class Login {
 
     private String login;
@@ -26,5 +28,20 @@ public class Login {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Login login = (Login) o;
+        if(this.hashCode() == login.hashCode()) {
+            return true;
+        }
+        return false;
+        //return Objects.equals(login.login, login.password) && Objects.equals(login, password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(login, password);
     }
 }

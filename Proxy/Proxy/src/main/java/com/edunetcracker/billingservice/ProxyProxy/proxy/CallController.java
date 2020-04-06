@@ -2,15 +2,19 @@ package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Call;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.edunetcracker.billingservice.ProxyProxy.session.SessionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @RestController
 public class CallController {
@@ -29,124 +33,190 @@ public class CallController {
     private Checks checks;
 
     @GetMapping("callToMinutes")
-    public ResponseEntity<Boolean> callToMinutes(@RequestParam("token") String token) {
+    public Boolean callToMinutes(@RequestParam("token") String token) {
         try {
-            if(sessionService.inSession(token)) {
+            if (sessionService.inSession(token)) {
                 String login = sessionService.getLogin(token).getLogin();
                 if (checks.isAccountExists(login)) {
+                    String url = helpers.getUrlBilling() + "/getCallByLogin/?login=" + login;
+                    Call call = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Call.class).getBody();
 
-                    //String url = helpers.getUrlProxy() + "/callBalance/?login=" + login;
-                    Long accountResourceBalance = callBalance(login).getBody();//new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+                    url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + login;
+                    Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
 
-                    //url = helpers.getUrlProxy() + "/callCost/?login=" + login;
-                    Float accountCallCost = callCost(login).getBody();//new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
-
-                    Long lackResources = checks.lackResources(accountResourceBalance, 60L, accountCallCost);
-
-                    // если закончились средства тарифа
-                    if (lackResources > 0L) {
-                        String url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
-                        Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
-                        ////
-                        url = helpers.getUrlProxy() + "/defaultCallCost/?login=" + login;
-                        Float defaultCallCost = defaultCallCost(login).getBody();//new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
-
-                        Long debt = checks.lackBalance(lackResources, accountBalance, defaultCallCost);
-                        //  если деньги есть
-                        // возможно стоит послать два сообщения кролику на использование
-                        // доступных ресурсов и использование чистого баланса клиента
-                        if (debt == 0L) {
-                            //TODO RABBIT
-                            rabbitMQSender.send(login, RabbitMQMessageType.CALL_ONE_MINUTE);
-                            return new ResponseEntity<>(true, HttpStatus.OK);
+                    float cost = call.getCall_cost();
+                    float defaultCost = call.getDefault_call_cost();
+                    if (call.getCall_balance() <= 0L) {
+                        if (account.getBalance() - ((long) (defaultCost * 60)) >= 0) {
+                            account.setBalance(-(long) (defaultCost * 60));   // - points
+                            rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                            return true;
+                        } else
+                            return false;
+                    } else {
+                        // если ресурса по тарифу хватает
+                        if (call.getCall_balance() - 60 >= 0L) {
+                            call.setCall_balance(60L);                  // - minutes
+                            account.setBalance(-(long) (cost * 60));    // - points
+                            rabbitMQSender.send(call, RabbitMQMessageType.CALL_ONE_MINUTE);
+                            rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                            return true;
                         }
+                        // ресурса не хватает
                         else {
-                            rabbitMQSender.send(login, RabbitMQMessageType.STOP_CALL);
-                            return new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
+                            long callLack = 60 - call.getCall_balance();
+                            long amountForTariff = (long) (cost * call.getCall_balance());                 //  нехватка
+                            long amountForDefault = (long) (callLack * defaultCost);         //  пересчёт остатка ресурсов
+                            if (account.getBalance() - amountForDefault >= 0) {
+                                call.setCall_balance(call.getCall_balance());
+                                account.setBalance(-(amountForTariff + amountForDefault));
+                                rabbitMQSender.send(call, RabbitMQMessageType.CALL_ONE_MINUTE);
+                                rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                                return true;
+                            }
                         }
-
+                        return false;
                     }
-                    rabbitMQSender.send(login, RabbitMQMessageType.CALL_ONE_MINUTE);
-                    return new ResponseEntity<>(true, HttpStatus.OK);
                 }
             }
-            return new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>((Boolean) null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return false;
         }
     }
 
+
+    @GetMapping("callToSecond")
+    public Boolean callToSecond(@RequestParam("token") String token)  {
+        try {
+            if (sessionService.inSession(token)) {
+                String login = sessionService.getLogin(token).getLogin();
+                if (checks.isAccountExists(login)) {
+                    String url = "http://localhost:8202/getCallByLogin/?login=" + login;
+                    Call call = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Call.class).getBody();
+
+                    url = "http://localhost:8202/getAccountByLogin/?login=" + login;
+                    Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
+
+                    float cost = call.getCall_cost();
+                    float defaultCost = call.getDefault_call_cost();
+                    if (call.getCall_balance() <= 0L) {
+                        if (account.getBalance() - ((long) (defaultCost)) >= 0) {
+                            account.setBalance(-(long) (defaultCost));   // - points
+                            rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                            return true;
+                        } else
+                            return false;
+                    } else {
+                        // если ресурса по тарифу хватает
+                        if (call.getCall_balance() - 1 >= 0L) {
+                            call.setCall_balance(1L);                  // - minutes
+                            account.setBalance(-(long) (cost));         // - points
+                            rabbitMQSender.send(call, RabbitMQMessageType.CALL_ONE_SECOND);
+                            rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                            return true;
+                        }
+                        // ресурса не хватает
+                        else {
+                            if (account.getBalance() - defaultCost >= 0) {
+                                account.setBalance(-(long) defaultCost);         // - points
+                                rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+/*
     @GetMapping("stopCall")
-    public ResponseEntity<Boolean> stopCall(@RequestParam("token") String token) {
+    public Boolean stopCall(@RequestParam("token") String token) {
         try {
             if(sessionService.inSession(token)) {
                 String login = sessionService.getLogin(token).getLogin();
                 if (checks.isAccountExists(login)) {
-                    //TODO RABBIT
                     rabbitMQSender.send(login, RabbitMQMessageType.STOP_CALL);
-                    return new ResponseEntity<>(true, HttpStatus.OK);
+                    return true;
                 }
             }
-            return new ResponseEntity<>(false, HttpStatus.OK);
+            return false;
             } catch (Exception e) {
                 e.printStackTrace();
-                return new ResponseEntity<>((Boolean) null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return false;
             }
-        }
+    }*/
+
+    @PostMapping("createCall")
+    public Boolean createCall(@RequestBody Call call) throws JsonProcessingException {
+        rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
+
+        return true;
+    }
+
+    @PutMapping("updateCall")
+    public Boolean updateCall(@RequestBody Call call) throws JsonProcessingException {
+        rabbitMQSender.send(call, RabbitMQMessageType.UPDATE_CALL);
+        return true;
+    }
+
+    @GetMapping("getAllCall")
+    public ResponseEntity<List<Call>> getAllCalls() {
+        String url = helpers.getUrlBilling() + "/getAllCall";
+        ResponseEntity<List<Call>> responseEntity = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), new ParameterizedTypeReference<List<Call>>() {
+        });
+        return responseEntity;
+    }
+
+    @GetMapping("getCallByLogin")
+    public ResponseEntity<Call> getCallByLogin(@RequestParam("login") String login) {
+        String url = helpers.getUrlBilling() + "/getCallByLogin/?login=" + login;
+        ResponseEntity<Call> responseEntity = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Call.class);
+        return responseEntity;
+    }
+
+    @GetMapping("getCallResourcesByLogin")
+    public ResponseEntity<Long> getCallResourcesByLogin(@RequestParam("login") String login) {
+        return callBalance(login);
+    }
 
     //  цена единицы звонка по тарифу
-    //@GetMapping("callCost")
-    public ResponseEntity<Float> callCost(/*@RequestParam("login")*/ String login) {
-        try {
-            //TODO GET
-            String url = helpers.getUrlBilling() + "/callCost/?login=" + login;
-            ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
-            if (responseCallCost != null) {
-                return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
-            }
-            return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Float) null, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Float> callCost(String login) {
+        String url = helpers.getUrlBilling() + "/getCallCostByLogin/?login=" + login;
+        ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
+        if (responseCallCost != null) {
+            return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
         }
+        return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
 
     }
 
     //  цена единицы звонка без тарифа
-    //@GetMapping("defaultCallCost")
-    public ResponseEntity<Float> defaultCallCost(/*@RequestParam("login")*/ String login) {
-        try {
-            //TODO GET
-            String url = helpers.getUrlBilling() + "/defaultCallCost/?login=" + login;
-            ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
-            if (responseCallCost != null) {
-                return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
-            }
-            return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Float) null, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Float> defaultCallCost(String login) {
+        String url = helpers.getUrlBilling() + "/getDefaultCallCost/?login=" + login;
+        ResponseEntity<Float> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
+        if (responseCallCost != null) {
+            return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
         }
+        return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
 
 
     }
 
     //  количество доступных единиц звонка
-    //@GetMapping("callBalance")
-    public ResponseEntity<Long> callBalance(/*@RequestParam("login")*/ String login) {
-        try {
-            //TODO GET
-            String url = helpers.getUrlBilling() + "/callBalance/?login=" + login;
-            ResponseEntity<Long> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
-            if (responseCallCost != null) {
-                return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
-            }
-            return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Long) null, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Long> callBalance(String login) {
+        String url = helpers.getUrlBilling() + "/getCallBalance/?login=" + login;
+        ResponseEntity<Long> responseCallCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
+        if (responseCallCost != null) {
+            return new ResponseEntity<>(responseCallCost.getBody(), responseCallCost.getStatusCode());
         }
+        return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
 
     }
 

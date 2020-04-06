@@ -35,9 +35,15 @@ public class LoginController {
                                         @RequestParam("password") String password) {
         try {
             if(checks.isAccountExists(login)) {//если есть аккаунт
-                if (new Login(login, password) == getAccountLoginAndPassword(login)) {//если правильный пароль
 
+                Login login1 = new Login(login, password);
+                Login login2 = getAccountLoginAndPassword(login);
+
+                if (login1.getLogin().equals(login2.getLogin()) && login1.getPassword().equals(login2.getPassword())) {//если правильный пароль
+
+                    System.out.println("login/");
                     String session = sessionService.newSession(new Login(login, password));
+                    System.out.println("/login");
                     return new ResponseEntity<>(session, HttpStatus.OK);
 
                 }
@@ -72,7 +78,7 @@ public class LoginController {
     public Login getAccountLoginAndPassword(@RequestParam("login") String login) {
         try {
             //TODO
-            String url = helpers.getUrlBilling() + "/getAccount/?login=" + login;
+            String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + login;
             ResponseEntity<Account> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
             Login login1 = new Login(responseAccount.getBody().getLogin(),responseAccount.getBody().getPassword());
             return login1;
