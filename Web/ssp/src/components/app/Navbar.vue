@@ -46,7 +46,7 @@ import axios from 'axios'
 export default {
   data: () => ({
       dropdown: null,
-      username: ''
+      username: 'username'
     }),
   methods: {
     getNameUser() {
