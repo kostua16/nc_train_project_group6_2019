@@ -2,15 +2,19 @@ package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Internet;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.edunetcracker.billingservice.ProxyProxy.session.SessionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @RestController
 public class InternetController {
@@ -27,131 +31,139 @@ public class InternetController {
     @Autowired
     private Checks checks;
 
-    // +проверки на использование внепакетных услуг
-    // + входит ли услуга в список доступных
-    @GetMapping("useInternet")
-    public ResponseEntity<Boolean> useInternet(@RequestParam("token") String token) {
+
+    @GetMapping("useInternetKilobytes")
+    public Boolean useInternetKilobytes(@RequestParam("token") String token,
+                                        @RequestParam("quantity") Long quantity) {
+        return useInternetByQuantity(token, quantity);
+    }
+    @GetMapping("useInternetMegabytes")
+    public Boolean useInternetMegabytes(@RequestParam("token") String token,
+                                        @RequestParam("quantity") Long quantity) {
+        return useInternetByQuantity(token, quantity*1024); //1000
+    }
+    @PostMapping("createInternet")
+    public Boolean createInternet(@RequestBody Internet internet) throws JsonProcessingException {
+        rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
+
+        return true;
+    }
+
+    @PutMapping("updateInternet")
+    public Boolean updateInternet(@RequestBody Internet internet) throws JsonProcessingException {
+        rabbitMQSender.send(internet, RabbitMQMessageType.UPDATE_INTERNET);
+        return true;
+    }
+
+    @GetMapping("getAllInternet")
+    public ResponseEntity<List<Internet>> getAllInternet() {
+        String url = helpers.getUrlBilling() + "/getAllCall";
+        ResponseEntity<List<Internet>> responseEntity = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), new ParameterizedTypeReference<List<Internet>>() {
+        });
+        return responseEntity;
+    }
+
+    @GetMapping("getInternetByLogin")
+    public ResponseEntity<Internet> getInternetByLogin(@RequestParam("login") String login) {
+        String url = helpers.getUrlBilling() + "/getInternetByLogin/?login=" + login;
+        ResponseEntity<Internet> responseEntity = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Internet.class);
+        return responseEntity;
+    }
+
+    @GetMapping("getInternetResourcesByLogin")
+    public ResponseEntity<Long> getInternetResourcesByLogin(@RequestParam("login") String login) {
+        return internetBalance(login);
+    }
+
+    ///
+    public Boolean useInternetByQuantity(String token, Long quantity) {
         try {
             if (sessionService.inSession(token)) {
                 String login = sessionService.getLogin(token).getLogin();
-                String url;
                 if (checks.isAccountExists(login)) {
 
+                    String url = helpers.getUrlBilling() + "/getInternetByLogin/?login=" + login;
+                    Internet internet = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Internet.class).getBody();
 
-                    /*url = helpers.getUrlProxy() + "/internetBalance/?login=" + login;
-                    Long internetBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
+                    url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + login;
+                    Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
 
-                    url = helpers.getUrlProxy() + "/internetCost/?login=" + login;
-                    Float internetCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
-                    */
-                    Long internetBalance = internetBalance(login).getBody();
-                    Float internetCost = internetCost(login).getBody();
-                    Long lackResources = checks.lackResources(internetBalance, 1024L, internetCost);  //  resources = bytes
-
-                    // если закончились средства тарифа
-                    if (lackResources > 0L) {
-                        url = helpers.getUrlProxy() + "/getBalance/?login=" + login;
-                        Long accountBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class).getBody();
-                        ////url = helpers.getUrlProxy() + "/defaultInternetCost/?login=" + login;
-                        Float defaultInternetCost = defaultInternetCost(login).getBody();//new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class).getBody();
-
-                        Long debt = checks.lackBalance(lackResources, accountBalance, defaultInternetCost);
-                        //  если деньги есть
-                        // возможно стоит послать два сообщения кролику на использование
-                        // доступных ресурсов и использование чистого баланса клиента
-                        if (debt == 0L) {
-                            //TODO RABBIT
-                            rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
-                            return new ResponseEntity<>(true, HttpStatus.OK);
+                    float cost = internet.getInternet_cost();
+                    float defaultCost = internet.getDefault_internet_cost();
+                    if (internet.getInternet_balance() <= 0L) {
+                        if (account.getBalance() - ((long) (defaultCost * quantity)) >= 0) {
+                            account.setBalance(-(long) (defaultCost * quantity));
+                            rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                            return true;
                         } else
-                        rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_STOP_USE_KILOBYTE);
-                        return new ResponseEntity<>(true, HttpStatus.OK);
+                            return false;
+                    } else {
+                        // если ресурса по тарифу хватает
+                        if (internet.getInternet_balance() - quantity >= 0L) {
+                            internet.setInternet_balance(quantity);                  // - minutes
+                            account.setBalance(-(long) (cost * quantity));    // - points
+                            rabbitMQSender.send(internet, RabbitMQMessageType.INTERNET_USE_KILOBYTE);   //TODO
+                            rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                            return true;
+                        }
+                        // ресурса не хватает
+                        else {
+                            long callLack = quantity - internet.getInternet_balance();
+                            long amountForTariff = (long) (cost * internet.getInternet_balance());                 //  нехватка
+                            long amountForDefault = (long) (callLack * defaultCost);         //  пересчёт остатка ресурсов
+                            if (account.getBalance() - amountForDefault >= 0) {
+                                internet.setInternet_balance(internet.getInternet_balance());
+                                account.setBalance(-(amountForTariff + amountForDefault));
+                                rabbitMQSender.send(internet, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
+                                rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                                return true;
+                            }
+                        }
+                        return false;
                     }
-                    rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
-                    return new ResponseEntity<>(true, HttpStatus.OK);
-                }
-
-            }
-            //rabbitMQSender.send(login, RabbitMQMessageType.STOP_CALL);
-            return new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Boolean) null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("stopUseInternet")
-    public ResponseEntity<Boolean> stopUseInternet(@RequestParam("token") String token) {
-        try {
-            if(sessionService.inSession(token)) {
-                String login = sessionService.getLogin(token).getLogin();
-                if (checks.isAccountExists(login)) {
-                    //TODO RABBIT
-                    rabbitMQSender.send(login, RabbitMQMessageType.INTERNET_STOP_USE_KILOBYTE);
-                    return new ResponseEntity<>(true, HttpStatus.OK);
                 }
             }
-            return new ResponseEntity<>(false, HttpStatus.OK);
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>((Boolean) null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return false;
         }
     }
+    ///
 
 
-    //  цена байта по тарифу
-    //@GetMapping("internetCost")
-    public ResponseEntity<Float> internetCost(/*@RequestParam("login")*/ String login) {
-        try {
-            //TODO GET
-            String url = helpers.getUrlBilling() + "/internetCost/?login=" + login;
-            ResponseEntity<Float> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
-            if (response != null) {
-                return new ResponseEntity<>(response.getBody(), response.getStatusCode());
-            }
-            return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Float) null, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    //  цена единицы звонка по тарифу
+    public ResponseEntity<Float> internetCost(String login) {
+        String url = helpers.getUrlBilling() + "/getInternetCostByLogin/?login=" + login;
+        ResponseEntity<Float> responseCost = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
+        if (responseCost != null) {
+            return new ResponseEntity<>(responseCost.getBody(), responseCost.getStatusCode());
         }
+        return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
 
     }
 
-    //  цена байта без тарифа
-    //@GetMapping("defaultInternetCost")
-    public ResponseEntity<Float> defaultInternetCost(/*@RequestParam("login")*/ String login) {
-        try {
-            //TODO GET
-            String url = helpers.getUrlBilling() + "/defaultInternetCost/?login=" + login;
-            ResponseEntity<Float> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
-            if (response != null) {
-                return new ResponseEntity<>(response.getBody(), response.getStatusCode());
-            }
-            return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Float) null, HttpStatus.INTERNAL_SERVER_ERROR);
+    //  цена единицы звонка без тарифа
+    public ResponseEntity<Float> defaultInternetCost(String login) {
+        String url = helpers.getUrlBilling() + "/getDefaultInternetCost/?login=" + login;
+        ResponseEntity<Float> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Float.class);
+        if (response != null) {
+            return new ResponseEntity<>(response.getBody(), response.getStatusCode());
         }
+        return new ResponseEntity<>((Float) null, HttpStatus.NOT_FOUND);
 
 
     }
 
-    //  количество доступного трафика
-    //@GetMapping("internetBalance")
-    public ResponseEntity<Long> internetBalance(/*@RequestParam("login")*/ String login) {
-        try {
-            //TODO GET
-            String url = helpers.getUrlBilling() + "/internetBalance/?login=" + login;
-            ResponseEntity<Long> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
-            if (response != null) {
-                return new ResponseEntity<>(response.getBody(), response.getStatusCode());
-            }
-            return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Long) null, HttpStatus.INTERNAL_SERVER_ERROR);
+    //  количество доступных единиц звонка
+    public ResponseEntity<Long> internetBalance(String login) {
+        String url = helpers.getUrlBilling() + "/getInternetBalance/?login=" + login;
+        ResponseEntity<Long> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
+        if (response != null) {
+            return new ResponseEntity<>(response.getBody(), response.getStatusCode());
         }
+        return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
 
     }
 

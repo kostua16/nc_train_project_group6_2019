@@ -1,15 +1,18 @@
 package com.edunetcracker.billingservice.ProxyProxy.entity;
 
+
 public class Account {
 
-    private String login = null;
 
-    private String password = null;
+    private String login;
 
-    private String name = null;
+    private String password;
 
-    private Long balance = null;
+    private String name;
 
+    private Long balance;
+
+    // private String rang;         // user, administrator...
 
     ///////////////////////////////////////
     public String getLogin() {
