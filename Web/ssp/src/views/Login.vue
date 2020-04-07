@@ -1,14 +1,14 @@
 <template>
-    
-<form class="card auth-card" @submit.prevent="submitHandler"><!-- тут прослушиваем событие enter в кнопке и вызваем метод "submitHandler" -->
-  <div class="card-content">
+
+  <form class="card auth-card" @submit.prevent="submitHandler"><!-- тут прослушиваем событие enter в кнопке и вызваем метод "submitHandler" -->
+    <div class="card-content">
       <span class="card-title">Личный кабинет</span>
       <div class="input-field">
         <input
-            id="email"
-            type="text"
-            v-model.trim="email"
-            :class="{invalid: ($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.email.email)}"
+          id="email"
+          type="text"
+          v-model.trim="email"
+          :class="{invalid: ($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.email.email)}"
         >
         <!--<input
             id="email"
@@ -19,70 +19,100 @@
         > -->
         <label for="email">Email</label>
         <small
-         class="helper-text invalid"
-         v-if="($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.password.minLength)"
-         >Email</small>
+          class="helper-text invalid"
+          v-if="($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.password.minLength)"
+        >Email</small>
       </div>
       <div class="input-field">
         <input
-            id="password"
-            type="password"
-            v-model.trim="password"
-            :class="{invalid: ($v.password.$dirty && !$v.password.required)||($v.password.$dirty && !$v.password.minLength)}"
+          id="password"
+          type="password"
+          v-model.trim="password"
+          :class="{invalid: ($v.password.$dirty && !$v.password.required)||($v.password.$dirty && !$v.password.minLength)}"
         >
         <label for="password">Пароль</label>
-        <small 
-        class="helper-text invalid"
-        v-if="($v.password.$dirty && !$v.password.required)||($v.password.$dirty && !$v.password.minLength)"
+        <small
+          class="helper-text invalid"
+          v-if="($v.password.$dirty && !$v.password.required)||($v.password.$dirty && !$v.password.minLength)"
         >Минимум {{$v.password.$params.minLength.min}} символов.</small>
       </div>
     </div>
     <div class="card-action">
       <div>
+
+
+
         <button
-            class="btn waves-effect waves-light auth-submit"
-            type="submit"
+          class="btn waves-effect waves-light auth-submit"
+          type="submit"
+
         >
           Войти
           <i class="material-icons right"/>
         </button>
+        <small
+          class="helper-text invalid"
+          v-if="loginAndPassword"
+        >Неправильный логин или пароль</small>
+
+
+
+
       </div>
 
       <p class="center">
         Нет аккаунта?
         <router-link to="/register">Зарегистрироваться</router-link>
       </p>
-  </div>
-</form>
+    </div>
+  </form>
 </template>
 
 
 <script>
-import {email, required, minLength} from 'vuelidate/lib/validators' 
-export default {
-  name: 'login', //имя данной странице  
-  data: () => ({
-    email: '',
-    password: ''
-  }),
-  validations: {
-    email: {email, required}, /* required - пустое поле не принимаем*/
-    password: {required, minLength: minLength(6)}
-  },
-  methods: {
-    submitHandler() {
-      //console.log(this.$v.password)
-      if (this.$v.$invalid) {
-        this.$v.$touch()
-        return
-      }
-      const formData = {
-        email: this.email,
-        password: this.password
-      }
-      console.log(formData)
-      this.$router.push('/')
+  import axios from 'axios'
+  import {email, required, minLength} from 'vuelidate/lib/validators'
+  export default {
+    name: 'login', //имя данной странице
+    data: () => ({
+      email: '',
+      password: '',
+      token: '',
+      loginAndPassword: false
+    }),
+    validations: {
+      email: {email, required}, /* required - пустое поле не принимаем*/
+      password: {required, minLength: minLength(6)}
+
+    },
+    // mounted () {
+    //   this.loginByAccount()
+    // },
+    methods: {
+      submitHandler() {
+        //console.log(this.$v.password)
+        if (this.$v.$invalid) {
+          this.$v.$touch()
+          return
+        }
+        axios.get('http://localhost:8102/login/?login=' + this.email + '&password=' + this.password).then(response => {
+          this.token = response.data
+          // console.log(this.token) //Токен
+          localStorage.setItem('token',this.token)
+          // console.log(localStorage.getItem('token'))
+          this.$router.push('/')
+
+        }).catch(e => {
+
+          console.log(e)
+          this.loginAndPassword = true
+
+        })
+
+      },
+
     }
+
+
   }
-}
 </script> -->

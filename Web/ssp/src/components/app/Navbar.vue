@@ -17,7 +17,7 @@
                 ref="dropdown"
             >
             <!-- ref="dropdown" задали для обрашения к нему в mounted, значение ref может быть любым-->
-              USER NAME
+              {{username}}
               <i class="material-icons right">arrow_drop_down</i>
             </a>
 
@@ -42,23 +42,39 @@
 
 
 <script>
+import axios from 'axios'
 export default {
   data: () => ({
       dropdown: null,
+      username: ''
     }),
   methods: {
+    getNameUser() {
+      // token = localStorage.getItem('token')
+       axios.get('http://localhost:8102/getAccount/?token='+localStorage.getItem('token')).then(response => {
+         this.username = response.data.name
+        //  console.log(response.data)
+      //  console.log(this.username) //Токен
+        // localStorage.setItem('token',this.token)
+       // console.log(localStorage.getItem('token'))
+      }).catch(e => {
+        console.log(e)
+      })
+    },
     logout() { //метод выхода из системы// отдельный метод чтобы куки сбросить и.т.д
       //console.log('Logout')
       this.$router.push('/login?message=logout') //передаем сообщение что мы вышли
     }
   },
   mounted() {
-   this.dropdown = M.Dropdown.init(this.$refs.dropdown, {
+    this.dropdown = M.Dropdown.init(this.$refs.dropdown, {
       constrainWidth: true //materializecss.com/dropdown.html
     })
+    // console.log(localStorage.getItem('token'))
+    this.getNameUser()
   },
   beforeDestroy() { //избавляемся от утечек памяти // работает когда покидаем страницу //по сути не нужно
-    console.log('beforeDestroy')
+  //  console.log('beforeDestroy')
     if (this.dropdown && this.dropdown.destroy) {
       this.dropdown.destroy() //метод destroy
     }

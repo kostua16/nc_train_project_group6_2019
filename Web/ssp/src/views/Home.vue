@@ -16,7 +16,7 @@
           <span class="card-title">Баланс</span>
 
           <p class="currency-line">
-            <span>12.0 Р</span>
+            <span>{{balance}} Р</span>
           </p>
         </div>
       </div>
@@ -51,4 +51,25 @@
   </div>
 </div>
 </template>
+
+<script>
+import axios from 'axios'
+export default {
+  data: () => ({
+    balance : 0
+  }),
+  mounted(){
+    this.getMoney()
+  },
+  methods:{
+    getMoney() {
+      axios.get('http://localhost:8102/getAccount/?token='+localStorage.getItem('token')).then(response => {
+         this.balance = response.data.balance
+      }).catch(e => {
+        console.log(e)
+      })
+    }
+  }
+}
+</script>
 
