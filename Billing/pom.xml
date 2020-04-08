@@ -20,9 +20,7 @@
 	</properties>
 
 	<modules>
-        <!-- <module>Billing-App</module> -->
-		<!--<module>Billing-DB</module> -->
-        <module>Another-Billing</module>
+        <module>Billing-DB</module>
     </modules>
 
 	<build>

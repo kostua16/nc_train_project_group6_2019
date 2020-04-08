@@ -9,9 +9,9 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.edu-netcracker.billing-service</groupId>
-	<artifactId>Another-Billing</artifactId>
+	<artifactId>Billing-DB</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Billing</name>
+	<name>Billing-DB</name>
 	<packaging>jar</packaging>
 
 	<dependencies>

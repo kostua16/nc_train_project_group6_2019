@@ -17,6 +17,8 @@ public class Account {
 
     private Long balance;
 
+    // private String tariff;       // tariff name
+
     // private String rang;         // user, administrator...
 
     ///////////////////////////////////////

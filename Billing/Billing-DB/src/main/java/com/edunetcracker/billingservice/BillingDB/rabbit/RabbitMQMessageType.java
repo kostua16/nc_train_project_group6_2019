@@ -30,5 +30,6 @@ public interface RabbitMQMessageType {
     public static final String CREATE_SMS ="CREATE_SMS";                  //message = Sms
     public static final String UPDATE_SMS ="UPDATE_SMS";                  //message = Sms
     public static final String DELETE_SMS ="DELETE_SMS";                  //message = String
+    public static final String RESPONSE_SMS ="RESPONSE_SMS";              //message = Sms
 }
 

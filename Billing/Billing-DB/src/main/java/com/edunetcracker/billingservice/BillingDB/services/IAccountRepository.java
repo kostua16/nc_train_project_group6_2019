@@ -17,6 +17,7 @@ public interface IAccountRepository extends JpaRepository<Account, Long> {
     //@Override
     //List<Account> findAll();
     Account findAccountByLogin(String login);
+    //Account findAccountByTelephone(String telephone);
 
     @Transactional
     @Async

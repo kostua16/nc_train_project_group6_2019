@@ -1,13 +1,7 @@
 package com.edunetcracker.billingservice.BillingDB.rabbit;
 
-import com.edunetcracker.billingservice.BillingDB.entity.Account;
-import com.edunetcracker.billingservice.BillingDB.entity.Call;
-import com.edunetcracker.billingservice.BillingDB.entity.Internet;
-import com.edunetcracker.billingservice.BillingDB.entity.Sms;
-import com.edunetcracker.billingservice.BillingDB.services.IAccountRepository;
-import com.edunetcracker.billingservice.BillingDB.services.ICallRepository;
-import com.edunetcracker.billingservice.BillingDB.services.IInternetRepository;
-import com.edunetcracker.billingservice.BillingDB.services.ISmsRepository;
+import com.edunetcracker.billingservice.BillingDB.entity.*;
+import com.edunetcracker.billingservice.BillingDB.services.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -36,6 +30,9 @@ public class RabbitMQListener {
     ISmsRepository SmsRepository = null;
 
     @Autowired
+    ITariffRepository TariffRepository = null;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @RabbitListener(queues = "q2")
@@ -47,6 +44,7 @@ public class RabbitMQListener {
                 case CREATE_ACCOUNT: {  //message = Account
                     System.out.println("CREATE_ACCOUNT");
                     Account account = objectMapper.readValue(message.getBody(), Account.class);
+                    System.out.println(account.getLogin() + "  " + account.getBalance());
                     AccountRepository.save(account);
                     break;
                 }
@@ -68,7 +66,7 @@ public class RabbitMQListener {
                     System.out.println("ADD_BALANCE");
                     Account account = objectMapper.readValue(message.getBody(), Account.class);
                     Account realAccount = AccountRepository.findAccountByLogin(account.getLogin());
-                    account.setBalance(account.getBalance()+realAccount.getBalance());
+                    account.setBalance(account.getBalance() + realAccount.getBalance());
                     AccountRepository.addAccountBalance(account);
                     break;
                 }
@@ -96,7 +94,7 @@ public class RabbitMQListener {
                     System.out.println("CALL_ONE_SECOND");
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
                     Call realCall = CallRepository.findCallByLogin(call.getLogin());
-                    realCall.setCall_balance(realCall.getCall_balance()-call.getCall_balance());
+                    realCall.setCall_balance(realCall.getCall_balance() - call.getCall_balance());
                     CallRepository.updateCall(realCall);
                     break;
                 }
@@ -104,7 +102,7 @@ public class RabbitMQListener {
                     System.out.println("CALL_ONE_SECOND");
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
                     Call realCall = CallRepository.findCallByLogin(call.getLogin());
-                    realCall.setCall_balance(realCall.getCall_balance()-call.getCall_balance());
+                    realCall.setCall_balance(realCall.getCall_balance() - call.getCall_balance());
                     CallRepository.updateCall(realCall);
                     break;
                 }
@@ -137,7 +135,7 @@ public class RabbitMQListener {
                     System.out.println("INTERNET_USE_KILOBYTE");
                     Internet internet = objectMapper.readValue(message.getBody(), Internet.class);
                     Internet realInternet = InternetRepository.findInternetByLogin(internet.getLogin());
-                    realInternet.setInternet_balance(realInternet.getInternet_balance()-realInternet.getInternet_balance());
+                    realInternet.setInternet_balance(realInternet.getInternet_balance() - internet.getInternet_balance());
                     InternetRepository.updateInternet(realInternet);
                     break;
                 }
@@ -162,12 +160,27 @@ public class RabbitMQListener {
                     break;
                 }
 
+                case RESPONSE_SMS: {
+                    System.out.println("RESPONSE_SMS");
+                    Sms sms = objectMapper.readValue(message.getBody(), Sms.class);
+                    Sms realSms = SmsRepository.findSmsByLogin(sms.getLogin());
+                    realSms.setSms_balance(realSms.getSms_balance() - sms.getSms_balance());
+                    SmsRepository.updateSms(realSms);
+                    break;
+                }
+                /** Tariff */
+                case CREATE_TARIFF: {
+                    System.out.println("CREATE_TARIFF");
+                    Tariff tariff = objectMapper.readValue(message.getBody(), Tariff.class);
+                    TariffRepository.save(tariff);
+                    break;
+                }
+
                 default: {
                     break;
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
