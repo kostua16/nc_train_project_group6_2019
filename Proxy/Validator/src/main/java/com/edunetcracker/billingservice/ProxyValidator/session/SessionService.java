@@ -1,6 +1,6 @@
-package com.edunetcracker.billingservice.ProxyProxy.session;
+package com.edunetcracker.billingservice.ProxyValidator.session;
 
-import com.edunetcracker.billingservice.ProxyProxy.entity.Login;
+import com.edunetcracker.billingservice.ProxyValidator.entity.Login;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,43 +18,19 @@ public class SessionService {
         String session = generateSession();
         // если сессии для пользователя нет
         if (!loginMap.containsKey(login)) {
-            System.out.println("---no session---");
             loginMap.put(login, session);
             sessionMap.put(session, login);
             return session;
         }
-        System.out.println("___oldSession___");
-        System.out.println("---loginMap");
-        int i = 0;
+        /*int i = 0;
         for (Map.Entry<Login, String> e : loginMap.entrySet()) {
             System.out.println(i + " " + e.getKey().getLogin() + " -> " + e.getValue());
             ++i; //iterate
-        }
-        System.out.println("---sessionMap");
-        i = 0;
-        for (Map.Entry<String, Login> e : sessionMap.entrySet()) {
-            System.out.println(i + " " + e.getKey() + " -> " + e.getValue().getLogin());
-            ++i; //iterate
-        }
-        System.out.println("!!!oldSession!!!");
+        }*/
+
         sessionMap.remove(loginMap.get(login));
         loginMap.put(login, session);
         sessionMap.put(session, login);
-
-        System.out.println("---newSession---");
-        System.out.println("---loginMap");
-        i = 0;
-        for (Map.Entry<Login, String> e : loginMap.entrySet()) {
-            System.out.println(i + " " + e.getKey().getLogin() + " -> " + e.getValue());
-            ++i; //iterate
-        }
-        System.out.println("---sessionMap");
-        i = 0;
-        for (Map.Entry<String, Login> e : sessionMap.entrySet()) {
-            System.out.println(i + " " + e.getKey() + " -> " + e.getValue().getLogin());
-            ++i; //iterate
-        }
-        System.out.println("!!!newSession!!!");
         return session;
     }
 

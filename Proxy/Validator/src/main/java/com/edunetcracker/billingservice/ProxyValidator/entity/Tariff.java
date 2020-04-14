@@ -1,13 +1,9 @@
 package com.edunetcracker.billingservice.ProxyValidator.entity;
 
+
 public class Tariff {
 
     private String name;
-
-
-    public Tariff(String name) {
-        this.name = name;
-    }
 
     public String getName() {
         return name;
@@ -16,5 +12,4 @@ public class Tariff {
     public void setName(String name) {
         this.name = name;
     }
-
 }
