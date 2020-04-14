@@ -34,7 +34,7 @@ public class Checks {
 
     public Boolean isTariffExists(String tariffName) {
         try {
-            String url = helpers.getUrlProxy() + "/getTariff/?name=" + tariffName;
+            String url = helpers.getUrlBilling() + "/getTariffByName/?name=" + tariffName;
             Tariff tariff  = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Tariff.class).getBody();
             if (tariff == null)
                 return false;
@@ -49,7 +49,7 @@ public class Checks {
     public Boolean isAddAmountFeasible(String accountLogin, Long amount) {
         try {
 
-            String url = helpers.getUrlProxy() + "/getBalance/?login=" + accountLogin;
+            String url = helpers.getUrlBilling() + "/getBalanceByLogin/?login=" + accountLogin;
             ResponseEntity<Long> responseBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
 
             if (responseBalance.getBody() + amount >= 0L) {
@@ -61,70 +61,6 @@ public class Checks {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public Boolean canUseMoneyTransactions(Long accountBalance, Long cost) {
-
-        if (accountBalance - cost >= 0L) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * нехватка ресурса по тарифу
-     * accountResourceBalance - limit
-     * return 0 if all OK
-     */
-    public Long lackResources(Long accountResourceBalance, Long resources, Float costResource) {
-
-        long lackResources = (long) (resources * costResource) - accountResourceBalance;
-
-        if (lackResources > 0) {  // <, если бы из баланса вычитали
-            return lackResources;
-        }
-        return 0L;
-
-    }
-
-    //  если известно, что ресурс = 1
-    public Long lackResources(Long accountResourceBalance, Long costResource) {
-
-        long lackResources = costResource - accountResourceBalance;
-
-        if (lackResources > 0) {  // <, если бы из баланса вычитали
-            return lackResources;
-        }
-        return 0L;
-
-    }
-
-    /**
-     * нехватка ресурса по тарифу
-     * return 0 if all OK
-     */
-    public Long lackBalance(Long lackResources, Long accountBalance, Float defaultCostResource) {
-
-        //  если нехватка баланса
-        Long result = (long) (lackResources * defaultCostResource) - accountBalance;
-        if (result > 0L) {    // <, если бы из баланса вычитали
-            //  если нехватка баланса, возвращает нехватающую сумму
-            return result;
-        }
-        return 0L;
-
-    }
-
-    public Long lackBalance(Long lackResources, Long accountBalance, Long defaultCostResource) {
-
-        //  если нехватка баланса
-        Long result = lackResources * defaultCostResource - accountBalance;
-        if (result > 0L) {    // <, если бы из баланса вычитали
-            //  если нехватка баланса, возвращает нехватающую сумму
-            return result;
-        }
-        return 0L;
-
     }
 
 }

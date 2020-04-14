@@ -13,6 +13,7 @@ public interface RabbitMQMessageType {
     public static final String CREATE_TARIFF ="CREATE_TARIFF";          //message = Tariff
     public static final String UPDATE_TARIFF ="UPDATE_TARIFF";          //message = Tariff
     public static final String DELETE_TARIFF ="DELETE_TARIFF";          //message = String
+    public static final String UPDATE_TARIFF_BY_TARIFF_PLAN ="UPDATE_TARIFF_BY_TARIFF_PLAN";          //message = String
     /** Call **/
     public static final String CREATE_CALL ="CREATE_CALL";              //message = Call
     public static final String UPDATE_CALL ="UPDATE_CALL";              //message = Call
@@ -30,6 +31,18 @@ public interface RabbitMQMessageType {
     public static final String CREATE_SMS ="CREATE_SMS";                  //message = Sms
     public static final String UPDATE_SMS ="UPDATE_SMS";                  //message = Sms
     public static final String DELETE_SMS ="DELETE_SMS";                  //message = String
-    public static final String REQUEST_SMS ="REQUEST_SMS";                  //message = String
+    public static final String RESPONSE_SMS ="RESPONSE_SMS";              //message = Sms
+    /** Tariff Call **/
+    public static final String CREATE_TARIFF_CALL ="CREATE_TARIFF_CALL";
+    public static final String UPDATE_TARIFF_CALL ="UPDATE_TARIFF_CALL";
+    public static final String DELETE_TARIFF_CALL ="DELETE_TARIFF_CALL";
+    /** Tariff Call **/
+    public static final String CREATE_TARIFF_INTERNET ="CREATE_TARIFF_INTERNET";
+    public static final String UPDATE_TARIFF_INTERNET ="UPDATE_TARIFF_INTERNET";
+    public static final String DELETE_TARIFF_INTERNET ="DELETE_TARIFF_INTERNET";
+    /** Tariff Call **/
+    public static final String CREATE_TARIFF_SMS ="CREATE_TARIFF_SMS";
+    public static final String UPDATE_TARIFF_SMS ="UPDATE_TARIFF_SMS";
+    public static final String DELETE_TARIFF_SMS ="DELETE_TARIFF_SMS";
 }
 
