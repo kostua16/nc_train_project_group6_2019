@@ -31,5 +31,17 @@ public interface RabbitMQMessageType {
     public static final String UPDATE_SMS ="UPDATE_SMS";                  //message = Sms
     public static final String DELETE_SMS ="DELETE_SMS";                  //message = String
     public static final String RESPONSE_SMS ="RESPONSE_SMS";              //message = Sms
+    /** Tariff Call **/
+    public static final String CREATE_TARIFF_CALL ="CREATE_TARIFF_CALL";
+    public static final String UPDATE_TARIFF_CALL ="UPDATE_TARIFF_CALL";
+    public static final String DELETE_TARIFF_CALL ="DELETE_TARIFF_CALL";
+    /** Tariff Call **/
+    public static final String CREATE_TARIFF_INTERNET ="CREATE_TARIFF_INTERNET";
+    public static final String UPDATE_TARIFF_INTERNET ="UPDATE_TARIFF_INTERNET";
+    public static final String DELETE_TARIFF_INTERNET ="DELETE_TARIFF_INTERNET";
+    /** Tariff Call **/
+    public static final String CREATE_TARIFF_SMS ="CREATE_TARIFF_SMS";
+    public static final String UPDATE_TARIFF_SMS ="UPDATE_TARIFF_SMS";
+    public static final String DELETE_TARIFF_SMS ="DELETE_TARIFF_SMS";
 }
 

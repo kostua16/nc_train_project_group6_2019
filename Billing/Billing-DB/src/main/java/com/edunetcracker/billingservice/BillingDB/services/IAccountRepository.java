@@ -25,7 +25,11 @@ public interface IAccountRepository extends JpaRepository<Account, Long> {
 
     @Modifying
     @Transactional
-    @Query("update Account t set t.password = :#{#account.getPassword()}  where t.login = :#{#account.getLogin()} ")
+    @Query("update Account t set t.password = :#{#account.getPassword()}," +
+                                "t.name = :#{#account.getName()}," +
+                                "t.balance = :#{#account.getBalance()}," +
+                                "t.tariff = :#{#account.getTariff()}," +
+                                "t.rang = :#{#account.getRang()}  where t.login = :#{#account.getLogin()} ")
     void updateAccount(@Param("account") Account account);
 
     @Modifying

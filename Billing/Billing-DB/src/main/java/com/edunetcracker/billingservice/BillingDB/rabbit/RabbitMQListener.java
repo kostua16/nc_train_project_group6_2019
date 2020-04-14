@@ -33,6 +33,15 @@ public class RabbitMQListener {
     ITariffRepository TariffRepository = null;
 
     @Autowired
+    ITariffCallRepository TariffCallRepository = null;
+
+    @Autowired
+    ITariffInternetRepository TariffInternetRepository = null;
+
+    @Autowired
+    ITariffSmsRepository TariffSmsRepository = null;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @RabbitListener(queues = "q2")
@@ -175,7 +184,69 @@ public class RabbitMQListener {
                     TariffRepository.save(tariff);
                     break;
                 }
-
+                case DELETE_TARIFF: {
+                    System.out.println("DELETE_TARIFF");
+                    String login = objectMapper.readValue(message.getBody(), String.class);
+                    TariffRepository.deleteTariffByName(login);
+                    break;
+                }
+                /** Tariff Call */
+                case CREATE_TARIFF_CALL: {  //message = Account
+                    System.out.println("CREATE_TARIFF_CALL");
+                    TariffCall t = objectMapper.readValue(message.getBody(), TariffCall.class);
+                    TariffCallRepository.save(t);
+                    break;
+                }
+                case DELETE_TARIFF_CALL: {  //message = String
+                    System.out.println("DELETE_TARIFF_CALL");
+                    String name = objectMapper.readValue(message.getBody(), String.class);
+                    TariffCallRepository.deleteByName(name);
+                    break;
+                }
+                case UPDATE_TARIFF_CALL: {  //message = Account
+                    System.out.println("UPDATE_TARIFF_CALL");
+                    TariffCall t = objectMapper.readValue(message.getBody(), TariffCall.class);
+                    TariffCallRepository.updateTariffCall(t);
+                    break;
+                }
+                /** Tariff Internet */
+                case CREATE_TARIFF_INTERNET: {  //message = Account
+                    System.out.println("CREATE_TARIFF_INTERNET");
+                    TariffInternet t = objectMapper.readValue(message.getBody(), TariffInternet.class);
+                    TariffInternetRepository.save(t);
+                    break;
+                }
+                case DELETE_TARIFF_INTERNET: {  //message = String
+                    System.out.println("DELETE_TARIFF_INTERNET");
+                    String name = objectMapper.readValue(message.getBody(), String.class);
+                    TariffInternetRepository.deleteByName(name);
+                    break;
+                }
+                case UPDATE_TARIFF_INTERNET: {  //message = Account
+                    System.out.println("UPDATE_TARIFF_INTERNET");
+                    TariffInternet t = objectMapper.readValue(message.getBody(), TariffInternet.class);
+                    TariffInternetRepository.updateTariffInternet(t);
+                    break;
+                }
+                /** Tariff Call */
+                case CREATE_TARIFF_SMS: {  //message = Account
+                    System.out.println("CREATE_TARIFF_SMS");
+                    TariffSms t = objectMapper.readValue(message.getBody(), TariffSms.class);
+                    TariffSmsRepository.save(t);
+                    break;
+                }
+                case DELETE_TARIFF_SMS: {  //message = String
+                    System.out.println("DELETE_TARIFF_SMS");
+                    String name = objectMapper.readValue(message.getBody(), String.class);
+                    TariffSmsRepository.deleteByName(name);
+                    break;
+                }
+                case UPDATE_TARIFF_SMS: {  //message = Account
+                    System.out.println("UPDATE_TARIFF_SMS");
+                    TariffSms t = objectMapper.readValue(message.getBody(), TariffSms.class);
+                    TariffSmsRepository.updateTariffSms(t);
+                    break;
+                }
                 default: {
                     break;
                 }

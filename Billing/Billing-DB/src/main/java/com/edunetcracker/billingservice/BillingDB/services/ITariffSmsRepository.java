@@ -9,13 +9,13 @@ import org.springframework.scheduling.annotation.Async;
 
 import javax.transaction.Transactional;
 
-public interface ITariffSmsRepository{} /*extends JpaRepository<TariffSms, Long> {
+public interface ITariffSmsRepository extends JpaRepository<TariffSms, Long> {
 
     TariffSms findTariffSmsByName(String name);
 
     @Transactional
     @Async
-    Long deleteByLogin(String login);
+    Long deleteByName(String name);
 
     @Modifying
     @Transactional
@@ -24,4 +24,4 @@ public interface ITariffSmsRepository{} /*extends JpaRepository<TariffSms, Long>
             "                         t.default_sms_cost = :#{#tariffSms.getDefault_sms_cost()} where t.name = :#{#tariffSms.getName()} ")
     void updateTariffSms(@Param("tariffSms") TariffSms tariffSms);
 
-}*/
+}

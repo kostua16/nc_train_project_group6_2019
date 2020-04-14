@@ -9,13 +9,13 @@ import org.springframework.scheduling.annotation.Async;
 
 import javax.transaction.Transactional;
 
-public interface ITariffCallRepository{} /*extends JpaRepository<TariffCall, Long> {
+public interface ITariffCallRepository extends JpaRepository<TariffCall, Long> {
 
     TariffCall findTariffCallByName(String name);
 
     @Transactional
     @Async
-    Long deleteByLogin(String login);
+    Long deleteByName(String name);
 
     @Modifying
     @Transactional
@@ -24,4 +24,4 @@ public interface ITariffCallRepository{} /*extends JpaRepository<TariffCall, Lon
             "                         t.default_call_cost = :#{#tariffCall.getDefault_call_cost()} where t.name = :#{#tariffCall.getName()} ")
     int updateTariffCall(@Param("tariffCall") TariffCall tariffCall);
 
-}*/
+}

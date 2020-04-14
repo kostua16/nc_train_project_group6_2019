@@ -9,13 +9,13 @@ import org.springframework.scheduling.annotation.Async;
 
 import javax.transaction.Transactional;
 
-public interface ITariffInternetRepository{} /*extends JpaRepository<TariffInternet, Long> {
+public interface ITariffInternetRepository extends JpaRepository<TariffInternet, Long> {
 
     TariffInternet findTariffInternetByName(String name);
 
     @Transactional
     @Async
-    Long deleteByLogin(String login);
+    Long deleteByName(String name);
 
     @Modifying
     @Transactional
@@ -24,4 +24,4 @@ public interface ITariffInternetRepository{} /*extends JpaRepository<TariffInter
             "                             t.default_internet_cost = :#{#tariffInternet.getDefault_internet_cost()} where t.name = :#{#tariffInternet.getName()} ")
     void updateTariffInternet(@Param("tariffInternet") TariffInternet tariffInternet);
 
-}*/
+}

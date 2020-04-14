@@ -17,9 +17,9 @@ public class Account {
 
     private Long balance;
 
-    // private String tariff;       // tariff name
+    private String tariff;
 
-    // private String rang;         // user, administrator...
+    private String rang;         // user, administrator...
 
     ///////////////////////////////////////
     public String getLogin() {
@@ -54,4 +54,19 @@ public class Account {
         this.balance = balance;
     }
 
+    public String getTariff() {
+        return tariff;
+    }
+
+    public void setTariff(String tariff) {
+        this.tariff = tariff;
+    }
+
+    public String getRang() {
+        return rang;
+    }
+
+    public void setRang(String rang) {
+        this.rang = rang;
+    }
 }
