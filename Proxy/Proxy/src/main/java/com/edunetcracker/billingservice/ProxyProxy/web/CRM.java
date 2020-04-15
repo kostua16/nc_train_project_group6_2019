@@ -1,5 +1,6 @@
 package com.edunetcracker.billingservice.ProxyProxy.web;
 
+import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.entity.CollectedTariff;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Tariff;
@@ -37,6 +38,9 @@ public class CRM {
 
     @Autowired
     TariffController tariffController;
+
+    @Autowired
+    Checks checks;
     /***************************************************/
     /**
      * AccountName
@@ -68,6 +72,7 @@ public class CRM {
     @GetMapping("topup")
     public Boolean topup (@RequestParam("login") String login,
                           @RequestParam("amount") Long amount ) {
+        Account account = accountController.getAccount(login).getBody();
         if (amount > 0L && balanceController.addToBalance(login, amount).getBody())
             return true;
         return false;
@@ -75,6 +80,7 @@ public class CRM {
     //  http://localhost:8102/showtariff/?login=tester@mail.ru
     @GetMapping("showtariff")
     public Map<String, Map<String, String>> showtariff(@RequestParam("login") String login){
+        Account account = accountController.getAccount(login).getBody();
         String userTariff = accountController.getAccount(login).getBody().getTariff();
         List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
         if (userTariff != null && tariffs != null) {

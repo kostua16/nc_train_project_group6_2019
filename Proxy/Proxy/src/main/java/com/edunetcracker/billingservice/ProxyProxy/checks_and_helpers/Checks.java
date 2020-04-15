@@ -10,11 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class Checks {
 
     @Autowired
     Helpers helpers;
+
+    List<String> ranges = Arrays.asList("user","administrator");
 
     /*************checks**************/
     public Boolean isAccountExists(String accountLogin) {
@@ -61,6 +66,14 @@ public class Checks {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean isAvailableInRanges(String mainRang){
+        for(int a = 0; a< ranges.size(); a++){
+            if(mainRang.equals(ranges.get(a)))
+                return true;
+        }
+        return false;
     }
 
 }

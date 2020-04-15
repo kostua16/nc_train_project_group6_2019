@@ -9,6 +9,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class Checks {
 
@@ -17,13 +20,17 @@ public class Checks {
 
     @Autowired
     SessionService sessionService;
+    public static final String USER ="USER";
+    public static final String ADMINISTRATOR ="ADMINISTRATOR";
+    List<String> ranges = Arrays.asList("USER","ADMINISTRATOR");
+
 
     /*************checks**************/
     public Boolean isAccountExists(String accountLogin) {
         try {
             String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + accountLogin;
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
-            System.out.println("isAccountExists" + account.getBalance());
+            System.out.println("isAccountExists " + account.getBalance());
             if (account == null)
                 return false;
 
@@ -39,8 +46,7 @@ public class Checks {
             return true;
         return false;
     }
-
-    public String getLoginByToken(String token) {
+    public String getLoginByTokenAndCheck(String token) {
         if (checkByToken(token)) {
             String login = sessionService.getLogin(token).getLogin();
             if (isAccountExists(login)) {
@@ -48,6 +54,14 @@ public class Checks {
             }
         }
         return null;
+    }
+
+    public boolean isAvailableInRanges(String mainRang){
+        for(int a = 0; a< ranges.size(); a++){
+            if(mainRang.equals(ranges.get(a)))
+                return true;
+        }
+        return false;
     }
 
 }

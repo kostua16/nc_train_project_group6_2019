@@ -71,14 +71,14 @@ public class SmsController {
     public Boolean requestSmsByQuantity(String login, Long quantity) {
         try {
             String url = helpers.getUrlBilling() + "/getSmsByLogin/?login=" + login;
-            Sms internet = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Sms.class).getBody();
+            Sms sms = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Sms.class).getBody();
 
             url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + login;
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
 
-            float cost = internet.getSms_cost();
-            float defaultCost = internet.getDefault_sms_cost();
-            if (internet.getSms_balance() <= 0L) {
+            float cost = sms.getSms_cost();
+            float defaultCost = sms.getDefault_sms_cost();
+            if (sms.getSms_balance() <= 0L) {
                 if (account.getBalance() - ((long) (defaultCost * quantity)) >= 0) {
                     account.setBalance(-(long) (defaultCost * quantity));
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
@@ -87,22 +87,22 @@ public class SmsController {
                     return false;
             } else {
                 // если ресурса по тарифу хватает
-                if (internet.getSms_balance() - quantity >= 0L) {
-                    internet.setSms_balance(quantity);                  // - minutes
+                if (sms.getSms_balance() - quantity >= 0L) {
+                    sms.setSms_balance(quantity);                  // - minutes
                     account.setBalance(-(long) (cost * quantity));    // - points
-//TODO      //!!           //rabbitMQSender.send(internet, RabbitMQMessageType.REQUEST_SMS);   //TODO
+                    rabbitMQSender.send(sms, RabbitMQMessageType.REQUEST_SMS);   //TODO
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                     return true;
                 }
                 // ресурса не хватает
                 else {
-                    long callLack = quantity - internet.getSms_balance();
-                    long amountForTariff = (long) (cost * internet.getSms_balance());                 //  нехватка
+                    long callLack = quantity - sms.getSms_balance();
+                    long amountForTariff = (long) (cost * sms.getSms_balance());                 //  нехватка
                     long amountForDefault = (long) (callLack * defaultCost);         //  пересчёт остатка ресурсов
                     if (account.getBalance() - amountForDefault >= 0) {
-                        internet.setSms_balance(internet.getSms_balance());
+                        sms.setSms_balance(sms.getSms_balance());
                         account.setBalance(-(amountForTariff + amountForDefault));
-//TODO      //!!            //rabbitMQSender.send(internet, RabbitMQMessageType.REQUEST_SMS);
+                        rabbitMQSender.send(sms, RabbitMQMessageType.REQUEST_SMS);
                         rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                         return true;
                     }

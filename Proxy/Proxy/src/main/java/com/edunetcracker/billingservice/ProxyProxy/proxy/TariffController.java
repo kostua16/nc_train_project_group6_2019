@@ -177,6 +177,19 @@ public class TariffController {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
     }
+
+    public ResponseEntity<Boolean> deleteCollectedTariffByName(String name) {
+        try {
+            rabbitMQSender.send(name, RabbitMQMessageType.DELETE_TARIFF);
+            rabbitMQSender.send(name, RabbitMQMessageType.DELETE_TARIFF_CALL);
+            rabbitMQSender.send(name, RabbitMQMessageType.DELETE_TARIFF_INTERNET);
+            rabbitMQSender.send(name, RabbitMQMessageType.DELETE_TARIFF_SMS);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        }
+    }
     //update all accounts by their tariff plans
     /*@GetMapping("newMonth")*/
     public Boolean newMonth() {

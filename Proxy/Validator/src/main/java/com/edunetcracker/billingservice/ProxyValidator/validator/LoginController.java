@@ -72,7 +72,6 @@ public class LoginController {
 
     public Login getAccountLoginAndPassword(@RequestParam("login") String login) {
         try {
-            //TODO
             String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + login;
             ResponseEntity<Account> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
             Login login1 = new Login(responseAccount.getBody().getLogin(), responseAccount.getBody().getPassword());

@@ -169,8 +169,8 @@ public class RabbitMQListener {
                     break;
                 }
 
-                case RESPONSE_SMS: {
-                    System.out.println("RESPONSE_SMS");
+                case REQUEST_SMS: {
+                    System.out.println("REQUEST_SMS");
                     Sms sms = objectMapper.readValue(message.getBody(), Sms.class);
                     Sms realSms = SmsRepository.findSmsByLogin(sms.getLogin());
                     realSms.setSms_balance(realSms.getSms_balance() - sms.getSms_balance());

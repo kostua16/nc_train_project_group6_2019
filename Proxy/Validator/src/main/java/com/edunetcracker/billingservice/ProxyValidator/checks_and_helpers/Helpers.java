@@ -1,7 +1,12 @@
 package com.edunetcracker.billingservice.ProxyValidator.checks_and_helpers;
 
+import com.edunetcracker.billingservice.ProxyValidator.entity.Account;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class Helpers {
@@ -29,5 +34,9 @@ public class Helpers {
         return "http://" + hostProxy + ":" + portProxy;
     }
 
-
+    public Account getAccount(String accountLogin){
+        String url = getUrlBilling() + "/getAccountByLogin/?login=" + accountLogin;
+        Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
+        return account;
+    }
 }
