@@ -64,6 +64,9 @@ public class CRM {
             returnMap.put("internet", internet.toString());
             returnMap.put("minutes", minutes.toString());
             returnMap.put("sms", sms.toString());
+            //
+            returnMap.put("telephone", account.getTelephone());
+            //
             return returnMap;
         }
         return null;

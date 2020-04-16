@@ -78,6 +78,9 @@ public class SmsController {
 
             float cost = sms.getSms_cost();
             float defaultCost = sms.getDefault_sms_cost();
+            if (account.getBalance()<=0L){
+                return false;
+            }
             if (sms.getSms_balance() <= 0L) {
                 if (account.getBalance() - ((long) (defaultCost * quantity)) >= 0) {
                     account.setBalance(-(long) (defaultCost * quantity));
@@ -88,11 +91,15 @@ public class SmsController {
             } else {
                 // если ресурса по тарифу хватает
                 if (sms.getSms_balance() - quantity >= 0L) {
-                    sms.setSms_balance(quantity);                  // - minutes
-                    account.setBalance(-(long) (cost * quantity));    // - points
-                    rabbitMQSender.send(sms, RabbitMQMessageType.REQUEST_SMS);   //TODO
-                    rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
-                    return true;
+                    long amountForTariff = (long) (cost * quantity);
+                    if (account.getBalance() - amountForTariff >= 0) {
+                        sms.setSms_balance(quantity);                  // - minutes
+                        account.setBalance(-(long) (cost * quantity));    // - points
+                        rabbitMQSender.send(sms, RabbitMQMessageType.REQUEST_SMS);   //TODO
+                        rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                        return true;
+                    }
+                    else return false;
                 }
                 // ресурса не хватает
                 else {

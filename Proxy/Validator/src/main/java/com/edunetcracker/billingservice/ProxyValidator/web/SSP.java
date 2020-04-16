@@ -28,14 +28,16 @@ public class SSP {
     //  http://localhost:8102/createA
     /**
      * Создание пользователя и записи по тарифу
-     * {
-     *   "login": "111@mail.ru",
-     *   "password": "111",
-     *   "name": "1_1",
-     *   "balance": "40000",
-     *   "tariff": "DEFAULT",
-     *   "rang": "USER"
-     * }
+     {
+     "login": "111",
+     "password": "111",
+     "name": "1_1",
+     "balance": "40000",
+     "tariff": "DEFAULT",
+     "telephone": "897654321",
+     "rang": "USER"
+     }
+
      */
     @PostMapping("createA")
     public ResponseEntity<Boolean> createA(@RequestParam("token") String token,

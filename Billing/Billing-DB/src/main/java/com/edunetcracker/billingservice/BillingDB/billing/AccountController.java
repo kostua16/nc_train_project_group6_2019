@@ -26,6 +26,13 @@ public class AccountController {
         Account account = AccountRepository.findAccountByLogin(login);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
+    @GetMapping("getAccountByTelephone")
+    public ResponseEntity<Account> getAccountByTelephone(@RequestParam("telephone") String telephone) {
+        System.out.println("getAccountByTelephone1");
+        Account account = AccountRepository.findAccountByTelephone(telephone);
+        System.out.println("getAccountByTelephone2");
+        return new ResponseEntity<>(account, HttpStatus.OK);
+    }
 
     @GetMapping("getAllAccount")
     public ResponseEntity<List<Account>> getAllAccount() {

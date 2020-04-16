@@ -83,8 +83,12 @@ public class InternetController {
 
             float cost = internet.getInternet_cost();
             float defaultCost = internet.getDefault_internet_cost();
+            if (account.getBalance()<=0L){
+                return false;
+            }
             if (internet.getInternet_balance() <= 0L) {
                 if (account.getBalance() - ((long) (defaultCost * quantity)) >= 0) {
+                    System.out.println("IF 1");
                     account.setBalance(-(long) (defaultCost * quantity));
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                     return true;
@@ -93,11 +97,18 @@ public class InternetController {
             } else {
                 // если ресурса по тарифу хватает
                 if (internet.getInternet_balance() - quantity >= 0L) {
-                    internet.setInternet_balance(quantity);                  // - minutes
-                    account.setBalance(-(long) (cost * quantity));    // - points
-                    rabbitMQSender.send(internet, RabbitMQMessageType.INTERNET_USE_KILOBYTE);   //TODO
-                    rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
-                    return true;
+                    System.out.println("IF 2");
+                    long amountForTariff = (long) (cost * quantity);
+                    if (account.getBalance() - amountForTariff >= 0) {
+                        System.out.println("IF 3");
+                        internet.setInternet_balance(quantity);                  // - minutes
+                        account.setBalance(-(long) (cost * quantity));    // - points
+                        rabbitMQSender.send(internet, RabbitMQMessageType.INTERNET_USE_KILOBYTE);   //TODO
+                        rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                        return true;
+                    }
+                    else return false;
+
                 }
                 // ресурса не хватает
                 else {
@@ -105,15 +116,18 @@ public class InternetController {
                     long amountForTariff = (long) (cost * internet.getInternet_balance());                 //  нехватка
                     long amountForDefault = (long) (callLack * defaultCost);         //  пересчёт остатка ресурсов
                     if (account.getBalance() - amountForDefault >= 0) {
+                        System.out.println("IF 4");
                         internet.setInternet_balance(internet.getInternet_balance());
                         account.setBalance(-(amountForTariff + amountForDefault));
                         rabbitMQSender.send(internet, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
                         rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                         return true;
                     }
+                    else return false;
                 }
             }
-            return false;
+            //System.out.println("IF 4");
+            //return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

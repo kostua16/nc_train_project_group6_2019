@@ -53,6 +53,17 @@ public class AccountController {
             return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
         }
     }
+    public ResponseEntity<Account> getAccountByTelephone(String telephone) {
+        try {
+            System.out.println("getAccountByTelephone");
+            String url = helpers.getUrlBilling() + "/getAccountByTelephone/?telephone=" + telephone;
+            ResponseEntity<Account> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
+            return responseAccount;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
+        }
+    }
     /*@GetMapping("getAllAccount")*/
     public ResponseEntity<List<Account>> getAllAccount(/*@RequestParam("token") String token*/) {
         try {

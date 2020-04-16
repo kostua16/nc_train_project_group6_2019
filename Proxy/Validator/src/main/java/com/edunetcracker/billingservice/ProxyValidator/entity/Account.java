@@ -14,6 +14,8 @@ public class Account {
 
     private String tariff;
 
+    private String telephone;
+
     private String rang;         // user, administrator...
 
     ///////////////////////////////////////
@@ -63,5 +65,13 @@ public class Account {
 
     public void setRang(String rang) {
         this.rang = rang;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 }

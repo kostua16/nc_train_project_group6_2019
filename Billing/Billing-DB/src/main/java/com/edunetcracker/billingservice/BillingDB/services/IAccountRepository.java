@@ -17,6 +17,7 @@ public interface IAccountRepository extends JpaRepository<Account, Long> {
     //@Override
     //List<Account> findAll();
     Account findAccountByLogin(String login);
+    Account findAccountByTelephone(String telephone);
     //Account findAccountByTelephone(String telephone);
 
     @Transactional
@@ -29,6 +30,7 @@ public interface IAccountRepository extends JpaRepository<Account, Long> {
                                 "t.name = :#{#account.getName()}," +
                                 "t.balance = :#{#account.getBalance()}," +
                                 "t.tariff = :#{#account.getTariff()}," +
+                                "t.telephone = :#{#account.getTelephone()}," +
                                 "t.rang = :#{#account.getRang()}  where t.login = :#{#account.getLogin()} ")
     void updateAccount(@Param("account") Account account);
 

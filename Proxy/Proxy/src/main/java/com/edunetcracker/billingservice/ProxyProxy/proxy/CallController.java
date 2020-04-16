@@ -30,7 +30,7 @@ public class CallController {
     private Checks checks;
 
    /* @GetMapping("callToMinutes")*/
-    public Boolean callToMinutes(/*@RequestParam("token")*/ String login) {
+    public Boolean callToMinutes(/*@RequestParam("token")*/ String login, long minutes) {
         try {
             String url = helpers.getUrlBilling() + "/getCallByLogin/?login=" + login;
             Call call = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Call.class).getBody();
@@ -40,27 +40,38 @@ public class CallController {
 
             float cost = call.getCall_cost();
             float defaultCost = call.getDefault_call_cost();
+            if (account.getBalance()<=0L){
+                return false;
+            }
             if (call.getCall_balance() <= 0L) {
-                if (account.getBalance() - ((long) (defaultCost * 60)) >= 0) {
-                    account.setBalance(-(long) (defaultCost * 60));   // - points
+                if (account.getBalance() - ((long) (defaultCost * 60 * minutes)) >= 0) {
+                    account.setBalance(-(long) (defaultCost * 60 * minutes));   // - points
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                     return true;
                 } else
                     return false;
             } else {
                 // если ресурса по тарифу хватает
-                if (call.getCall_balance() - 60 >= 0L) {
-                    call.setCall_balance(60L);                  // - minutes
-                    account.setBalance(-(long) (cost * 60));    // - points
-                    rabbitMQSender.send(call, RabbitMQMessageType.CALL_ONE_MINUTE);
-                    rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
-                    return true;
+                if (call.getCall_balance() - 60 * minutes >= 0L) {
+                    System.out.println("C 1");
+                    long amountForTariff = (long) (cost * minutes*60L);
+                    if (account.getBalance() - amountForTariff >= 0) {
+                        System.out.println("C 2");
+                        call.setCall_balance(minutes * 60L);                  // - minutes
+                        account.setBalance(-(long) (cost * 60 * minutes));    // - points
+                        rabbitMQSender.send(call, RabbitMQMessageType.CALL_ONE_MINUTE);
+                        rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                        return true;
+                    }
+                    else return false;
+
                 }
                 // ресурса не хватает
                 else {
-                    long callLack = 60 - call.getCall_balance();
+                    long callLack = 60 * minutes - call.getCall_balance();
                     long amountForTariff = (long) (cost * call.getCall_balance());                 //  нехватка
                     long amountForDefault = (long) (callLack * defaultCost);         //  пересчёт остатка ресурсов
+                    System.out.println("C 3");
                     if (account.getBalance() - amountForDefault >= 0) {
                         call.setCall_balance(call.getCall_balance());
                         account.setBalance(-(amountForTariff + amountForDefault));
@@ -89,6 +100,9 @@ public class CallController {
 
             float cost = call.getCall_cost();
             float defaultCost = call.getDefault_call_cost();
+            if (account.getBalance()<=0L){
+                return false;
+            }
             if (call.getCall_balance() <= 0L) {
                 if (account.getBalance() - ((long) (defaultCost)) >= 0) {
                     account.setBalance(-(long) (defaultCost));   // - points
