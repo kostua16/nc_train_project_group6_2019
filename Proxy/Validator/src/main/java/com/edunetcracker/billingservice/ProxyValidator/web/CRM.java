@@ -142,6 +142,21 @@ public class CRM {
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
+    @GetMapping("showA")
+    public ResponseEntity<Map<String, Map<String, String>>> showA(@RequestParam("token") String token){
+        String login = checks.getLoginByTokenAndCheck(token);
+        if(login == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        String rang = helpers.getAccount(login).getRang();
+        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+            String url = helpers.getUrlProxy() + "showA";
+            Map<String, Map<String, String>> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
     @GetMapping("showT")
     public ResponseEntity<Map<String, Map<String, String>>> showT(@RequestParam("token") String token){
         String login = checks.getLoginByTokenAndCheck(token);
@@ -150,7 +165,7 @@ public class CRM {
         }
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
-            String url = helpers.getUrlProxy() + "showT/?login=" + login;
+            String url = helpers.getUrlProxy() + "showT";
             Map<String, Map<String, String>> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

@@ -206,6 +206,23 @@ public class CRM {
         }
         return false;
     }
+    @GetMapping("showA")
+    public Map<String, Map<String, String>> showA(){
+        List<Account> accounts = accountController.getAllAccount().getBody();
+        Map<String, Map<String, String>> returnMap = new HashMap<>();
+        Map<String, String> acc;
+        for (int a = 0; a< accounts.size(); a++){
+            acc = new HashMap<>();
+            acc.put("password", accounts.get(a).getPassword());
+            acc.put("name", accounts.get(a).getName());
+            acc.put("balance", accounts.get(a).getBalance().toString());
+            acc.put("tariff", accounts.get(a).getTariff());
+            acc.put("rang", accounts.get(a).getRang());
+            acc.put("telephone", accounts.get(a).getTelephone());
+            returnMap.put(accounts.get(a).getLogin(), acc);
+        }
+        return returnMap;
+    }
     @GetMapping("showT")
     public Map<String, Map<String, String>> showT(){
         List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
