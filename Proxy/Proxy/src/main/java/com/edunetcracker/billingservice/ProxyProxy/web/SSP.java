@@ -1,201 +1,111 @@
 package com.edunetcracker.billingservice.ProxyProxy.web;
 
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
-import com.edunetcracker.billingservice.ProxyProxy.entity.*;
-import com.edunetcracker.billingservice.ProxyProxy.proxy.AccountController;
-import com.edunetcracker.billingservice.ProxyProxy.proxy.TariffController;
-import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
-import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
+import com.edunetcracker.billingservice.ProxyProxy.entity.CollectedTariff;
+import com.edunetcracker.billingservice.ProxyProxy.entity.Tariff;
+import com.edunetcracker.billingservice.ProxyProxy.proxy.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 public class SSP {
+    //TODO  get balance and services status
+    //TODO  choice a tariff
+    //TODO  depositing to balance
 
     @Autowired
-    private RabbitMQSender rabbitMQSender;
+    AccountController accountController;
 
     @Autowired
-    private Helpers helpers;
+    BalanceController balanceController;
 
     @Autowired
-    private Checks checks;
+    CallController callController;
+
+    @Autowired
+    InternetController internetController;
+
+    @Autowired
+    SmsController smsController;
 
     @Autowired
     TariffController tariffController;
 
     @Autowired
-    AccountController accountController;
-
-    //  http://localhost:8102/start
-    @PostMapping("start")
-    public Boolean start() throws JsonProcessingException {
-        if (!checks.isAccountExists("tester@mail.ru") &&
-                !checks.isTariffExists("DEFAULT")) {
-            Account account = new Account();
-            account.setLogin("tester@mail.ru");
-            account.setPassword("123");
-            account.setName("Piter");
-            account.setBalance(0L);
-            account.setTariff("DEFAULT");
-            account.setRang("ADMINISTRATOR");
-            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
-            Tariff tariff = new Tariff();
-            tariff.setName("DEFAULT");
-            rabbitMQSender.send(tariff, RabbitMQMessageType.CREATE_TARIFF);
-            TariffCall tariffCall = new TariffCall();
-            tariffCall.setName("DEFAULT");
-            tariffCall.setCall_cost(2.2F);
-            tariffCall.setCall_balance(1222333L);
-            tariffCall.setDefault_call_cost(3.5F);
-            rabbitMQSender.send(tariffCall, RabbitMQMessageType.CREATE_TARIFF_CALL);
-            TariffInternet tariffInternet = new TariffInternet();
-            tariffInternet.setName("DEFAULT");
-            tariffInternet.setInternet_cost(2.2F);
-            tariffInternet.setInternet_balance(12223333L);
-            tariffInternet.setDefault_internet_cost(3.5F);
-            rabbitMQSender.send(tariffInternet, RabbitMQMessageType.CREATE_TARIFF_INTERNET);
-            TariffSms tariffSms = new TariffSms();
-            tariffSms.setName("DEFAULT");
-            tariffSms.setSms_cost(2.2F);
-            tariffSms.setSms_balance(100L);
-            tariffSms.setDefault_sms_cost(3.5F);
-            rabbitMQSender.send(tariffSms, RabbitMQMessageType.CREATE_TARIFF_SMS);
-            Call call = new Call();
-            call.setLogin("tester@mail.ru");
-            call.setCall_cost(2.2F);
-            call.setCall_balance(1222333L);
-            call.setDefault_call_cost(3.5F);
-            rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
-            Internet internet = new Internet();
-            internet.setLogin("tester@mail.ru");
-            internet.setInternet_cost(2.2F);
-            internet.setInternet_balance(12223333L);
-            internet.setDefault_internet_cost(3.5F);
-            rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
-            Sms sms = new Sms();
-            sms.setLogin("tester@mail.ru");
-            sms.setSms_cost(2.2F);
-            sms.setSms_balance(100L);
-            sms.setDefault_sms_cost(3.5F);
-            rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
-            return true;
-        }
-        return false;
-    }
-
-    //  http://localhost:8102/createA
+    Checks checks;
+    /***************************************************/
     /**
-     * {
-     *   "login": "111",
-     *   "password": "222",
-     *   "name": "333",
-     *   "balance": "444",
-     *   "tariff": "555",
-     *   "rang": "666"
-     * }
+     * AccountName
+     * Balance
+     * Remains:
+     *          Internet
+     *          Minutes
+     *          SMS
      */
-    @PostMapping("createA")
-    public Boolean createA(@RequestBody Account newAccount) throws JsonProcessingException {
-        // если нет аккаунта, но есть тариф
-        System.out.println("createA");
-        if (!checks.isAccountExists(newAccount.getLogin()) && checks.isTariffExists(newAccount.getTariff())) {
-            System.out.println("createA !");
-            Account account = newAccount;
-            account.setBalance(0L);
-            //account.setRang("base_user");
-            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
-            CollectedTariff collectedTariff = tariffController.getCollectedTariffByName(newAccount.getTariff()).getBody();
-            Call call = new Call();
-            call.setLogin(newAccount.getLogin());
-            call.setCall_cost(collectedTariff.getTariffCall().getCall_cost());
-            call.setCall_balance(collectedTariff.getTariffCall().getCall_balance());
-            call.setDefault_call_cost(collectedTariff.getTariffCall().getDefault_call_cost());
-            rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
-            Internet internet = new Internet();
-            internet.setLogin(newAccount.getLogin());
-            internet.setInternet_cost(collectedTariff.getTariffInternet().getInternet_cost());
-            internet.setInternet_balance(collectedTariff.getTariffInternet().getInternet_balance());
-            internet.setDefault_internet_cost(collectedTariff.getTariffInternet().getDefault_internet_cost());
-            rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
-            Sms sms = new Sms();
-            sms.setLogin(newAccount.getLogin());
-            sms.setSms_cost(collectedTariff.getTariffSms().getSms_cost());
-            sms.setSms_balance(collectedTariff.getTariffSms().getSms_balance());
-            sms.setDefault_sms_cost(collectedTariff.getTariffSms().getDefault_sms_cost());
-            rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
-            return true;
+    //  http://localhost:8102/home/?login=tester@mail.ru
+    @GetMapping("home")
+    public Map<String, String> home(@RequestParam("login") String login){
+        Account account = accountController.getAccount(login).getBody();
+        Long internet = internetController.getInternetByLogin(login).getBody().getInternet_balance();
+        Long minutes = callController.getCallByLogin(login).getBody().getCall_balance();
+        Long sms = smsController.getSmsByLogin(login).getBody().getSms_balance();
+        if(account != null && internet != null && minutes != null && sms != null) {
+            Map<String, String> returnMap = new HashMap<>();
+            returnMap.put("name", account.getName());
+            returnMap.put("balance", account.getBalance().toString());
+            returnMap.put("internet", internet.toString());
+            returnMap.put("minutes", minutes.toString());
+            returnMap.put("sms", sms.toString());
+            //
+            returnMap.put("telephone", account.getTelephone());
+            //
+            return returnMap;
         }
+        return null;
+    }
+    //  http://localhost:8102/topup/?login=tester@mail.ru&amount=999
+    @GetMapping("topup")
+    public Boolean topup (@RequestParam("login") String login,
+                          @RequestParam("amount") Long amount ) {
+        Account account = accountController.getAccount(login).getBody();
+        if (amount > 0L && balanceController.addToBalance(login, amount).getBody())
+            return true;
         return false;
     }
-
-    //  http://localhost:8102/createT/?tariff=FOR_SMALL
-
-    /**
-     * {
-     *   "tariff": {"tariffName":"BIG_GIB"},
-     *   "tariffCall": {"Call_cost": "4.5","Call_balance": "100","Default_call_cost": "14.0"},
-     *   "tariffInternet": {"Internet_cost": "4.5","Internet_balance": "100","Default_internet_cost": "14.0"},
-     *   "tariffSms": {"Sms_cost": "4.5","Sms_balance": "100","Default_sms_cost": "14.0"}
-     * }
-     */
-    @PostMapping("createT")
-    public Boolean createT(@RequestBody Map<String, Map<String, String>> requestB) throws JsonProcessingException {
-        if (!checks.isTariffExists(requestB.get("tariff").get("tariffName"))) {
-            Tariff tariff = new Tariff();
-            tariff.setName(requestB.get("tariff").get("tariffName"));
-            rabbitMQSender.send(tariff, RabbitMQMessageType.CREATE_TARIFF);
-            TariffCall tariffCall = new TariffCall();
-            tariffCall.setName(requestB.get("tariff").get("tariffName"));
-            tariffCall.setCall_cost(Float.parseFloat(requestB.get("tariffCall").get("Call_cost")));
-            tariffCall.setCall_balance(Long.parseLong(requestB.get("tariffCall").get("Call_balance")));
-            tariffCall.setDefault_call_cost(Float.parseFloat(requestB.get("tariffCall").get("Default_call_cost")));
-            rabbitMQSender.send(tariffCall, RabbitMQMessageType.CREATE_TARIFF_CALL);
-            TariffInternet tariffInternet = new TariffInternet();
-            tariffInternet.setName(requestB.get("tariff").get("tariffName"));
-            tariffInternet.setInternet_cost(Float.parseFloat(requestB.get("tariffInternet").get("Internet_cost")));
-            tariffInternet.setInternet_balance(Long.parseLong(requestB.get("tariffInternet").get("Internet_balance")));
-            tariffInternet.setDefault_internet_cost(Float.parseFloat(requestB.get("tariffInternet").get("Default_internet_cost")));
-            rabbitMQSender.send(tariffInternet, RabbitMQMessageType.CREATE_TARIFF_INTERNET);
-            TariffSms tariffSms = new TariffSms();
-            tariffSms.setName(requestB.get("tariff").get("tariffName"));
-            tariffSms.setSms_cost(Float.parseFloat(requestB.get("tariffSms").get("Sms_cost")));
-            tariffSms.setSms_balance(Long.parseLong(requestB.get("tariffSms").get("Sms_balance")));
-            tariffSms.setDefault_sms_cost(Float.parseFloat(requestB.get("tariffSms").get("Default_sms_cost")));
-            rabbitMQSender.send(tariffSms, RabbitMQMessageType.CREATE_TARIFF_SMS);
-            return true;
+    //  http://localhost:8102/showtariff/?login=tester@mail.ru
+    @GetMapping("showtariff")
+    public Map<String, Map<String, String>> showtariff(@RequestParam("login") String login){
+        String userTariff = accountController.getAccount(login).getBody().getTariff();
+        List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
+        if (userTariff != null && tariffs != null) {
+            Map<String, Map<String, String>> returnMap = new HashMap<>();
+            Map<String, String> tariff;
+            Map<String, String> uTariff = new HashMap<>();
+            uTariff.put("tariff", userTariff);
+            returnMap.put("user", uTariff);
+            for (int a = 0; a< tariffs.size(); a++){
+                tariff = new HashMap<>();
+                tariff.put("call", tariffs.get(a).getTariffCall().getCall_balance().toString());
+                tariff.put("internet", tariffs.get(a).getTariffInternet().getInternet_balance().toString());
+                tariff.put("sms", tariffs.get(a).getTariffSms().getSms_balance().toString());
+                returnMap.put(tariffs.get(a).getName(), tariff);
+            }
+            return returnMap;
         }
-        return false;
+        return null;
     }
-
-    //
-    @DeleteMapping("deleteA")
-    public Boolean deleteA(@RequestParam("login") String login) throws JsonProcessingException {
-        if (checks.isAccountExists(login)) {
-            Account account = accountController.getAccount(login).getBody();
-            accountController.deleteAccountByLogin(login);
-            tariffController.deleteCollectedTariffByName(account.getTariff());
-            return true;
-        }
-        return false;
-    }
-
-    @DeleteMapping("deleteT")
-    public Boolean deleteT(@RequestParam("name") String name) throws JsonProcessingException {
-        if (checks.isTariffExists(name)) {
-            tariffController.deleteTariff(name);
-            return true;
-        }
-        return false;
-    }
-
-    @PostMapping("changeT")
-    public Boolean changeT(@RequestParam("login") String login,
-                           @RequestParam("tariff") String tariff){
+    //  http://localhost:8102/choicetariff/?login=tester@mail.ru&tariff=FOR_SMALL
+    @GetMapping("choicetariff")
+    public Boolean choicetariff(@RequestParam("login") String login,
+                                @RequestParam("tariff") String tariff){
         Account account = accountController.getAccount(login).getBody();
         if(account != null) {
             account.setTariff(tariff);
@@ -204,4 +114,13 @@ public class SSP {
         }
         return false;
     }
+    @GetMapping("getTelephone")
+    public String getTelephone(@RequestParam("login") String login){
+        Account account = accountController.getAccount(login).getBody();
+        if(account != null) {
+            return account.getTariff();
+        }
+        return null;
+    }
+
 }
