@@ -9,7 +9,12 @@ import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -236,5 +241,12 @@ public class CRM {
             returnMap.put(tariffs.get(a).getName(), tariff);
         }
         return returnMap;
+    }
+    //  http://localhost:8102/showHistory
+    @GetMapping("showHistory")
+    public List<History> showHistory(){
+        String url = helpers.getUrlBilling() + "/getAllHistory";
+        List<History> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
+        return response;
     }
 }

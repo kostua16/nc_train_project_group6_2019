@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-
+@Service
 public interface ICallRepository extends JpaRepository<Call, Long> {
 
     Call findCallByLogin(String login);

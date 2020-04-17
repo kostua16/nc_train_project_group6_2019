@@ -3,6 +3,7 @@ package com.edunetcracker.billingservice.ProxyValidator.web;
 import com.edunetcracker.billingservice.ProxyValidator.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyValidator.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyValidator.entity.Account;
+import com.edunetcracker.billingservice.ProxyValidator.entity.History;
 import com.edunetcracker.billingservice.ProxyValidator.session.SessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,6 +168,20 @@ public class CRM {
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "showT";
             Map<String, Map<String, String>> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+    @GetMapping("showHistory")
+    public ResponseEntity<List<History>> showHistory(@RequestParam("token") String token){
+        String login = checks.getLoginByTokenAndCheck(token);
+        if(login == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        String rang = helpers.getAccount(login).getRang();
+        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+            String url = helpers.getUrlProxy() + "/showHistory";
+            List<History> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
