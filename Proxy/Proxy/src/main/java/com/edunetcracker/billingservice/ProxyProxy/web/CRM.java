@@ -38,61 +38,125 @@ public class CRM {
     @Autowired
     AccountController accountController;
 
+    /**
+     * admin@mail.ru
+     *
+     * user@mail.ru
+     *
+     * 123456
+     * Номер 88005553535 у второго 88005553536
+     */
     //  http://localhost:8102/start
     @PostMapping("start")
     public Boolean start() throws JsonProcessingException {
-        if (!checks.isAccountExists("tester@mail.ru") &&
-                !checks.isTariffExists("DEFAULT")) {
-            Account account = new Account();
-            account.setLogin("tester@mail.ru");
-            account.setPassword("123");
-            account.setName("Piter");
-            account.setBalance(0L);
-            account.setTariff("DEFAULT");
-            account.setRang("ADMINISTRATOR");
-            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
+        if (!checks.isTariffExists("DEFAULT")) {
             Tariff tariff = new Tariff();
             tariff.setName("DEFAULT");
             rabbitMQSender.send(tariff, RabbitMQMessageType.CREATE_TARIFF);
             TariffCall tariffCall = new TariffCall();
             tariffCall.setName("DEFAULT");
             tariffCall.setCall_cost(2.2F);
-            tariffCall.setCall_balance(1222333L);
+            tariffCall.setCall_balance(10000L);
             tariffCall.setDefault_call_cost(3.5F);
             rabbitMQSender.send(tariffCall, RabbitMQMessageType.CREATE_TARIFF_CALL);
             TariffInternet tariffInternet = new TariffInternet();
             tariffInternet.setName("DEFAULT");
             tariffInternet.setInternet_cost(2.2F);
-            tariffInternet.setInternet_balance(12223333L);
+            tariffInternet.setInternet_balance(20000L);
             tariffInternet.setDefault_internet_cost(3.5F);
             rabbitMQSender.send(tariffInternet, RabbitMQMessageType.CREATE_TARIFF_INTERNET);
             TariffSms tariffSms = new TariffSms();
             tariffSms.setName("DEFAULT");
             tariffSms.setSms_cost(2.2F);
-            tariffSms.setSms_balance(100L);
+            tariffSms.setSms_balance(300L);
             tariffSms.setDefault_sms_cost(3.5F);
             rabbitMQSender.send(tariffSms, RabbitMQMessageType.CREATE_TARIFF_SMS);
+        }
+        if (!checks.isTariffExists("ADMINISTRATOR")) {
+            Tariff tariff = new Tariff();
+            tariff.setName("ADMINISTRATOR");
+            rabbitMQSender.send(tariff, RabbitMQMessageType.CREATE_TARIFF);
+            TariffCall tariffCall = new TariffCall();
+            tariffCall.setName("ADMINISTRATOR");
+            tariffCall.setCall_cost(0F);
+            tariffCall.setCall_balance(0L);
+            tariffCall.setDefault_call_cost(0F);
+            rabbitMQSender.send(tariffCall, RabbitMQMessageType.CREATE_TARIFF_CALL);
+            TariffInternet tariffInternet = new TariffInternet();
+            tariffInternet.setName("ADMINISTRATOR");
+            tariffInternet.setInternet_cost(0F);
+            tariffInternet.setInternet_balance(0L);
+            tariffInternet.setDefault_internet_cost(0F);
+            rabbitMQSender.send(tariffInternet, RabbitMQMessageType.CREATE_TARIFF_INTERNET);
+            TariffSms tariffSms = new TariffSms();
+            tariffSms.setName("ADMINISTRATOR");
+            tariffSms.setSms_cost(0F);
+            tariffSms.setSms_balance(0L);
+            tariffSms.setDefault_sms_cost(0F);
+            rabbitMQSender.send(tariffSms, RabbitMQMessageType.CREATE_TARIFF_SMS);
+        }
+        if (!checks.isAccountExists("admin@mail.ru")) {
+            Account account = new Account();
+            account.setLogin("admin@mail.ru");
+            account.setPassword("123456");
+            account.setName("admin");
+            account.setBalance(0L);
+            account.setTariff("ADMINISTRATOR");
+            account.setTelephone("88005553535");
+            account.setRang("ADMINISTRATOR");
+            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
+
             Call call = new Call();
-            call.setLogin("tester@mail.ru");
+            call.setLogin("admin@mail.ru");
             call.setCall_cost(2.2F);
-            call.setCall_balance(1222333L);
+            call.setCall_balance(10000L);
             call.setDefault_call_cost(3.5F);
             rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
             Internet internet = new Internet();
-            internet.setLogin("tester@mail.ru");
+            internet.setLogin("admin@mail.ru");
             internet.setInternet_cost(2.2F);
-            internet.setInternet_balance(12223333L);
+            internet.setInternet_balance(20000L);
             internet.setDefault_internet_cost(3.5F);
             rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
             Sms sms = new Sms();
-            sms.setLogin("tester@mail.ru");
+            sms.setLogin("admin@mail.ru");
             sms.setSms_cost(2.2F);
-            sms.setSms_balance(100L);
+            sms.setSms_balance(300L);
             sms.setDefault_sms_cost(3.5F);
             rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
-            return true;
         }
-        return false;
+        if (!checks.isAccountExists("user@mail.ru")){
+            Account account = new Account();
+            account.setLogin("user@mail.ru");
+            account.setPassword("123456");
+            account.setName("user");
+            account.setBalance(0L);
+            account.setTariff("DEFAULT");
+            account.setTelephone("88005553536");
+            account.setRang("USER");
+            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
+            // взять тариф и присвоить его
+            Call call = new Call();
+            call.setLogin("user@mail.ru");
+            call.setCall_cost(2.2F);
+            call.setCall_balance(10000L);
+            call.setDefault_call_cost(3.5F);
+            rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
+            Internet internet = new Internet();
+            internet.setLogin("user@mail.ru");
+            internet.setInternet_cost(2.2F);
+            internet.setInternet_balance(20000L);
+            internet.setDefault_internet_cost(3.5F);
+            rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
+            Sms sms = new Sms();
+            sms.setLogin("user@mail.ru");
+            sms.setSms_cost(2.2F);
+            sms.setSms_balance(300L);
+            sms.setDefault_sms_cost(3.5F);
+            rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
+
+        }
+        return true;
     }
 
     //  http://localhost:8102/createA
@@ -103,6 +167,7 @@ public class CRM {
      *   "name": "333",
      *   "balance": "444",
      *   "tariff": "555",
+     *   "telephone": "123",
      *   "rang": "666"
      * }
      */
@@ -200,6 +265,7 @@ public class CRM {
         return false;
     }
 
+    // изменяет выбранный тариф пользователя (если был тариф А, тостанет Тафри Б) (просто меняет строку)
     @PostMapping("changeT")
     public Boolean changeT(@RequestParam("login") String login,
                            @RequestParam("tariff") String tariff){
