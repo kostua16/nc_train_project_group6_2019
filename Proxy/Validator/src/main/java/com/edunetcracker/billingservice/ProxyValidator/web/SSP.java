@@ -38,16 +38,16 @@ public class SSP {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
+        //if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
             System.out.println("2");
             System.out.println("home " + login);
             String url = helpers.getUrlProxy() + "home/?login=" + login;
             Map<String, String> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
-        }
+        /*}
 
         System.out.println("3");
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);*/
 
     }
     /**
@@ -75,7 +75,7 @@ public class SSP {
      */
     //  http://localhost:8101/showtariff/?token=!!!
     @GetMapping("showtariff")
-    public ResponseEntity<Map<String, Map<String, String>>> showtariff(@RequestParam("token") @NotNull String token){
+    public ResponseEntity<Map<String, Object>> showtariff(@RequestParam("token") @NotNull String token){
         String login = checks.getLoginByTokenAndCheck(token);
         if(login == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -83,7 +83,7 @@ public class SSP {
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
             String url = helpers.getUrlProxy() + "showtariff/?login=" + login;
-            Map<String, Map<String, String>> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
+            Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

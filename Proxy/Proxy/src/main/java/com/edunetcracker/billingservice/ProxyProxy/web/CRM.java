@@ -108,21 +108,21 @@ public class CRM {
 
             Call call = new Call();
             call.setLogin("admin@mail.ru");
-            call.setCall_cost(2.2F);
-            call.setCall_balance(10000L);
-            call.setDefault_call_cost(3.5F);
+            call.setCall_cost(0F);
+            call.setCall_balance(0L);
+            call.setDefault_call_cost(0F);
             rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
             Internet internet = new Internet();
             internet.setLogin("admin@mail.ru");
-            internet.setInternet_cost(2.2F);
-            internet.setInternet_balance(20000L);
-            internet.setDefault_internet_cost(3.5F);
+            internet.setInternet_cost(0F);
+            internet.setInternet_balance(0L);
+            internet.setDefault_internet_cost(0F);
             rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
             Sms sms = new Sms();
             sms.setLogin("admin@mail.ru");
-            sms.setSms_cost(2.2F);
-            sms.setSms_balance(300L);
-            sms.setDefault_sms_cost(3.5F);
+            sms.setSms_cost(0F);
+            sms.setSms_balance(0L);
+            sms.setDefault_sms_cost(0F);
             rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
         }
         if (!checks.isAccountExists("user@mail.ru")){
@@ -278,9 +278,9 @@ public class CRM {
         return false;
     }
     @GetMapping("showA")
-    public Map<String, Map<String, String>> showA(){
+    public Map<String, Object> showA(){
         List<Account> accounts = accountController.getAllAccount().getBody();
-        Map<String, Map<String, String>> returnMap = new HashMap<>();
+        Map<String, Map<String, String>> returnA = new HashMap<>();
         Map<String, String> acc;
         for (int a = 0; a< accounts.size(); a++){
             acc = new HashMap<>();
@@ -290,22 +290,26 @@ public class CRM {
             acc.put("tariff", accounts.get(a).getTariff());
             acc.put("rang", accounts.get(a).getRang());
             acc.put("telephone", accounts.get(a).getTelephone());
-            returnMap.put(accounts.get(a).getLogin(), acc);
+            returnA.put(accounts.get(a).getLogin(), acc);
         }
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("accounts", returnA);
         return returnMap;
     }
     @GetMapping("showT")
-    public Map<String, Map<String, String>> showT(){
+    public Map<String, Object> showT(){
         List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
-        Map<String, Map<String, String>> returnMap = new HashMap<>();
+        Map<String, Map<String, String>> returnT = new HashMap<>();
         Map<String, String> tariff;
         for (int a = 0; a< tariffs.size(); a++){
             tariff = new HashMap<>();
             tariff.put("call", tariffs.get(a).getTariffCall().getCall_balance().toString());
             tariff.put("internet", tariffs.get(a).getTariffInternet().getInternet_balance().toString());
             tariff.put("sms", tariffs.get(a).getTariffSms().getSms_balance().toString());
-            returnMap.put(tariffs.get(a).getName(), tariff);
+            returnT.put(tariffs.get(a).getName(), tariff);
         }
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("tariffs", returnT);
         return returnMap;
     }
     //  http://localhost:8102/showHistory

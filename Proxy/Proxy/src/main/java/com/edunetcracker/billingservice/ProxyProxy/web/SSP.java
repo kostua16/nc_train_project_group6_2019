@@ -82,22 +82,25 @@ public class SSP {
     }
     //  http://localhost:8102/showtariff/?login=tester@mail.ru
     @GetMapping("showtariff")
-    public Map<String, Map<String, String>> showtariff(@RequestParam("login") String login){
+    public Map<String, Object> showtariff(@RequestParam("login") String login){
         String userTariff = accountController.getAccount(login).getBody().getTariff();
         List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
         if (userTariff != null && tariffs != null) {
-            Map<String, Map<String, String>> returnMap = new HashMap<>();
+            Map<String, Map<String, String>> returnT = new HashMap<>();
             Map<String, String> tariff;
-            Map<String, String> uTariff = new HashMap<>();
+            /*Map<String, String> uTariff = new HashMap<>();
             uTariff.put("tariff", userTariff);
-            returnMap.put("user", uTariff);
+            returnT.put("user", uTariff);*/
             for (int a = 0; a< tariffs.size(); a++){
                 tariff = new HashMap<>();
                 tariff.put("call", tariffs.get(a).getTariffCall().getCall_balance().toString());
                 tariff.put("internet", tariffs.get(a).getTariffInternet().getInternet_balance().toString());
                 tariff.put("sms", tariffs.get(a).getTariffSms().getSms_balance().toString());
-                returnMap.put(tariffs.get(a).getName(), tariff);
+                returnT.put(tariffs.get(a).getName(), tariff);
             }
+            Map<String, Object> returnMap = new HashMap<>();
+            returnMap.put("user", userTariff);
+            returnMap.put("tariffs", returnT);
             return returnMap;
         }
         return null;

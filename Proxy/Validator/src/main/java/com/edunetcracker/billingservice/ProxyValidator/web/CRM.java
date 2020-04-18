@@ -6,6 +6,7 @@ import com.edunetcracker.billingservice.ProxyValidator.entity.Account;
 import com.edunetcracker.billingservice.ProxyValidator.entity.History;
 import com.edunetcracker.billingservice.ProxyValidator.session.SessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,9 @@ public class CRM {
     @Autowired
     SessionService sessionService;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     //  http://localhost:8102/createA
     /**
      * Создание пользователя и записи по тарифу
@@ -44,19 +48,18 @@ public class CRM {
      */
     @PostMapping("createA")
     public ResponseEntity<Boolean> createA(@RequestParam("token") String token,
-                                            @RequestBody @NotNull Account newAccount) throws JsonProcessingException {
-        String login = checks.getLoginByTokenAndCheck(token);
-        if(login == null) {
-            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
-        }
-        String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
-            String url = helpers.getUrlProxy() + "createA";
-            Boolean response = new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(newAccount, new HttpHeaders()), Boolean.class).getBody();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-
+                                            @RequestBody Account newAccount) throws JsonProcessingException {
+            String login = checks.getLoginByTokenAndCheck(token);
+            if (login == null) {
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+            }
+            String rang = helpers.getAccount(login).getRang();
+            if (checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+                String url = helpers.getUrlProxy() + "createA";
+                Boolean response = new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(newAccount, new HttpHeaders()), Boolean.class).getBody();
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     //  http://localhost:8102/createT/?tariff=FOR_SMALL
@@ -144,7 +147,7 @@ public class CRM {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
     @GetMapping("showA")
-    public ResponseEntity<Map<String, Map<String, String>>> showA(@RequestParam("token") String token){
+    public ResponseEntity<Map<String, Object>> showA(@RequestParam("token") String token){
         String login = checks.getLoginByTokenAndCheck(token);
         if(login == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -152,14 +155,14 @@ public class CRM {
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "showA";
-            Map<String, Map<String, String>> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
+            Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("showT")
-    public ResponseEntity<Map<String, Map<String, String>>> showT(@RequestParam("token") String token){
+    public ResponseEntity<Map<String, Object>> showT(@RequestParam("token") String token){
         String login = checks.getLoginByTokenAndCheck(token);
         if(login == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -167,7 +170,7 @@ public class CRM {
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "showT";
-            Map<String, Map<String, String>> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
+            Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.GET,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
