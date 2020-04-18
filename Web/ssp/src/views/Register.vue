@@ -9,6 +9,13 @@
             v-model.trim="email"
             :class="{invalid: ($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.email.email)}"
         >
+        <!--<input
+            id="email"
+            type="text"
+            v-model.trim="email" -trim убирает пробелы
+            :class="{класс для неправельности контрола invalid: ($v.email.$dirty и если не пустой)или($v.email.$dirty и это не имейл)}"
+            :class="{invalid: ($v.email.$dirty && !$v.email.required)||($v.email.$dirty && !$v.email.email)}"
+        > -->
         <label for="email">Email</label>
         <small
          class="helper-text invalid"
@@ -23,7 +30,7 @@
             :class="{invalid: ($v.password.$dirty && !$v.password.required)||($v.password.$dirty && !$v.password.minLength)}"
         >
         <label for="password">Пароль</label>
-        <small 
+        <small
         class="helper-text invalid"
         v-if="($v.password.$dirty && !$v.password.required)||($v.password.$dirty && !$v.password.minLength)"
         >Минимум {{$v.password.$params.minLength.min}} символов.</small>
@@ -36,7 +43,7 @@
             :class="{invalid : $v.name.$dirty && !$v.name.required}"
         >
         <label for="name">Имя</label>
-        <small 
+        <small
         class="helper-text invalid"
         v-if="$v.name.$dirty && !$v.name.required"
         >Name</small>
@@ -71,7 +78,7 @@
 import {email, required, minLength} from 'vuelidate/lib/validators'
 
 export default {
-  name: 'register', //имя данной странице  
+  name: 'register', //имя данной странице
   data: () => ({
     email: '',
     password: '',
@@ -84,6 +91,9 @@ export default {
     name: {required},
     agree: {checked: v => v} //checked должен вернуть true
   },
+  mounted () {
+    this.addAccount()
+  },
   methods: {
     submitHandler() {
       //console.log(this.$v.password)
@@ -91,15 +101,29 @@ export default {
         this.$v.$touch()
         return
       }
-      const formData = {
+      addAccount()
+
+      // const formData = {
+      //   email: this.email,
+      //   password: this.password,
+      //   name: this.name
+      // }
+
+      // console.log(formData)
+
+
+      this.$router.push('/')
+    },
+    addAccount () {
+      axios.post('http://localhost:8081/addAccount/', {
         email: this.email,
         password: this.password,
         name: this.name
-      }
-      console.log(formData)
-      
-      this.$router.push('/')
+      }).catch(e => {
+        console.log(e)
+      })
     }
+
   }
 }
 </script>

@@ -39,9 +39,9 @@
 
             <tbody>
             <tr>
-              <td>15 гб</td>
-              <td>300 мин</td>
-              <td>20 шт</td>
+              <td>{{parseFloat(internet/1024).toFixed(1)}} Мб</td>
+              <td>{{parseFloat(minutes/60).toFixed(0)}} мин</td>
+              <td>{{sms}} шт</td>
             </tr>
             </tbody>
           </table>
@@ -56,15 +56,23 @@
 import axios from 'axios'
 export default {
   data: () => ({
-    balance : 0
+    balance : 0,
+    minutes : '0',
+    sms : '0',
+    internet: 0
   }),
   mounted(){
     this.getMoney()
+    console.log(localStorage.getItem('token'))
   },
   methods:{
     getMoney() {
-      axios.get('http://localhost:8102/getAccount/?token='+localStorage.getItem('token')).then(response => {
+      axios.get('http://localhost:8101/home/?token='+localStorage.getItem('token')).then(response => {
          this.balance = response.data.balance
+         this.minutes = response.data.minutes
+         this.sms = response.data.sms
+         this.internet = response.data.internet
+         console.log(response.data)
       }).catch(e => {
         console.log(e)
       })

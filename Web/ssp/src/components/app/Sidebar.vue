@@ -1,7 +1,7 @@
 <template>
 <ul class="sidenav app-sidenav" :class="{open: value}"> <!-- сушаем значение клик если оно активировано дописываем open в класс  -->
   <router-link
-  v-for="link in links" 
+  v-for="link in links"
   :key="link.url"
   tag='li'
   active-class="active"
@@ -19,9 +19,9 @@
 
 
 
- <!-- 
+ <!--
       <li>
-        <a href="#" class="waves-effect waves-orange pointer">Счет</a> 
+        <a href="#" class="waves-effect waves-orange pointer">Счет</a>
       </li>
       <li>
         <a href="#" class="waves-effect waves-orange pointer">Пополнить счет</a>
@@ -45,13 +45,14 @@ export default {
   data: () => ({ //стрелочная функция
     links: [
       {title: 'Счет', url: '/', exact: true}, // {ключ, значение}
-      {title: 'Пополнить счет', url: ''},
-      {title: 'Изменить тариф', url: ''},//тарифы
-      {title: 'История', url: '/history'},
-      {title: 'Услуги и опции', url: ''}//блокировка номера, удалить акаунт,
-    ]//массив 
+      {title: 'Пополнить счет', url: '/bank'},
+      {title: 'Изменить тариф', url: '/tariff'},//тарифы
+      {title: 'Пользователи', url: '/user'},//блокировка номера, удалить акаунт,
+      {title: 'Тарифы', url: '/tariffadmin'},
+      {title: 'Mobile', url: '/mobile'}//блокировка номера, удалить акаунт,
+    ]//массив
   })
-  
+
 }
 </script>
 
