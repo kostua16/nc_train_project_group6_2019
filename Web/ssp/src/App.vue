@@ -7,24 +7,30 @@
 </template>
 
 <script>
-import EmptyLayout from '@/layouts/EmptyLayout' 
+import EmptyLayout from '@/layouts/EmptyLayout'
 import MainLayout from '@/layouts/MainLayout'
+import AtcLayout from '@/layouts/AtcLayout'
+import SspLayout from '@/layouts/SspLayout'
+import CrmLayout from '@/layouts/CrmLayout'
 export default {
   computed: {
     layout(){ //свойство- возвращает строку названия лаяута которое будет использоватся из 21 строчки
        //console.log(this.$route.meta.layout)
       //this.$route.meta.layout возврашает empty или main
-       return (this.$route.meta.layout || 'Empty') + '-Layout' //возврашаяет состояние <router-view/> свойство и имя
+       return (this.$route.meta.layout || 'Empty' || 'Crm') + '-Layout' //возврашаяет состояние <router-view/> свойство и имя
     }
   },
   components: {
-    EmptyLayout, MainLayout  //импортируем для тега <component :is="layout">
+    EmptyLayout,
+    MainLayout,
+    AtcLayout,
+    SspLayout,
+    CrmLayout  //импортируем для тега <component :is="layout">
   }
 }
 </script>
 
-
-<style lang="scss"> 
-@import '~materialize-css/dist/css/materialize.min.css'; 
+<style lang="scss">
+@import '~materialize-css/dist/css/materialize.min.css';
 @import 'assets/index.css';
 </style>
