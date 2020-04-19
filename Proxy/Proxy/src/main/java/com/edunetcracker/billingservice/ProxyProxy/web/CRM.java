@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -297,20 +298,22 @@ public class CRM {
         return returnMap;
     }
     @GetMapping("showT")
-    public Map<String, Object> showT(){
+    public List<Map> showT(){
         List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
-        Map<String, Map<String, String>> returnT = new HashMap<>();
         Map<String, String> tariff;
+        List<Map> returnT = new ArrayList<>();
         for (int a = 0; a< tariffs.size(); a++){
             tariff = new HashMap<>();
+            tariff.put("name", tariffs.get(a).getName());
             tariff.put("call", tariffs.get(a).getTariffCall().getCall_balance().toString());
             tariff.put("internet", tariffs.get(a).getTariffInternet().getInternet_balance().toString());
             tariff.put("sms", tariffs.get(a).getTariffSms().getSms_balance().toString());
-            returnT.put(tariffs.get(a).getName(), tariff);
+            returnT.add(tariff);
         }
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("tariffs", returnT);
-        return returnMap;
+        //return returnMap;
+        return returnT;
     }
     //  http://localhost:8102/showHistory
     @GetMapping("showHistory")

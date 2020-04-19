@@ -8,6 +8,7 @@ import com.edunetcracker.billingservice.ProxyValidator.session.SessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -162,7 +163,7 @@ public class CRM {
     }
 
     @GetMapping("showT")
-    public ResponseEntity<Map<String, Object>> showT(@RequestParam("token") String token){
+    public ResponseEntity<List<Map>> showT(@RequestParam("token") String token){
         String login = checks.getLoginByTokenAndCheck(token);
         if(login == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -170,7 +171,7 @@ public class CRM {
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "showT";
-            Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.GET,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
+            List<Map> response = new RestTemplate().exchange(url, HttpMethod.GET,  new HttpEntity(new HttpHeaders()), new ParameterizedTypeReference<List<Map>>() {}).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

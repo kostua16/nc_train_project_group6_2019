@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,17 +87,15 @@ public class SSP {
         String userTariff = accountController.getAccount(login).getBody().getTariff();
         List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
         if (userTariff != null && tariffs != null) {
-            Map<String, Map<String, String>> returnT = new HashMap<>();
             Map<String, String> tariff;
-            /*Map<String, String> uTariff = new HashMap<>();
-            uTariff.put("tariff", userTariff);
-            returnT.put("user", uTariff);*/
+            List<Map> returnT = new ArrayList<>();
             for (int a = 0; a< tariffs.size(); a++){
                 tariff = new HashMap<>();
+                tariff.put("name", tariffs.get(a).getName());
                 tariff.put("call", tariffs.get(a).getTariffCall().getCall_balance().toString());
                 tariff.put("internet", tariffs.get(a).getTariffInternet().getInternet_balance().toString());
                 tariff.put("sms", tariffs.get(a).getTariffSms().getSms_balance().toString());
-                returnT.put(tariffs.get(a).getName(), tariff);
+                returnT.add(tariff);
             }
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("user", userTariff);
