@@ -17,7 +17,7 @@
 
     <button class="btn waves-effect waves-light" type="submit"  @click.prevent="deleteTariff">Удалить
       <i class="material-icons right">send</i>
-    </button>т
+    </button>
   </form>
 
     <div class="row">
