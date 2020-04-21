@@ -56,21 +56,21 @@ public class CRM {
             rabbitMQSender.send(tariff, RabbitMQMessageType.CREATE_TARIFF);
             TariffCall tariffCall = new TariffCall();
             tariffCall.setName("DEFAULT");
-            tariffCall.setCall_cost(2.2F);
-            tariffCall.setCall_balance(10000L);
-            tariffCall.setDefault_call_cost(3.5F);
+            tariffCall.setCall_cost(0F);
+            tariffCall.setCall_balance(1800L);
+            tariffCall.setDefault_call_cost(0.0834F);
             rabbitMQSender.send(tariffCall, RabbitMQMessageType.CREATE_TARIFF_CALL);
             TariffInternet tariffInternet = new TariffInternet();
             tariffInternet.setName("DEFAULT");
-            tariffInternet.setInternet_cost(2.2F);
-            tariffInternet.setInternet_balance(20000L);
-            tariffInternet.setDefault_internet_cost(3.5F);
+            tariffInternet.setInternet_cost(0F);
+            tariffInternet.setInternet_balance(1000000L);
+            tariffInternet.setDefault_internet_cost(0.001F);
             rabbitMQSender.send(tariffInternet, RabbitMQMessageType.CREATE_TARIFF_INTERNET);
             TariffSms tariffSms = new TariffSms();
             tariffSms.setName("DEFAULT");
-            tariffSms.setSms_cost(2.2F);
-            tariffSms.setSms_balance(300L);
-            tariffSms.setDefault_sms_cost(3.5F);
+            tariffSms.setSms_cost(0F);
+            tariffSms.setSms_balance(30L);
+            tariffSms.setDefault_sms_cost(2F);
             rabbitMQSender.send(tariffSms, RabbitMQMessageType.CREATE_TARIFF_SMS);
         }
         if (!checks.isTariffExists("ADMINISTRATOR")) {
@@ -139,21 +139,21 @@ public class CRM {
             // взять тариф и присвоить его
             Call call = new Call();
             call.setLogin("user@mail.ru");
-            call.setCall_cost(2.2F);
-            call.setCall_balance(10000L);
-            call.setDefault_call_cost(3.5F);
+            call.setCall_cost(0F);
+            call.setCall_balance(1800L);
+            call.setDefault_call_cost(0.0834F);
             rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
             Internet internet = new Internet();
             internet.setLogin("user@mail.ru");
-            internet.setInternet_cost(2.2F);
-            internet.setInternet_balance(20000L);
-            internet.setDefault_internet_cost(3.5F);
+            internet.setInternet_cost(0F);
+            internet.setInternet_balance(1000000L);
+            internet.setDefault_internet_cost(0.001F);
             rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
             Sms sms = new Sms();
             sms.setLogin("user@mail.ru");
-            sms.setSms_cost(2.2F);
-            sms.setSms_balance(300L);
-            sms.setDefault_sms_cost(3.5F);
+            sms.setSms_cost(0F);
+            sms.setSms_balance(30L);
+            sms.setDefault_sms_cost(2F);
             rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
 
         }
@@ -259,7 +259,27 @@ public class CRM {
 
     @DeleteMapping("deleteT")
     public Boolean deleteT(@RequestParam("name") String name) throws JsonProcessingException {
-        if (checks.isTariffExists(name)) {
+        if (!name.equals("DEFAULT") && !name.equals("ADMINISTRATOR") && checks.isTariffExists(name)) {
+            System.out.println("deleteT 1");
+            Map<String, Map<String,String>> accounts = (Map<String, Map<String,String>>)showA().get("accounts");
+
+            System.out.println("deleteT 2");
+            for(Map.Entry entry : accounts.entrySet()) {
+
+                System.out.println("deleteT 3");
+                String key = (String) entry.getKey();
+                Map<String,String> value = (Map<String, String>) entry.getValue();
+
+                System.out.println("deleteT 4");
+                if(value.get("tariff").equals(name)){
+
+                    System.out.println("deleteT 5");
+                    System.out.println(value.get("tariff"));
+                    choiceT(key,"DEFAULT");
+                    System.out.println("login = " + key);
+                }
+            }
+            System.out.println("deleteT 6");
             tariffController.deleteTariff(name);
             return true;
         }
@@ -321,5 +341,15 @@ public class CRM {
         String url = helpers.getUrlBilling() + "/getAllHistory";
         List<History> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
         return response;
+    }
+
+    private Boolean choiceT(String login, String tariff){
+        Account account = accountController.getAccount(login).getBody();
+        if(account != null) {
+            account.setTariff(tariff);
+            accountController.updateAccount(account);
+            return true;
+        }
+        return false;
     }
 }
