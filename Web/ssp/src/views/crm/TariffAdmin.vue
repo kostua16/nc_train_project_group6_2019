@@ -17,38 +17,10 @@
 
     <button class="btn waves-effect waves-light" type="submit"  @click.prevent="deleteTariff">Удалить
       <i class="material-icons right">send</i>
-    </button>
+    </button>т
   </form>
 
     <div class="row">
-      <div lass="t" v-for = "(tariff) in tariffs">
-        <div class="col s12 m6 l4">
-          <div class="card orange darken-1 bill-card">
-            <div class="card-content white-text">
-              <div class="card-header">
-                <span class="card-title">{{tariff.name}}</span>
-              </div>
-              <table>
-                <thead>
-                <tr>
-                  <th>Интернет</th>
-                  <th>Минуты</th>
-                  <th>СМС</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                  <td>{{tariff.internet}} mb</td>
-                  <td>{{tariff.call}} min</td>
-                  <td>{{tariff.sms}}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="col s12 m6 14">
           <div class="card  red darken-4 bill-card" style="height: 200% ; width: 100%" >
           <div class="card-content white-text">
@@ -94,6 +66,33 @@
                   <i class="material-icons right">clear</i>
                 </button>
               </div>
+          </div>
+        </div>
+      </div>
+      <div lass="t" v-for = "(tariff) in tariffs">
+        <div class="col s12 m6 l4">
+          <div class="card orange darken-1 bill-card">
+            <div class="card-content white-text">
+              <div class="card-header">
+                <span class="card-title">{{tariff.name}}</span>
+              </div>
+              <table>
+                <thead>
+                <tr>
+                  <th>Интернет</th>
+                  <th>Минуты</th>
+                  <th>СМС</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td>{{tariff.internet}} mb</td>
+                  <td>{{tariff.call}} min</td>
+                  <td>{{tariff.sms}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
