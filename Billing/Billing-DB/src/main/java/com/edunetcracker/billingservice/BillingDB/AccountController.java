@@ -9,9 +9,13 @@ import java.util.List;
 
 @RestController
 public class AccountController {
-    @GetMapping("test")
-    public String t() {
-        return "Good";
+        @GetMapping("test")
+        public String t() {
+            return "Good";
+        }
+        @GetMapping("")
+        public String u() {
+        return "Hello";
     }
 
 
