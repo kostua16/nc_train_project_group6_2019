@@ -33,5 +33,10 @@ public class AccountController {
         List<Account> accounts = AccountRepository.findAll();
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
+    @GetMapping("test")
+    public String t() {
+        return "Good";
+    }
+
 
 }
