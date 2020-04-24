@@ -1,21 +1,35 @@
-package com.edunetcracker.billingservice.ProxyProxy.entity;
+package com.edunetcracker.billingservice.BillingDB.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
+@Entity
+@Table(name = "test_account")
 public class Account {
 
-
+    @Id
+    @NotNull
     private String login;
 
+    @NotNull
     private String password;
 
+    @NotNull
     private String name;
 
+    @NotNull
     private Long balance;
 
+    @NotNull
     private String tariff;
 
+    /*@Id*/
+    @NotNull
     private String telephone;
 
+    @NotNull
     private String rang;         // user, administrator...
 
     ///////////////////////////////////////

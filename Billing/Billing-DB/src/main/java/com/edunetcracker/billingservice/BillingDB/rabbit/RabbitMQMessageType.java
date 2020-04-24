@@ -1,4 +1,4 @@
-package com.edunetcracker.billingservice.ProxyProxy.rabbit;
+package com.edunetcracker.billingservice.BillingDB.rabbit;
 
 public interface RabbitMQMessageType {
     public static final String GET_ACCOUNT_INFORMATION ="GET_ACCOUNT_INFORMATION";
@@ -13,7 +13,6 @@ public interface RabbitMQMessageType {
     public static final String CREATE_TARIFF ="CREATE_TARIFF";          //message = Tariff
     public static final String UPDATE_TARIFF ="UPDATE_TARIFF";          //message = Tariff
     public static final String DELETE_TARIFF ="DELETE_TARIFF";          //message = String
-    public static final String UPDATE_TARIFF_BY_TARIFF_PLAN ="UPDATE_TARIFF_BY_TARIFF_PLAN";          //message = String
     /** Call **/
     public static final String CREATE_CALL ="CREATE_CALL";              //message = Call
     public static final String UPDATE_CALL ="UPDATE_CALL";              //message = Call
