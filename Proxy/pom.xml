@@ -22,6 +22,7 @@
 		<module>Proxy</module>
 		<module>Validator</module>
 	</modules>
+
 	<build>
 		<plugins>
 			<plugin>
