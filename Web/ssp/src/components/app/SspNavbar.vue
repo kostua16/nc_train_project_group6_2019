@@ -5,7 +5,7 @@
           <a href="#" @click.prevent="$emit('click')">
             <i class="material-icons black-text">dehaze</i>
           </a>
-          <span class="black-text">Личный кабинет</span>
+          <span class="black-text">SSP</span>
         </div>
 
         <ul class="right hide-on-small-and-down">
@@ -46,7 +46,7 @@ import axios from 'axios'
 export default {
   data: () => ({
       dropdown: null,
-      username: 'USERNAME'
+      username: ''
     }),
   methods: {
     getNameUser() {

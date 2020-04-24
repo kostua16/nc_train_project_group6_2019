@@ -39,31 +39,16 @@
     </div>
     <div class="card-action">
       <div>
-
-
-
-        <button
-            class="btn waves-effect waves-light auth-submit"
-            type="submit"
-
-        >
-          Войти
+        <button class="btn waves-effect waves-light auth-submit" type="submit" >Войти
           <i class="material-icons right"/>
         </button>
-        <small
+            
+      <button class="btn waves-effect waves-light auth-submit" type="submit"  @click.prevent="goTo('/')">Назад</button>
+      <small
         class="helper-text invalid"
         v-if="loginAndPassword"
         >Неправильный логин или пароль</small>
-
-
-
-
       </div>
-
-      <p class="center">
-        Нет аккаунта?
-        <router-link to="/register">Зарегистрироваться</router-link>
-      </p>
   </div>
 </form>
 </template>
@@ -107,7 +92,7 @@ export default {
        // console.log(this.token) //Токен
         localStorage.setItem('token',this.token)
        // console.log(localStorage.getItem('token'))
-        this.$router.push('/')
+        this.$router.push('/ssp/home')
 
       }).catch(e => {
 
@@ -117,9 +102,19 @@ export default {
       })
 
     },
+      goTo(a) {
+          this.$router.push(a)
+      }
 
   }
 
 
 }
 </script> -->
+
+<style scoped>
+  .btn {
+    margin-bottom: 1rem;
+
+  }
+</style>

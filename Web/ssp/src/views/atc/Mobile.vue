@@ -13,7 +13,7 @@
           <input id="icon_telephone2" type="tel" v-model.trim="telephoneTo" class="validate">
           <label for="icon_telephone2">In the Phone</label>
         </div>
-        
+
       </div>
     </form>
 
@@ -25,7 +25,12 @@
           <label for="minutes">Minutes</label>
         </div>
         <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="getMinutes"><i class="material-icons right">send</i>to spend</a>
+          <a class="waves-effect waves-light btn" @click.prevent="spendMinutes" @click="multiplyActionsMinutes"><i class="material-icons right">send</i>to spend</a>
+          <!--<div>
+            <span v-for="n in 1*minutes" :key="n">
+              {{n}}
+            </span>
+          </div>-->
         </div>
       </div>
     </form>
@@ -38,7 +43,7 @@
           <label for="sms">Sms</label>
         </div>
         <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="getSms"><i class="material-icons right">send</i>to spend</a>
+          <a class="waves-effect waves-light btn" @click.prevent="spendSms" @click="multiplyActionsSms"><i class="material-icons right">send</i>to spend</a>
         </div>
       </div>
     </form>
@@ -51,63 +56,111 @@
           <label for="Internet">Internet</label>
         </div>
         <div class="input-field col s6">
-          <a class="waves-effect waves-light btn"  @click.prevent="getInternet"><i class="material-icons right">send</i>to spend</a>
+          <a class="waves-effect waves-light btn"  @click.prevent="spendInternet" @click="multiplyActionsInternet"><i class="material-icons right">send</i>to spend</a>
         </div>
       </div>
     </form>
-    
+<!--
     <form class="col s12">
       <div class="row">
-        
+
         <div class="input-field col s6">
           <a class="waves-effect waves-light btn" @click.prevent="spendAll"><i class="material-icons right">send</i>to spend all</a>
         </div>
       </div>
-    </form>
-
+    </form>-->
+    <!--<button id="show-modal" @click="showModal = true">Show Modal</button>-->
+    <modal v-if="showModal" v-bind:minutes="minutes"  v-bind:sms="sms" v-bind:internet="internet" v-bind:type="typeModal" @close="showModal = false" >
+    </modal>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import Modal from "./Modal";
 export default {
     data: () => ({
     telephoneFrom : '',
     telephoneTo: '',
-    minutes : '',
+    minutes : null,
     sms : null,
-    internet: null
+    internet: null,
+    showModal: false,
+    typeModal: 'call',/*
+    stopModal: true*/
   }),
-  mounted(){
-    
+    mounted(){
   },
-  methods:{       
-    getMinutes() {//http://localhost:8102/callFromTo/?telephoneFrom=897654321&minutes=1&telephoneTo=999
-      axios.get('http://localhost:8102/callFromTo/?telephoneFrom=' + this.telephoneFrom + '&minutes='+ this.minutes+'&telephoneTo='+this.telephoneTo).then(response => {
-         console.log(response.data)
-      }).catch(e => {
-        console.log(e)
-      })
+    methods:{
+        multiplyActionsMinutes() {
+            this.typeModal = 'call'
+            this.showModal = true
+
+        },
+        multiplyActionsSms() {
+            this.typeModal = 'sms'
+            this.showModal = true
+        },
+        multiplyActionsInternet() {
+            this.typeModal = 'internet'
+            this.showModal = true
+        },
+        sleep(milliseconds) {
+          const date = Date.now();
+          let currentDate = null;
+          do {
+              currentDate = Date.now();
+          } while (currentDate - date < milliseconds);
+      },
+      spendMinutes() {
+          if(this.minutes>0) {
+              axios.get('http://localhost:8102/callFromTo/?telephoneFrom=' + this.telephoneFrom + '&minutes=1' /*+ this.minutes*/ + '&telephoneTo=' + this.telephoneTo)
+                  .then(response => {
+                  console.log(response.data)
+                      if(response.data){
+                          this.minutes -= 1
+                          this.sleep(1000)
+                          this.spendMinutes()
+                          //Закрыть окно
+                      }
+              }).catch(e => {
+                  console.log(e)
+              })
+          }
     },
-    getSms() {//http://localhost:8102/smsFromTo/?telephoneFrom=897654321&sms=4&telephoneTo=999
-      axios.get('http://localhost:8102/smsFromTo/?telephoneFrom=' + this.telephoneFrom + '&sms='+ parseFloat(this.sms)+'&telephoneTo='+this.telephoneTo).then(response => {
-         console.log(response.data)
-      }).catch(e => {
-        console.log(e)
-      })
+    spendSms() {
+        if(this.sms>0) {
+          axios.get('http://localhost:8102/smsFromTo/?telephoneFrom=' + this.telephoneFrom + '&sms=1' /*parseFloat(this.sms)*/ +'&telephoneTo=' + this.telephoneTo)
+              .then(response => {
+              console.log(response.data)
+                  if(response.data){
+                      this.sms -= 1
+                      this.sleep(1000)
+                      this.spendSms()
+                  }
+          }).catch(e => {
+              console.log(e)
+          })
+      }
     },
-    getInternet() {//  http://localhost:8102/useInternet/?telephoneFrom=897654321&kilobytes=4
-      axios.get('http://localhost:8102/useInternet/?telephoneFrom=' + this.telephoneFrom + '&kilobytes='+ parseFloat(this.internet)*1024).then(response => {
-         console.log(response.data)
-      }).catch(e => {
-        console.log(e)
-      })
+    spendInternet() {//  http://localhost:8102/useInternet/?telephoneFrom=897654321&kilobytes=4
+        if(this.internet>0) {
+            axios.get('http://localhost:8102/useInternet/?telephoneFrom=' + this.telephoneFrom + '&kilobytes=1000' /*+ parseFloat(this.internet) * 1024*/)
+                .then(response => {
+                console.log(response.data)
+                    if(response.data){
+                        this.internet -= 1
+                        this.sleep(1000)
+                        this.spendInternet()
+                    }
+            }).catch(e => {
+                console.log(e)
+            })
+        }
     },
-    spendAll() {
-      getMinutes()
-      getSms()
-      getInternet()
-    }
+  },
+  components: {
+      Modal
   }
 }
 </script>

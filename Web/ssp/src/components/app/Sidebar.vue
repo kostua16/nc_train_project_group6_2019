@@ -19,7 +19,7 @@
 
 
 
- <!--
+<!--
       <li>
         <a href="#" class="waves-effect waves-orange pointer">Счет</a>
       </li>
@@ -35,22 +35,24 @@
       <li>
         <a href="#" class="waves-effect waves-orange pointer">Услуги и опции</a>
       </li>
-     -->
+-->
 </template>
 
 
 <script>
 export default {
   props: ['value'],
+  name: 'Sidebar',
   data: () => ({ //стрелочная функция
-    links: [
+    /*links: [
       {title: 'Счет', url: '/', exact: true}, // {ключ, значение}
       {title: 'Пополнить счет', url: '/bank'},
       {title: 'Изменить тариф', url: '/tariff'},//тарифы
       {title: 'Пользователи', url: '/user'},//блокировка номера, удалить акаунт,
       {title: 'Тарифы', url: '/tariffadmin'},
-      {title: 'Mobile', url: '/mobile'}//блокировка номера, удалить акаунт,
-    ]//массив
+      {title: 'Mobile', url: '/mobile'},//блокировка номера, удалить акаунт,
+      {title: 'История', url: '/history'}
+    ]//массив*/
   })
 
 }

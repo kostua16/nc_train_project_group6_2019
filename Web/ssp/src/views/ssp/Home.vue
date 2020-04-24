@@ -39,7 +39,7 @@
 
             <tbody>
             <tr>
-              <td>{{parseFloat(internet/1024).toFixed(1)}} Мб</td>
+              <td>{{parseFloat(internet/1000).toFixed(1)}} Мб</td>
               <td>{{parseFloat(minutes/60).toFixed(0)}} мин</td>
               <td>{{sms}} шт</td>
             </tr>

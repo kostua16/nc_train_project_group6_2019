@@ -11,7 +11,7 @@
             <input id="password" type="password"  v-model="password" class="validate">
             <label for="password">Password</label>
           </div>
-      
+
         <div class="input-field col s12">
               <input id="first_name" type="text" v-model="name" class="validate">
               <label for="first_name">First Name</label>
@@ -25,23 +25,21 @@
             <label for="telephone_numbe">telephone number</label>
           </div>
 
-          <div>
-              <select class="browser-default col s12" v-model="name">
-              <option value="" disabled selected>Выберите тариф пользователю</option>
-              <option value="1">Для самых близких 300 руб</option>
-              <option value="2">Постоянный онлайн 400 руб</option>
-              <option value="3">Говорю сколько хочу 500 руб</option>
-            </select>
-         </div>
-         <div>
-              <select class="browser-default col s12" v-model="rang">
-              <option value="" disabled selected>Выберите ранг</option>
-              <option value="USER">USER</option>
-              <option value="ADMIN">ADMIN</option>
-            </select>
-         </div>
         <div class="input-field col s12">
-          <a class="waves-effect waves-light btn" @click.prevent="pustUser"><i class="material-icons right">send</i>Добавить пользователя</a>
+          <input id="tariff" type="text" v-model="tariff" class="validate">
+          <label for="tariff">tariff</label>
+        </div>
+        <div class="input-field col s12">
+          <input id="rang" type="text" v-model="rang" class="validate">
+          <label for="rang">rang</label>
+        </div>
+
+        <div class="input-field col s12">
+         <!-- <button class="btn waves-effect waves-light" type="submit" @click.prevent="pustUser" name="action">Добавить пользователя
+            <i class="material-icons right">send</i>
+          </button>-->
+          <a class="waves-effect waves-light btn" @click.prevent="pustUser"><i class="material-icons right">send
+          </i>Добавить пользователя</a>
         </div>
       </div>
     </form>
@@ -52,7 +50,7 @@
             <input id="email2" type="email"  v-model="logindelet" class="validate">
             <label for="email2">Email</label>
           </div>
-      
+
 
           <button class="btn waves-effect waves-light" type="submit" @click.prevent="deleteAk" name="action">Удалить пользователя
              <i class="material-icons right">send</i>
@@ -60,7 +58,7 @@
       </div>
     </form>
 
-  
+
 
   </div>
 
@@ -69,15 +67,24 @@
 <script>
 import axios from 'axios'
 export default {
-   data: () => ({
-          login: "timur@mail.ru",         
+   data: ()=>  ({
+       /*login: "timur@mail.ru",
+       logindelet: "",
+       password: "123456",
+       name: "123",
+       balance: 11111,
+       tariff: "DEFAULT",
+       telephone: "88005553538",
+       rang: "USER",*/
+          login: "",
           logindelet: "",
-          password: "123456",
-          name: "123",
-          balance: "11111111",
-          tariff: "DEFAULT",
-          telephone: "88005553538",
-          rang: "USER"
+          password: "",
+          name: "",
+          balance: null,
+          tariff: "",
+          telephone: "",
+          rang: "",
+
     }),
   methods: {//deleteA
   //showT
@@ -95,21 +102,24 @@ export default {
         console.log(e)
       })
     },
-   
-   pustUser() { 
-       axios.post('http://localhost:8101/createA/?token=' + localStorage.getItem('token'), {
-          login: this.login,
-          password: this.password,
-          name: this.name,
-          balance: this.balance,
-          tariff: this.tariff,
-          telephone: this.telephone,
-          rang: this.rang
-       }).then(response =>{
-         console.log(response)
-      }).catch(e => {
-        console.log(e)
-      })
+      pustUser() {
+
+        var s={
+            'login': this.login,
+            'password': this.password,
+            'name': this.name,
+            'balance': this.balance,
+            'tariff': this.tariff,
+            'telephone': this.telephone,
+            'rang': this.rang
+        }
+          axios.post('http://localhost:8101/createA/?token=' + localStorage.getItem('token'),s
+          ).then(response =>{
+              console.log(response)
+          }).catch(e => {
+              console.log(u)
+              console.log(e)
+          })
     },
   },
   mounted() {
