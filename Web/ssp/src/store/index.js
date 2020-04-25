@@ -205,32 +205,41 @@ export default new Vuex.Store({
           console.log("login failed:" + error);
           context.commit('SET_LOGIN_FAIL', true);
           context.commit('SET_LOGIN_SUCCESS', false);
+          localStorage.removeItem("TOKEN");
           throw new Error("Login fail:" + error);
         } else {
           console.log("login success:" + token);
           context.commit('SET_TOKEN', token);
           context.commit('SET_LOGIN_FAIL', false);
           context.commit('SET_LOGIN_SUCCESS', true);
+          localStorage.setItem("TOKEN", token);
           context.dispatch("LOAD_USER_DETAILS");
         }
       };
 
-      if (context.state.STUB_MODE) {
-        const user = context.state.STUB_USERS.find(user => user.name === data.login && user.pass === data.password);
-        if (user != null) {
-          setup(user.name, null);
-        } else {
-          setup(null, "Cant find user");
-        }
+      const currentToken = localStorage.getItem("TOKEN");
+      if(currentToken!=null){
+        setup(currentToken, null);
       } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/login/?login=${data.login}&password=${data.password}`)
-          .then((response) => {
-            setup(response.data, null);
-          }).catch((error) => {
+        if (context.state.STUB_MODE) {
+          const user = context.state.STUB_USERS.find(user => user.name === data.login && user.pass === data.password);
+          if (user != null) {
+            setup(user.name, null);
+          } else {
+            setup(null, "Cant find user");
+          }
+        } else {
+          Vue.axios.get(`${context.state.VALIDATOR_URL}/login/?login=${data.login}&password=${data.password}`)
+            .then((response) => {
+              setup(response.data, null);
+            }).catch((error) => {
             console.log(error);
             setup(null, error);
-        });
+          });
+        }
       }
+
+
     },
     LOGOUT: async (context) => {
       context.commit('SET_TOKEN', null);
@@ -244,6 +253,7 @@ export default new Vuex.Store({
       context.commit('SET_USER_INTERNET', 0);
       context.commit('SET_USER_PHONE', 0);
       context.commit('SET_USER_PRICE_PLAN', '');
+      localStorage.removeItem("TOKEN");
     },
 
     LOAD_USER_DETAILS: async (context) => {
@@ -251,6 +261,7 @@ export default new Vuex.Store({
         if (error != null) {
           console.log(error);
           context.commit('SET_USER_LOADED', false);
+          context.dispatch("LOGOUT");
           throw new Error("Load User Fail:" + error);
         } else {
           context.commit('SET_USER_NAME', data.name);
