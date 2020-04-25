@@ -34,7 +34,7 @@ public class TemplatesConfig {
 
     @PostConstruct
     void postConstruct() throws IOException {
-        for (Resource resource : context.getResources("classpath*:**/*.html")) {
+        for (Resource resource : context.getResources("classpath:templates/**/*.html")) {
             LOG.info("{} - {}", resource.getURI(), resource.getFilename());
         }
     }
