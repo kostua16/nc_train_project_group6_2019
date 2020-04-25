@@ -9,40 +9,30 @@
 
     <table>
         <tr>
-            <td>All-tariff Name</td>
+            <th>Name</th>
+            <th>Call included-ammount</th>
+            <th>Call cost(Included)</th>
+            <th>Call cost(Exluded)</th>
+            <th>SMS included-ammount</th>
+            <th>SMS cost(Included)</th>
+            <th>SMS cost(Exluded)</th>
+            <th>Kilobytes included-ammount</th>
+            <th>Kilobytes cost(Included)</th>
+            <th>Kilobytes cost(Exluded)</th>
         </tr>
         <tr th:each="plan : ${plans}">
-            <td th:text="${plan.getName()}"></td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <td>Name</td>
-            <td>Type</td>
-            <td>Resource ammount</td>
-            <td>Included cost</td>
-            <td>Excluded cost</td>
-        </tr>
-        <tr th:each="c : ${calls}">
-            <td th:text="${c.getName()}"></td>
-            <td>Calls</td>
-            <td th:text="${c.getCall_balance()}"></td>
-            <td th:text="${c.getCall_cost()}"></td>
-            <td th:text="${c.getDefault_call_cost()}"></td>
-        </tr>
-        <tr th:each="sm : ${sms}">
-            <td th:text="${sm.getName()}"></td>
-            <td>SMS</td>
-            <td th:text="${sm.getSms_balance()}"></td>
-            <td th:text="${sm.getSms_cost()}"></td>
-            <td th:text="${sm.getDefault_sms_cost()}"></td>
-        </tr>
-        <tr th:each="i : ${internet}">
-            <td th:text="${i.getName()}"></td>
-            <td>Internet</td>
-            <td th:text="${i.getInternet_balance()}"></td>
-            <td th:text="${i.getInternet_cost()}"></td>
-            <td th:text="${i.getDefault_internet_cost()}"></td>
+            <td th:text="${plan.getTariff().getName()}"></td>
+            <td th:text="${plan.getTariffCall().getCall_balance()}"></td>
+            <td th:text="${plan.getTariffCall().getCall_cost()}"></td>
+            <td th:text="${plan.getTariffCall().getDefault_call_cost()}"></td>
+
+            <td th:text="${plan.getTariffSms().getSms_balance()}"></td>
+            <td th:text="${plan.getTariffSms().getSms_cost()}"></td>
+            <td th:text="${plan.getTariffSms().getDefault_sms_cost()}"></td>
+
+            <td th:text="${plan.getTariffInternet().getInternet_balance()}"></td>
+            <td th:text="${plan.getTariffInternet().getInternet_cost()}"></td>
+            <td th:text="${plan.getTariffInternet().getDefault_internet_cost()}"></td>
         </tr>
     </table>
 </div>

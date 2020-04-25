@@ -6,25 +6,30 @@
 </head>
 <body>
 <div>
-    <!--/*@thymesVar id="accounts" type="java.util.List<com.edunetcracker.billingservice.BillingDB.entity.Account>"*/-->
     <table>
         <tr>
-            <td>Name</td>
-            <td>Login</td>
-            <td>Pass</td>
-            <td>Rang</td>
-            <td>Balance</td>
-            <td>Price Plan</td>
-            <td>Phone number</td>
+            <th>Name</th>
+            <th>Login</th>
+            <th>Pass</th>
+            <th>Rang</th>
+            <th>Price Plan</th>
+            <th>Phone number</th>
+            <th>Money Balance</th>
+            <th>Calls Balance</th>
+            <th>Sms Balance</th>
+            <th>Internet Balance</th>
         </tr>
-        <tr th:each="acc : ${accounts}">
-            <td th:text="${acc.getName()}"></td>
-            <td th:text="${acc.getLogin()}"></td>
-            <td th:text="${acc.getPassword()}"></td>
-            <td th:text="${acc.getRang()}"></td>
-            <td th:text="${acc.getBalance()}"></td>
-            <td th:text="${acc.getTariff()}"></td>
-            <td th:text="${acc.getTelephone()}"></td>
+        <tr th:each="b : ${balances}">
+            <td th:text="${b.getAccount().getName()}"></td>
+            <td th:text="${b.getAccount().getLogin()}"></td>
+            <td th:text="${b.getAccount().getPassword()}"></td>
+            <td th:text="${b.getAccount().getRang()}"></td>
+            <td th:text="${b.getAccount().getTariff()}"></td>
+            <td th:text="${b.getAccount().getTelephone()}"></td>
+            <td th:text="${b.getAccount().getBalance()}"></td>
+            <td th:text="${b.getCallBalance().getCall_balance()}"></td>
+            <td th:text="${b.getSmsBalance().getSms_balance()}"></td>
+            <td th:text="${b.getInternetBalance().getInternet_balance()}"></td>
         </tr>
     </table>
 </div>
