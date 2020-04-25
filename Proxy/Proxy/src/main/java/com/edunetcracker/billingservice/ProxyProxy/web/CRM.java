@@ -8,6 +8,8 @@ import com.edunetcracker.billingservice.ProxyProxy.proxy.TariffController;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -38,6 +40,8 @@ public class CRM {
 
     @Autowired
     AccountController accountController;
+
+    Logger LOG = LoggerFactory.getLogger(CRM.class);
 
     /**
      * admin@mail.ru
@@ -175,9 +179,9 @@ public class CRM {
     @PostMapping("createA")
     public Boolean createA(@RequestBody Account newAccount) throws JsonProcessingException {
         // если нет аккаунта, но есть тариф
-        System.out.println("createA");
+        LOG.info("createA");
         if (!checks.isAccountExists(newAccount.getLogin()) && checks.isTariffExists(newAccount.getTariff())) {
-            System.out.println("createA !");
+            LOG.info("createA !");
             Account account = newAccount;
             account.setBalance(0L);
             //account.setRang("base_user");
@@ -260,26 +264,26 @@ public class CRM {
     @DeleteMapping("deleteT")
     public Boolean deleteT(@RequestParam("name") String name) throws JsonProcessingException {
         if (!name.equals("DEFAULT") && !name.equals("ADMINISTRATOR") && checks.isTariffExists(name)) {
-            System.out.println("deleteT 1");
+            LOG.info("deleteT 1");
             Map<String, Map<String,String>> accounts = (Map<String, Map<String,String>>)showA().get("accounts");
 
-            System.out.println("deleteT 2");
+            LOG.info("deleteT 2");
             for(Map.Entry entry : accounts.entrySet()) {
 
-                System.out.println("deleteT 3");
+                LOG.info("deleteT 3");
                 String key = (String) entry.getKey();
                 Map<String,String> value = (Map<String, String>) entry.getValue();
 
-                System.out.println("deleteT 4");
+                LOG.info("deleteT 4");
                 if(value.get("tariff").equals(name)){
 
-                    System.out.println("deleteT 5");
-                    System.out.println(value.get("tariff"));
+                    LOG.info("deleteT 5");
+                    LOG.info(value.get("tariff"));
                     choiceT(key,"DEFAULT");
-                    System.out.println("login = " + key);
+                    LOG.info("login = " + key);
                 }
             }
-            System.out.println("deleteT 6");
+            LOG.info("deleteT 6");
             tariffController.deleteTariff(name);
             return true;
         }

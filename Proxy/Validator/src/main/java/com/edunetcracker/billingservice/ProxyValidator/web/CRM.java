@@ -7,6 +7,8 @@ import com.edunetcracker.billingservice.ProxyValidator.entity.History;
 import com.edunetcracker.billingservice.ProxyValidator.session.SessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -32,6 +34,8 @@ public class CRM {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    Logger LOG = LoggerFactory.getLogger(CRM.class);
 
     //  http://localhost:8102/createA
     /**

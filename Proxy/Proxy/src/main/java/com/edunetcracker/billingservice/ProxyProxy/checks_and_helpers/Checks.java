@@ -2,6 +2,9 @@ package com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers;
 
 import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Tariff;
+import com.edunetcracker.billingservice.ProxyProxy.proxy.CallController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,12 +24,14 @@ public class Checks {
 
     List<String> ranges = Arrays.asList("user","administrator");
 
+    Logger LOG = LoggerFactory.getLogger(Checks.class);
+
     /*************checks**************/
     public Boolean isAccountExists(String accountLogin) {
         try {
             String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + accountLogin;
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
-            System.out.println("isAccountExists" + account.getBalance());
+            LOG.info("isAccountExists" + (account!=null ? account.getBalance() : null));
             if (account == null)
                 return false;
 

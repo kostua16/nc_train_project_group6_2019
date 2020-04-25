@@ -7,6 +7,8 @@ import com.edunetcracker.billingservice.ProxyProxy.entity.Internet;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -28,6 +30,8 @@ public class InternetController {
 
     @Autowired
     private Checks checks;
+
+    Logger LOG = LoggerFactory.getLogger(InternetController.class);
 
 
     /*@GetMapping("useInternetKilobytes")*/
@@ -88,7 +92,7 @@ public class InternetController {
             }
             if (internet.getInternet_balance() <= 0L) {
                 if (account.getBalance() - ((long) (defaultCost * quantity)) >= 0) {
-                    System.out.println("IF 1");
+                    LOG.info("IF 1");
                     account.setBalance(-(long) (defaultCost * quantity));
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                     return true;
@@ -97,10 +101,10 @@ public class InternetController {
             } else {
                 // если ресурса по тарифу хватает
                 if (internet.getInternet_balance() - quantity >= 0L) {
-                    System.out.println("IF 2");
+                    LOG.info("IF 2");
                     long amountForTariff = (long) (cost * quantity);
                     if (account.getBalance() - amountForTariff >= 0) {
-                        System.out.println("IF 3");
+                        LOG.info("IF 3");
                         internet.setInternet_balance(quantity);                  // - minutes
                         account.setBalance(-(long) (cost * quantity));    // - points
                         rabbitMQSender.send(internet, RabbitMQMessageType.INTERNET_USE_KILOBYTE);   //TODO
@@ -116,7 +120,7 @@ public class InternetController {
                     long amountForTariff = (long) (cost * internet.getInternet_balance());                 //  нехватка
                     long amountForDefault = (long) (callLack * defaultCost);         //  пересчёт остатка ресурсов
                     if (account.getBalance() - amountForDefault >= 0) {
-                        System.out.println("IF 4");
+                        LOG.info("IF 4");
                         internet.setInternet_balance(internet.getInternet_balance());
                         account.setBalance(-(amountForTariff + amountForDefault));
                         rabbitMQSender.send(internet, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
@@ -126,7 +130,7 @@ public class InternetController {
                     else return false;
                 }
             }
-            //System.out.println("IF 4");
+            //LOG.info("IF 4");
             //return false;
         } catch (Exception e) {
             e.printStackTrace();

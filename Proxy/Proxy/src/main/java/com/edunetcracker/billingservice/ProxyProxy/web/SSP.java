@@ -5,6 +5,8 @@ import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.entity.CollectedTariff;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Tariff;
 import com.edunetcracker.billingservice.ProxyProxy.proxy.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +44,8 @@ public class SSP {
 
     @Autowired
     Checks checks;
+
+    Logger LOG = LoggerFactory.getLogger(SSP.class);
     /***************************************************/
     /**
      * AccountName

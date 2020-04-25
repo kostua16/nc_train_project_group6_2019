@@ -7,6 +7,8 @@ import com.edunetcracker.billingservice.ProxyProxy.entity.Call;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -28,6 +30,8 @@ public class CallController {
 
     @Autowired
     private Checks checks;
+
+    Logger LOG = LoggerFactory.getLogger(CallController.class);
 
    /* @GetMapping("callToMinutes")*/
     public Boolean callToMinutes(/*@RequestParam("token")*/ String login, long minutes) {
@@ -53,10 +57,10 @@ public class CallController {
             } else {
                 // если ресурса по тарифу хватает
                 if (call.getCall_balance() - 60 * minutes >= 0L) {
-                    System.out.println("C 1");
+                    LOG.info("C 1");
                     long amountForTariff = (long) (cost * minutes*60L);
                     if (account.getBalance() - amountForTariff >= 0) {
-                        System.out.println("C 2");
+                        LOG.info("C 2");
                         call.setCall_balance(minutes * 60L);                  // - minutes
                         account.setBalance(-(long) (cost * 60 * minutes));    // - points
                         rabbitMQSender.send(call, RabbitMQMessageType.CALL_ONE_MINUTE);
@@ -71,7 +75,7 @@ public class CallController {
                     long callLack = 60 * minutes - call.getCall_balance();
                     long amountForTariff = (long) (cost * call.getCall_balance());                 //  нехватка
                     long amountForDefault = (long) (callLack * defaultCost);         //  пересчёт остатка ресурсов
-                    System.out.println("C 3");
+                    LOG.info("C 3");
                     if (account.getBalance() - amountForDefault >= 0) {
                         call.setCall_balance(call.getCall_balance());
                         account.setBalance(-(amountForTariff + amountForDefault));

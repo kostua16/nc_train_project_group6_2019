@@ -3,6 +3,8 @@ package com.edunetcracker.billingservice.BillingDB.billing;
 import com.edunetcracker.billingservice.BillingDB.entity.Account;
 import com.edunetcracker.billingservice.BillingDB.services.IAccountRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ public class BalanceController {
 
     @Autowired
     ObjectMapper objectMapper;
+    Logger LOG = LoggerFactory.getLogger(BalanceController.class);
 
     /***************************************************************************************/
 
@@ -25,7 +28,7 @@ public class BalanceController {
     public ResponseEntity<Long> getBalanceByLogin(@RequestParam("login") String login) {
 
         Account account = AccountRepository.findAccountByLogin(login);
-        System.out.println("acc b = " + account.getBalance());
+        LOG.info("acc b = " + account.getBalance());
         return new ResponseEntity<>(account.getBalance(), HttpStatus.OK);
     }
 }

@@ -2,7 +2,10 @@ package com.edunetcracker.billingservice.ProxyValidator.web;
 
 import com.edunetcracker.billingservice.ProxyValidator.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyValidator.checks_and_helpers.Helpers;
+import com.edunetcracker.billingservice.ProxyValidator.filter.SimpleLoggingFilter;
 import com.edunetcracker.billingservice.ProxyValidator.session.SessionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +29,8 @@ public class SSP {
     @Autowired
     SessionService sessionService;
 
+    Logger LOG = LoggerFactory.getLogger(SSP.class);
+
     /**
      * Стартовая страница
      */
@@ -33,21 +38,21 @@ public class SSP {
     @GetMapping("home")
     public ResponseEntity<Map<String, String>> home(@RequestParam("token") @NotNull String token){
         String login = checks.getLoginByTokenAndCheck(token);
-        System.out.println("V home");
+        LOG.info("V home");
         if(login == null ) {
-            System.out.println("null");
+            LOG.info("null");
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
         //if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
-            System.out.println("2");
-            System.out.println("home " + login);
+            LOG.info("2");
+            LOG.info("home " + login);
             String url = helpers.getUrlProxy() + "home/?login=" + login;
             Map<String, String> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         /*}
 
-        System.out.println("3");
+        LOG.info("3");
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);*/
 
     }

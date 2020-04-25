@@ -1,7 +1,10 @@
 package com.edunetcracker.billingservice.ProxyProxy.rabbit;
 
+import com.edunetcracker.billingservice.ProxyProxy.web.TelephoneExchange;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
@@ -22,6 +25,8 @@ public class RabbitMQSender {
 
     @Value("${rabbit.rabbitmq.queue2}")
     private String queue;
+
+    Logger LOG = LoggerFactory.getLogger(RabbitMQSender.class);
 
     //@Value("${rabbit.rabbitmq.exchange}")
     //private String exchange;
@@ -55,6 +60,7 @@ public class RabbitMQSender {
                 //.setHeader("__TypeId__", String.class)
                 .build();
         this.rabbitTemplate.convertAndSend(queue, mes);
+        LOG.info("Sent rabbit message to queue {}: [{}]", queue, orderJson);
     }
 
 }

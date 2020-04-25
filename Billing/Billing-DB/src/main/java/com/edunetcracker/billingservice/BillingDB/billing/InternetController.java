@@ -3,6 +3,8 @@ package com.edunetcracker.billingservice.BillingDB.billing;
 import com.edunetcracker.billingservice.BillingDB.entity.Internet;
 import com.edunetcracker.billingservice.BillingDB.services.IInternetRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ public class InternetController {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    Logger LOG = LoggerFactory.getLogger(InternetController.class);
 
     /***************************************************************************************/
 

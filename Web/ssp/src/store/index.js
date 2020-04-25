@@ -175,6 +175,8 @@ export default new Vuex.Store({
       } else {
         Vue.axios.get(`${context.state.VALIDATOR_URL}/showT/?token=${context.state.TOKEN}`).then(response => {
           context.commit('SET_ALL_PRICE_PLANS', response.data);
+          console.log('Loaded all price plans');
+          console.log(response.data);
         }).catch(e => {
           console.log(e);
         });
@@ -205,7 +207,7 @@ export default new Vuex.Store({
           context.commit('SET_LOGIN_SUCCESS', false);
           throw new Error("Login fail:" + error);
         } else {
-          console.log("login success");
+          console.log("login success:" + token);
           context.commit('SET_TOKEN', token);
           context.commit('SET_LOGIN_FAIL', false);
           context.commit('SET_LOGIN_SUCCESS', true);
@@ -223,7 +225,7 @@ export default new Vuex.Store({
       } else {
         Vue.axios.get(`${context.state.VALIDATOR_URL}/login/?login=${data.login}&password=${data.password}`)
           .then((response) => {
-            setup(response, null);
+            setup(response.data, null);
           }).catch((error) => {
             console.log(error);
             setup(null, error);
@@ -262,6 +264,8 @@ export default new Vuex.Store({
           context.dispatch('LOAD_ALL_PRICE_PLANS');
           context.dispatch('LOAD_HISTORY');
           context.commit('SET_USER_HISTORY', []);
+          console.log("user_loaded");
+          console.log(data);
         }
       };
       if (context.state.STUB_MODE) {
@@ -288,6 +292,8 @@ export default new Vuex.Store({
         } else {
           context.commit('SET_AVAILABLE_PRICE_PLANS', data.tariffs);
           context.commit('SET_USER_PRICE_PLAN', data.user);
+          console.log('Loaded available price plans');
+          console.log(data);
         }
       };
       if (context.state.STUB_MODE) {
@@ -313,6 +319,8 @@ export default new Vuex.Store({
           throw new Error("Load history Fail:" + error);
         } else {
           context.commit('SET_USER_HISTORY', data);
+          console.log('Loaded user history');
+          console.log(data);
         }
       };
       if (context.state.STUB_MODE) {
@@ -332,6 +340,8 @@ export default new Vuex.Store({
       } else {
         Vue.axios.get(`${context.state.VALIDATOR_URL}/home/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`).then(() => {
           context.commit('SET_USER_BALANCE', money);
+          console.log('updated user balance');
+          console.log(data);
         }).catch(e => {
           console.log(e);
           throw new Error("Update user balance Fail:" + e);
@@ -344,6 +354,8 @@ export default new Vuex.Store({
       } else {
         Vue.axios.get(`${context.state.VALIDATOR_URL}/choicetariff/?token=${context.state.TOKEN}&tariff=${tariff}`).then(() => {
           context.commit('SET_USER_PRICE_PLAN', tariff);
+          console.log('updated user price plan');
+          console.log(tariff);
         }).catch(e => {
           console.log(e);
           throw new Error("Update user price plan Fail:" + e);
@@ -353,7 +365,7 @@ export default new Vuex.Store({
     CREATE_USERS: async (context) => {
       if (!context.state.STUB_MODE) {
         Vue.axios.post(`${context.state.PROXY_URL}/start`).then(() => {
-          console.log("SSP user created");
+          console.log("SSP users created");
         }).catch(e => {
           console.log(e);
           throw new Error("Create users Fail:" + e);
