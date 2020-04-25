@@ -11,6 +11,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+
     <groupId>com.edu-netcracker.billing-service</groupId>
     <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -19,11 +20,14 @@
     <packaging>pom</packaging>
 
     <properties>
+        <spring.boot.version>2.2.2.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
         <node.version>v12.14.0</node.version>
         <npm.version>3.5.3</npm.version>
         <yarn.version>v1.21.1</yarn.version>
         <frontend-maven-plugin.version>1.9.0</frontend-maven-plugin.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
 
     <modules>
