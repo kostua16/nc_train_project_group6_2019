@@ -124,13 +124,4 @@ public class AccountController {
             return false;
         }
     }
-
-    public void AnotherFunctionWithCreateAccount(String login){
-        String url;
-        /****Call***/
-        url = helpers.getUrlProxy() + "/createCall";
-        Call createNewCall = new Call();
-        createNewCall.defaultCall(login);
-        new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(createNewCall, new HttpHeaders()), Boolean.class);
-    }
 }

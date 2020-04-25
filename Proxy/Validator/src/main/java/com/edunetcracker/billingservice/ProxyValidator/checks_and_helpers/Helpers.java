@@ -12,26 +12,22 @@ import org.springframework.web.client.RestTemplate;
 public class Helpers {
 
 
-    @Value("${app.billing.host}")
-    private String hostBilling = "localhost";
+    @Value("${app.billing.url}")
+    private String billingUrl = "http://localhost:8202";
 
-    @Value("${app.billing.port}")
-    private String portBilling = "8202";
 
-    @Value("${app.proxy_proxy.host}")
-    private String hostProxy = "localhost";
+    @Value("${app.proxy.url}")
+    private String proxyUrl = "http://localhost:8102";
 
-    @Value("${app.proxy_proxy.port}")
-    private String portProxy = "8102";
 
 
     /*************helpers**************/
     public String getUrlBilling() {
-        return "http://" + hostBilling + ":" + portBilling;
+        return billingUrl;
     }
 
     public String getUrlProxy() {
-        return "http://" + hostProxy + ":" + portProxy;
+        return proxyUrl;
     }
 
     public Account getAccount(String accountLogin){
