@@ -53,10 +53,10 @@ public class TestUIController {
             balances.add(balanceInfo);
         }
         model.addAttribute("balances", balances);
-        return "ui_test_users";
+        return "ui/test/users";
     }
 
-    @GetMapping("price_plans")
+    @GetMapping("plans")
     public String tariffs(Model model){
         List<Tariff> allTariffs = tariffRepository.findAll();
         List<PricePlanInfo> plans = new ArrayList<>();
@@ -69,6 +69,6 @@ public class TestUIController {
             plans.add(planInfo);
         }
         model.addAttribute("plans", plans);
-        return "ui_test_price_plans";
+        return "ui/test/plans";
     }
 }
