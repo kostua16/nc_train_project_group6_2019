@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Users list</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div>
+    <!--/*@thymesVar id="accounts" type="java.util.List<com.edunetcracker.billingservice.BillingDB.entity.Account>"*/-->
+    <table>
+        <tr>
+            <td>Name</td>
+            <td>Login</td>
+            <td>Pass</td>
+            <td>Rang</td>
+            <td>Balance</td>
+            <td>Price Plan</td>
+            <td>Phone number</td>
+        </tr>
+        <tr th:each="acc : ${accounts}">
+            <td th:text="${acc.getName()}"></td>
+            <td th:text="${acc.getLogin()}"></td>
+            <td th:text="${acc.getPassword()}"></td>
+            <td th:text="${acc.getRang()}"></td>
+            <td th:text="${acc.getBalance()}"></td>
+            <td th:text="${acc.getTariff()}"></td>
+            <td th:text="${acc.getTelephone()}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

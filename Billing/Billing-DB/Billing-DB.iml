@@ -7,7 +7,13 @@
   </component>
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
-      <configuration />
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/src/main/java/com/edunetcracker/billingservice/BillingDB/BillingDbApplication.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/edunetcracker/billingservice/BillingDB/rabbit/RabbitMQConfig.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/edunetcracker/billingservice/BillingDB/WebConfig.java</file>
+        </fileset>
+      </configuration>
     </facet>
     <facet type="web" name="Web">
       <configuration>
