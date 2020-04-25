@@ -47,7 +47,7 @@ public class SSP {
         //if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
             LOG.info("2");
             LOG.info("home " + login);
-            String url = helpers.getUrlProxy() + "home/?login=" + login;
+            String url = helpers.getUrlProxy() + "/home/?login=" + login;
             Map<String, String> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         /*}
@@ -69,7 +69,7 @@ public class SSP {
         }
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
-            String url = helpers.getUrlProxy() + "topup/?login=" + login + "&amount=" + amount;
+            String url = helpers.getUrlProxy() + "/topup/?login=" + login + "&amount=" + amount;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
@@ -88,7 +88,7 @@ public class SSP {
         }
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
-            String url = helpers.getUrlProxy() + "showtariff/?login=" + login;
+            String url = helpers.getUrlProxy() + "/showtariff/?login=" + login;
             Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
@@ -108,7 +108,7 @@ public class SSP {
         }
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
-            String url = helpers.getUrlProxy() + "choicetariff/?login=" + login + "&tariff=" + tariff;
+            String url = helpers.getUrlProxy() + "/choicetariff/?login=" + login + "&tariff=" + tariff;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
@@ -122,7 +122,7 @@ public class SSP {
         }
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
-            String url = helpers.getUrlProxy() + "getTelephone/?login=" + login;
+            String url = helpers.getUrlProxy() + "/getTelephone/?login=" + login;
             String response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), String.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
