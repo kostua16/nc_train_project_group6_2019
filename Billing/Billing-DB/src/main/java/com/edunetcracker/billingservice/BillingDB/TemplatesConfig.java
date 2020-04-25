@@ -5,12 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -21,15 +23,6 @@ public class TemplatesConfig {
     Logger LOG = LoggerFactory.getLogger(TemplatesConfig.class);
 
     @Autowired
-    SpringResourceTemplateResolver templateResolver;
-
-    @Autowired
-    ThymeleafViewResolver viewResolver;
-
-    @Autowired
-    ResourceLoader resourceLoader;
-
-    @Autowired
     ApplicationContext context;
 
     @PostConstruct
@@ -38,4 +31,32 @@ public class TemplatesConfig {
             LOG.info("{} - {}", resource.getURI(), resource.getFilename());
         }
     }
+
+
+    private SpringResourceTemplateResolver generateResolver(int order, String prefix ) {
+        SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
+        resolver.setApplicationContext(context);
+        resolver.setPrefix(prefix);
+        resolver.setSuffix(".html");
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setOrder(order);
+        resolver.setCacheable(true);
+        resolver.setCheckExistence(true);
+        return resolver;
+    }
+
+    @Bean("defaultTemplateResolver")
+    ITemplateResolver defaultTemplateResolver(){
+        return generateResolver(0,"classpath:templates/");
+    }
+
+    @Bean("templatesFromStaticFolderResolver")
+    ITemplateResolver templatesFromStaticFolderResolver(){
+        return generateResolver(1,"classpath:resources/");
+    }
+    @Bean("templatesFromThymeleafFolderResolver")
+    ITemplateResolver templatesFromThymeleafFolderResolver(){
+        return generateResolver(2,"classpath:thymeleaf/");
+    }
+
 }
