@@ -16,8 +16,11 @@ public class TestUIController {
 
     @Autowired
     private ITariffRepository tariffRepository;
+    @Autowired
     private ITariffCallRepository tariffCallRepository;
+    @Autowired
     private ITariffSmsRepository tariffSmsRepository;
+    @Autowired
     private ITariffInternetRepository tariffInternetRepository;
 
     @GetMapping("users")
