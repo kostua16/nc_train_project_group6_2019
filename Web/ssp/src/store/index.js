@@ -352,7 +352,7 @@ export default new Vuex.Store({
     },
     CREATE_USERS: async (context) => {
       if (!context.state.STUB_MODE) {
-        Vue.axios.get(`${context.state.PROXY_URL}/start`).then(() => {
+        Vue.axios.post(`${context.state.PROXY_URL}/start`).then(() => {
           console.log("SSP user created");
         }).catch(e => {
           console.log(e);
