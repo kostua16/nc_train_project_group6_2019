@@ -87,7 +87,7 @@ public class SSP {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
+        if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
             String url = helpers.getUrlProxy() + "/showtariff/?login=" + login;
             Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);

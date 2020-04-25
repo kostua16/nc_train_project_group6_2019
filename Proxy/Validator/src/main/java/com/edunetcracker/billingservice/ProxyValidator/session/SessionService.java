@@ -1,6 +1,8 @@
 package com.edunetcracker.billingservice.ProxyValidator.session;
 
 import com.edunetcracker.billingservice.ProxyValidator.entity.Login;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -8,10 +10,11 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class SessionService {
 
-    private Map<Login, String> loginMap = new HashMap<>(); //{String login, String password}, String session
-    private Map<String, Login> sessionMap = new HashMap<>(); //String session, {String login, String password}
+    private final Map<Login, String> loginMap = new HashMap<>(); //{String login, String password}, String session
+    private final Map<String, Login> sessionMap = new HashMap<>(); //String session, {String login, String password}
 
     public String newSession(Login login) {
 

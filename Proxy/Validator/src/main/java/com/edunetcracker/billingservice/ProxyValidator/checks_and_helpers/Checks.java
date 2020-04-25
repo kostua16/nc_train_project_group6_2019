@@ -25,7 +25,7 @@ public class Checks {
     SessionService sessionService;
     public static final String USER ="USER";
     public static final String ADMINISTRATOR ="ADMINISTRATOR";
-    List<String> ranges = Arrays.asList("USER","ADMINISTRATOR");
+    List<String> ranges = Arrays.asList(USER,ADMINISTRATOR);
 
     Logger LOG = LoggerFactory.getLogger(Checks.class);
 
@@ -34,7 +34,7 @@ public class Checks {
         try {
             String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + accountLogin;
             Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
-            LOG.info("isAccountExists " + account.getBalance());
+            LOG.info("isAccountExists.account={}", account);
             if (account == null)
                 return false;
 
@@ -46,14 +46,16 @@ public class Checks {
     }
 
     public Boolean checkByToken(String token) {
-        if (sessionService.inSession(token))
-            return true;
-        return false;
+        final Boolean result = sessionService.inSession(token);
+        LOG.info("checkByToken.token[{}]=>{}", token, result);
+        return result;
     }
     public String getLoginByTokenAndCheck(String token) {
         if (checkByToken(token)) {
             String login = sessionService.getLogin(token).getLogin();
+            LOG.info("getLoginByTokenAndCheck.token[{}]=>login[{}]", token, login);
             if (isAccountExists(login)) {
+                LOG.info("getLoginByTokenAndCheck.OK");
                 return login;
             }
         }
