@@ -1,43 +1,31 @@
 <template>
 
-<form class="card auth-card"><!-- тут прослушиваем событие enter в кнопке и вызваем метод "submitHandler" -->
-  <div class="card-content ">
-      <span class="card-title ">Swith модуль</span>
-       <button class="btn waves-effect waves-light auth-submit" type="submit" @click.prevent="goTo('/ssp/login')">SSP (users)
-          <i class="material-icons right"/>
-        </button>
-
-       <button class="btn waves-effect waves-light auth-submit" type="submit"@click.prevent="goTo('/crm/login')">CRM (admins)
-          <i class="material-icons right"/>
-        </button>
-
-        <button class="btn waves-effect waves-light auth-submit" type="submit"@click.prevent="goTo('/atc/mobile')"> ATC
-          <i class="material-icons right"/>
-        </button>
+  <form class="card auth-card"><!-- тут прослушиваем событие enter в кнопке и вызваем метод "submitHandler" -->
+    <div class="card-content ">
+      <span class="card-title ">Выберите модуль</span>
+      <button
+        class="btn waves-effect waves-light auth-submit"
+        type="submit"
+        v-for = "(module) in active_modules"
+        @click.prevent="goToModuleNoBack(module)">
+        {{module.name}}
+        <i class="material-icons right"/>
+      </button>
     </div>
-</form>
+  </form>
 </template>
 
 
 <script>
-import axios from 'axios'
-export default {
-  name: 'login', //имя данной странице
-  data: () => ({
-    email: '',
-    password: '',
-    token: '',
-    loginAndPassword: false
-  }),
-  methods: {
-      goTo(a) {
-       this.$router.push(a)
-    },
-
+  import BasePage from '../components/base/BasePage'
+  import {mapState} from "vuex";
+  export default {
+    extends: BasePage,
+    name: 'login',
+    computed: mapState({
+      active_modules: state => state.ACTIVE_MODULES,
+    }),
   }
-
-
-}
 </script>
 
 <style scoped>

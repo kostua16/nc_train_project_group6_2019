@@ -1,30 +1,32 @@
 <template>
   <div class="app-main-layout">
-   
+
     <Navbar @click="isOpen =!isOpen"/> <!-- Титульник  --> <!-- сушаем значение клик  -->
-    <Sidebar v-model="isOpen" /> <!-- меню слева  -->
+    <Sidebar v-model="isOpen"/> <!-- меню слева  -->
 
-    <main class="app-content" :class="{full: !isOpen}"> <!-- значение клика если не активировано то дописываем full в класс  -->
+    <main class="app-content" :class="{full: !isOpen}">
+      <!-- значение клика если не активировано то дописываем full в класс  -->
       <div class="app-page">
-          <router-view />
+        <router-view/>
 
 
-    </div>
+      </div>
     </main>
 
-</div>
+  </div>
 </template>
 
 <script>
-import Navbar from '@/components/app/Navbar'
-import Sidebar from '@/components/app/Sidebar'
-export default {
-  name: 'main-layout', //любое имя можно задать
-  data: () => ({
-    isOpen: true
-  }),
-  components: {
-    Navbar, Sidebar
+  import Navbar from '../components/base/BaseNavbar'
+  import Sidebar from '../components/base/BaseSidebar'
+
+  export default {
+    name: 'main-layout', //любое имя можно задать
+    data: () => ({
+      isOpen: true
+    }),
+    components: {
+      Navbar, Sidebar
+    }
   }
-}
 </script>

@@ -9,23 +9,20 @@
 <script>
 import EmptyLayout from '@/layouts/EmptyLayout'
 import MainLayout from '@/layouts/MainLayout'
-import AtcLayout from '@/layouts/AtcLayout'
-import SspLayout from '@/layouts/SspLayout'
-import CrmLayout from '@/layouts/CrmLayout'
 export default {
   computed: {
     layout(){ //свойство- возвращает строку названия лаяута которое будет использоватся из 21 строчки
        //console.log(this.$route.meta.layout)
       //this.$route.meta.layout возврашает empty или main
-       return (this.$route.meta.layout || 'Empty' || 'Crm') + '-Layout' //возврашаяет состояние <router-view/> свойство и имя
+       return (this.$route.meta.layout || 'Empty') + '-Layout' //возврашаяет состояние <router-view/> свойство и имя
     }
+  },
+  mounted() {
+    this.$store.dispatch('LOAD_SERVERS_DETAILS');
   },
   components: {
     EmptyLayout,
     MainLayout,
-    AtcLayout,
-    SspLayout,
-    CrmLayout  //импортируем для тега <component :is="layout">
   }
 }
 </script>

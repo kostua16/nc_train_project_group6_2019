@@ -103,10 +103,12 @@
 </template>
 
 <script>
-import axios from 'axios'
+  import UserPage from '../base/UserView'
+  import {mapState} from "vuex";
 export default {
+  extends: UserPage,
   data: () => ({
-    tariffs: {tariff:[]},
+    loginRoute: '/crm/login',
     newTariffName: '',
     Call_cost: '',
     Call_balance: '',
@@ -119,34 +121,12 @@ export default {
     Default_sms_cost: '',
     deleteTariffName: ''
   }),
-  mounted () {
-    this.getTariff()
-  },
+  computed: mapState({
+    tariffs: state => state.ALL_PRICE_PLANS
+  }),
   methods: {
-    shiwTariff(){
-      for (key in this.tariffs) {
-        if (person.hasOwnProperty(key)) {
-          //ключ = key
-          //значение = person[key]
-          console.log("Ключ = " + key);
-          console.log("Значение = " + person[key]);
-        } // если объект person имеет key (если у person есть свойство key)
-      }
-    },
-    getTariff(){ //настроить адресс
-      axios.get('http://localhost:8101/showT/?token='+localStorage.getItem('token')).then(response => {
-         this.tariffs = response.data
-         console.log(response.data)
-      }).catch(e => {
-        console.log(e)
-      })
-    },
     deleteTariff(){
-        axios.delete('http://localhost:8101/deleteT/?token='+localStorage.getItem('token') + '&name='+this.deleteTariffName).then(response => {
-            console.log(response.data)
-        }).catch(e => {
-            console.log(e)
-        })
+      this.$store.dispatch("DELETE_PRICE_PLAN", this.deleteTariffName);
     },
     createTariff(){
         var s={
@@ -155,12 +135,7 @@ export default {
             'tariffInternet': {"Internet_cost": this.Internet_cost*1000,"Internet_balance": this.Internet_balance,"Default_internet_cost": this.Default_internet_cost},
             'tariffSms': {"Sms_cost": this.Sms_cost,"Sms_balance": this.Sms_balance, "Default_sms_cost": this.Default_sms_cost}
         }
-        axios.post('http://localhost:8101/createT/?token='+localStorage.getItem('token'),s
-        ).then(response => {
-            console.log(response.data)
-        }).catch(e => {
-            console.log(e)
-        })
+      this.$store.dispatch("CREATE_PRICE_PLAN", s);
     }
   }
 }

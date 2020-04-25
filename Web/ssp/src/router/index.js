@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/ssp/Home.vue'
 
 Vue.use(VueRouter)
 
@@ -14,74 +13,56 @@ const routes = [
   },
   {
     path: '/ssp/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
-    name: 'login', //для себя имя
+    name: 'sspLogin', //для себя имя
     meta: {layout: 'Empty'}, //задаём лаяуты //свойства имя, имя
     component: () => import('../views/ssp/SspLogin') //импортируем контент
   },
   {
     path: '/crm/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
-    name: 'login', //для себя имя
+    name: 'crmLogin', //для себя имя
     meta: {layout: 'Empty'}, //задаём лаяуты //свойства имя, имя
     component: () => import('../views/crm/CrmLogin') //импортируем контент
   },
   {
-    path: '/crm',
-    name: 'crm',
-    meta: {layout: 'Crm', auth: true},
-    component: () => import('../views/crm/CRM.vue')
-  },
-  {
     path: '/crm/tariffadmin',
     name: 'tariffadmin',
-    meta: {layout: 'Crm', auth: true},
+    meta: {layout: 'Main', auth: true},
     component: () => import('../views/crm/TariffAdmin.vue')
   },
   {
-    path: '/crm/user',
-    name: 'user',
-    meta: {layout: 'Crm', auth: true},
+    path: '/crm',
+    name: 'crmUser',
+    meta: {layout: 'Main', auth: true},
     component: () => import('../views/crm/User.vue')
   },
   {
     path: '/crm/history',
-    name: 'history',
-    meta: {layout: 'Crm', auth: true},
+    name: 'crmHistory',
+    meta: {layout: 'Main', auth: true},
     component: () => import('../views/crm/History.vue')
   },
   {
     path: '/ssp',
-    name: 'ssp',
-    meta: {layout: 'Ssp', auth: true},
-    component: () => import('../views/ssp/SSP.vue')
-  },
-  {
-    path: '/ssp/home',
-    name: 'home',
-    meta: {layout: 'Ssp', auth: true},
+    name: 'sspHome',
+    meta: {layout: 'Main', auth: true},
     component: () => import('../views/ssp/Home.vue')
   },
   {
     path: '/ssp/bank',
-    name: 'bank',
-    meta: {layout: 'Ssp', auth: true},
+    name: 'sspBank',
+    meta: {layout: 'Main', auth: true},
     component: () => import('../views/ssp/Bank.vue')
   },
   {
     path: '/ssp/tariff',
-    name: 'tariff',
-    meta: {layout: 'Ssp', auth: true},
+    name: 'sspTariff',
+    meta: {layout: 'Main', auth: true},
     component: () => import('../views/ssp/Tariff.vue')
   },
   {
     path: '/atc',
-    name: 'atc',
-    meta: {layout: 'Atc'},
-    component: () => import('../views/atc/ATC.vue')
-  },
-  {
-    path: '/atc/mobile',
-    name: 'mobile',
-    meta: {layout: 'Atc'},
+    name: 'atcMobile',
+    meta: {layout: 'Main'},
     component: () => import('../views/atc/Mobile.vue')
   },
 ]

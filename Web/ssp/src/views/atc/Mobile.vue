@@ -25,7 +25,8 @@
           <label for="minutes">Minutes</label>
         </div>
         <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="spendMinutes" @click="multiplyActionsMinutes"><i class="material-icons right">send</i>to spend</a>
+          <a class="waves-effect waves-light btn" @click.prevent="spendMinutes" @click="multiplyActionsMinutes"><i
+            class="material-icons right">send</i>to spend</a>
           <!--<div>
             <span v-for="n in 1*minutes" :key="n">
               {{n}}
@@ -43,7 +44,8 @@
           <label for="sms">Sms</label>
         </div>
         <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="spendSms" @click="multiplyActionsSms"><i class="material-icons right">send</i>to spend</a>
+          <a class="waves-effect waves-light btn" @click.prevent="spendSms" @click="multiplyActionsSms"><i
+            class="material-icons right">send</i>to spend</a>
         </div>
       </div>
     </form>
@@ -52,115 +54,110 @@
       <div class="row">
         <div class="input-field col s6">
           <i class="material-icons prefix">public</i>
-          <input id="Internet" type="tel"  v-model.trim="internet" class="validate">
+          <input id="Internet" type="tel" v-model.trim="internet" class="validate">
           <label for="Internet">Internet</label>
         </div>
         <div class="input-field col s6">
-          <a class="waves-effect waves-light btn"  @click.prevent="spendInternet" @click="multiplyActionsInternet"><i class="material-icons right">send</i>to spend</a>
+          <a class="waves-effect waves-light btn" @click.prevent="spendInternet" @click="multiplyActionsInternet"><i
+            class="material-icons right">send</i>to spend</a>
         </div>
       </div>
     </form>
-<!--
-    <form class="col s12">
-      <div class="row">
+    <!--
+        <form class="col s12">
+          <div class="row">
 
-        <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="spendAll"><i class="material-icons right">send</i>to spend all</a>
-        </div>
-      </div>
-    </form>-->
+            <div class="input-field col s6">
+              <a class="waves-effect waves-light btn" @click.prevent="spendAll"><i class="material-icons right">send</i>to spend all</a>
+            </div>
+          </div>
+        </form>-->
     <!--<button id="show-modal" @click="showModal = true">Show Modal</button>-->
-    <modal v-if="showModal" v-bind:minutes="minutes"  v-bind:sms="sms" v-bind:internet="internet" v-bind:type="typeModal" @close="showModal = false" >
+    <modal v-if="showModal" v-bind:minutes="minutes" v-bind:sms="sms" v-bind:internet="internet" v-bind:type="typeModal"
+           @close="showModal = false">
     </modal>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import Modal from "./Modal";
-export default {
-    data: () => ({
-    telephoneFrom : '',
-    telephoneTo: '',
-    minutes : null,
-    sms : null,
-    internet: null,
-    showModal: false,
-    typeModal: 'call',/*
-    stopModal: true*/
-  }),
-    mounted(){
-  },
-    methods:{
-        multiplyActionsMinutes() {
-            this.typeModal = 'call'
-            this.showModal = true
+  import Modal from "./Modal";
 
-        },
-        multiplyActionsSms() {
-            this.typeModal = 'sms'
-            this.showModal = true
-        },
-        multiplyActionsInternet() {
-            this.typeModal = 'internet'
-            this.showModal = true
-        },
-        sleep(milliseconds) {
-          const date = Date.now();
-          let currentDate = null;
-          do {
-              currentDate = Date.now();
-          } while (currentDate - date < milliseconds);
+  export default {
+    data: () => ({
+      telephoneFrom: '',
+      telephoneTo: '',
+      minutes: null,
+      sms: null,
+      internet: null,
+      showModal: false,
+      typeModal: 'call',/*
+    stopModal: true*/
+    }),
+    mounted() {
+    },
+    methods: {
+      multiplyActionsMinutes() {
+        this.typeModal = 'call'
+        this.showModal = true
+
+      },
+      multiplyActionsSms() {
+        this.typeModal = 'sms'
+        this.showModal = true
+      },
+      multiplyActionsInternet() {
+        this.typeModal = 'internet'
+        this.showModal = true
+      },
+      sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+          currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
       },
       spendMinutes() {
-          if(this.minutes>0) {
-              axios.get('http://localhost:8102/callFromTo/?telephoneFrom=' + this.telephoneFrom + '&minutes=1' /*+ this.minutes*/ + '&telephoneTo=' + this.telephoneTo)
-                  .then(response => {
-                  console.log(response.data)
-                      if(response.data){
-                          this.minutes -= 1
-                          this.sleep(1000)
-                          this.spendMinutes()
-                          //Закрыть окно
-                      }
-              }).catch(e => {
-                  console.log(e)
-              })
-          }
-    },
-    spendSms() {
-        if(this.sms>0) {
-          axios.get('http://localhost:8102/smsFromTo/?telephoneFrom=' + this.telephoneFrom + '&sms=1' /*parseFloat(this.sms)*/ +'&telephoneTo=' + this.telephoneTo)
-              .then(response => {
-              console.log(response.data)
-                  if(response.data){
-                      this.sms -= 1
-                      this.sleep(1000)
-                      this.spendSms()
-                  }
-          }).catch(e => {
+        if (this.minutes > 0) {
+          this.$store.dispatch("DO_CALL", {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo})
+            .then(() => {
+              this.minutes -= 1;
+              this.sleep(1000);
+              this.spendMinutes()
+            })
+            .catch(e => {
               console.log(e)
-          })
-      }
-    },
-    spendInternet() {//  http://localhost:8102/useInternet/?telephoneFrom=897654321&kilobytes=4
-        if(this.internet>0) {
-            axios.get('http://localhost:8102/useInternet/?telephoneFrom=' + this.telephoneFrom + '&kilobytes=1000' /*+ parseFloat(this.internet) * 1024*/)
-                .then(response => {
-                console.log(response.data)
-                    if(response.data){
-                        this.internet -= 1
-                        this.sleep(1000)
-                        this.spendInternet()
-                    }
-            }).catch(e => {
-                console.log(e)
             })
         }
+      },
+      spendSms() {
+        if (this.sms > 0) {
+          this.$store.dispatch("DO_SMS", {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo})
+            .then(() => {
+              this.sms -= 1;
+              this.sleep(1000);
+              this.spendSms()
+            })
+            .catch(e => {
+              console.log(e)
+            })
+        }
+      },
+      spendInternet() {//  http://localhost:8102/useInternet/?telephoneFrom=897654321&kilobytes=4
+        if (this.internet > 0) {
+          this.$store.dispatch("DO_INTERNET", {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo})
+            .then(() => {
+              this.internet -= 1;
+              this.sleep(1000);
+              this.spendInternet()
+            })
+            .catch(e => {
+              console.log(e)
+            })
+        }
+      },
     },
-  },
-  components: {
+    components: {
       Modal
+    }
   }
-}
 </script>

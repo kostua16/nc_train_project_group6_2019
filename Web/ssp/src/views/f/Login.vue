@@ -60,13 +60,16 @@
 <script>
 import axios from 'axios'
 import {email, required, minLength} from 'vuelidate/lib/validators'
+import {mapState} from "vuex";
 export default {
   name: 'login', //имя данной странице
   data: () => ({
     email: '',
     password: '',
     token: '',
-    loginAndPassword: false
+  }),
+  computed: mapState({
+    loginAndPassword: state => state.LOGIN_FAILED
   }),
   validations: {
     email: {email, required}, /* required - пустое поле не принимаем*/
@@ -77,13 +80,6 @@ export default {
      this.creatAkaunt()
    },
   methods: {
-    creatAkaunt(){//УДАЛИТЬ ПОТОМ
-      axios.post('http://localhost:8102/start')
-      .then(console.log('true'))
-      .catch(e => {
-        console.log(e)
-      })
-    },
     submitHandler() {
       //console.log(this.$v.password)
       if (this.$v.$invalid) {

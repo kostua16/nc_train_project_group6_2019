@@ -65,9 +65,10 @@
 </template>
 
 <script>
-import axios from 'axios'
+  import UserPage from '../base/UserView'
 export default {
-   data: ()=>  ({
+  extends: UserPage,
+  data: ()=>  ({
        /*login: "timur@mail.ru",
        logindelet: "",
        password: "123456",
@@ -76,6 +77,7 @@ export default {
        tariff: "DEFAULT",
        telephone: "88005553538",
        rang: "USER",*/
+          loginRoute: '/crm/login',
           login: "",
           logindelet: "",
           password: "",
@@ -87,23 +89,10 @@ export default {
 
     }),
   methods: {//deleteA
-  //showT
-  getTariff() {
-    axios.get('http://localhost:8101/showT/?token='+localStorage.getItem('token')).then(response => {
-         console.log(response.data)
-      }).catch(e => {
-        console.log(e)
-      })
-  },
    deleteAk() {
-      axios.delete('http://localhost:8101/deleteA/?token='+ localStorage.getItem('token') +'&login=' + this.logindelet).then(response => {
-         console.log(response.data)
-      }).catch(e => {
-        console.log(e)
-      })
+     this.$store.dispatch("DELETE_USER", this.logindelet);
     },
       pustUser() {
-
         var s={
             'login': this.login,
             'password': this.password,
@@ -112,18 +101,9 @@ export default {
             'tariff': this.tariff,
             'telephone': this.telephone,
             'rang': this.rang
-        }
-          axios.post('http://localhost:8101/createA/?token=' + localStorage.getItem('token'),s
-          ).then(response =>{
-              console.log(response)
-          }).catch(e => {
-              console.log(u)
-              console.log(e)
-          })
+        };
+        this.$store.dispatch("CREATE_USER", s);
     },
   },
-  mounted() {
-    this.getTariff()
-  }
 }
 </script>

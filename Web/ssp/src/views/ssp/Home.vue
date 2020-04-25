@@ -53,31 +53,17 @@
 </template>
 
 <script>
-import axios from 'axios'
+  import UserPage from '../base/UserView'
+  import {mapState} from "vuex";
 export default {
-  data: () => ({
-    balance : 0,
-    minutes : '0',
-    sms : '0',
-    internet: 0
+  extends: UserPage,
+  data: () => ({ loginRoute: '/ssp/login' }),
+  computed: mapState({
+    balance: state => state.USER_BALANCE,
+    minutes: state => state.USER_MINUTES,
+    sms: state => state.USER_SMS,
+    internet: state => state.USER_INTERNET
   }),
-  mounted(){
-    this.getMoney()
-    console.log(localStorage.getItem('token'))
-  },
-  methods:{
-    getMoney() {
-      axios.get('http://localhost:8101/home/?token='+localStorage.getItem('token')).then(response => {
-         this.balance = response.data.balance
-         this.minutes = response.data.minutes
-         this.sms = response.data.sms
-         this.internet = response.data.internet
-         console.log(response.data)
-      }).catch(e => {
-        console.log(e)
-      })
-    }
-  }
 }
 </script>
 

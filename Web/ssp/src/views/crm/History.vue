@@ -24,25 +24,16 @@
 </div>
 </template>
 <script>
-    import axios from 'axios'
+  import UserPage from '../base/UserView'
+  import {mapState} from "vuex";
     export default {
-        data: () => ({
-            histories: [history]
-        }),
-        mounted(){
-            this.getHistory()
-            console.log(localStorage.getItem('token'))
-        },
-        methods:{
-            getHistory() {
-                axios.get('http://localhost:8101/showHistory/?token='+localStorage.getItem('token')).then(response => {
-                    this.histories=response.data
-                    console.log(response.data)
-                }).catch(e => {
-                    console.log(e)
-                })
-            }
-        }
+      extends: UserPage,
+      data: () => ({
+        loginRoute: '/crm/login',
+      }),
+      computed: mapState({
+        histories: state => state.USER_HISTORY
+      }),
     }
 </script>
 
