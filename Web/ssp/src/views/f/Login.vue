@@ -76,9 +76,6 @@ export default {
     password: {required, minLength: minLength(6)}
 
   },
-   mounted () {
-     this.creatAkaunt()
-   },
   methods: {
     submitHandler() {
       //console.log(this.$v.password)
@@ -86,20 +83,10 @@ export default {
         this.$v.$touch()
         return
       }
-       axios.get('http://localhost:8101/login/?login=' + this.email + '&password=' + this.password).then(response => {
-        this.token = response.data
-       // console.log(this.token) //Токен
-        localStorage.setItem('token',this.token)
-       // console.log(localStorage.getItem('token'))
-        this.$router.push('/')
-
-      }).catch(e => {
-
-        console.log(e)
-        this.loginAndPassword = true
-
-      })
-
+      this.$store.dispatch('LOGIN', {login: this.email, password: this.password}).then(() => {
+        console.log("successfully logged in");
+        this.$router.push('/');
+      });
     },
       goTo(a) {
           this.$router.push(a)
