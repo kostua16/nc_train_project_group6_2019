@@ -14,23 +14,17 @@ import java.util.Map;
 @RequestMapping("/")
 public class IndexController {
 
-    @Value("${app.validator.host}")
-    private String validatorHost;
+    @Value("${app.validator.url}")
+    private String validatorUrl;
 
-    @Value("${app.validator.port}")
-    private String validatorPort;
-
-    @Value("${app.proxy.host}")
-    private String proxyHost;
-
-    @Value("${app.proxy.port}")
-    private String proxyPort;
+    @Value("${app.proxy.url}")
+    private String proxyUrl;
 
     @GetMapping("serversDetails")
     public ResponseEntity<Map<String, String>> getValidatorAddress(){
         Map<String, String> response = new HashMap<>();
-        response.put("validator", "http://" + this.validatorHost + ":" + this.validatorPort);
-        response.put("proxy", "http://" + this.proxyHost + ":" + this.proxyPort);
+        response.put("validator", validatorUrl);
+        response.put("proxy", proxyUrl);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
