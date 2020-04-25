@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Users list</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div>
+    <!--/*@thymesVar id="plans" type="java.util.List<com.edunetcracker.billingservice.BillingDB.entity.Tariff>"*/-->
+    <!--/*@thymesVar id="calls" type="java.util.List<com.edunetcracker.billingservice.BillingDB.entity.TariffCall>"*/-->
+    <!--/*@thymesVar id="sms" type="java.util.List<com.edunetcracker.billingservice.BillingDB.entity.TariffSms>"*/-->
+    <!--/*@thymesVar id="internet" type="java.util.List<com.edunetcracker.billingservice.BillingDB.entity.TariffInternet>"*/-->
+    <table>
+        <tr>
+            <td>All-tariff Name</td>
+        </tr>
+        <tr th:each="plan : ${plans}">
+            <td th:text="${plan.getName()}"></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>Name</td>
+            <td>Type</td>
+            <td>Resource ammount</td>
+            <td>Included cost</td>
+            <td>Excluded cost</td>
+        </tr>
+        <tr th:each="c : ${calls}">
+            <td th:text="${c.getName()}"></td>
+            <td>Calls</td>
+            <td th:text="${c.getCall_balance()}"></td>
+            <td th:text="${c.getCall_cost()}"></td>
+            <td th:text="${c.getDefault_call_cost()}"></td>
+        </tr>
+        <tr th:each="sm : ${sms}">
+            <td th:text="${sm.getName()}"></td>
+            <td>SMS</td>
+            <td th:text="${sm.getSms_balance()}"></td>
+            <td th:text="${sm.getSms_cost()}"></td>
+            <td th:text="${sm.getDefault_sms_cost()}"></td>
+        </tr>
+        <tr th:each="i : ${internet}">
+            <td th:text="${i.getName()}"></td>
+            <td>Internet</td>
+            <td th:text="${i.getInternet_balance()}"></td>
+            <td th:text="${i.getInternet_cost()}"></td>
+            <td th:text="${i.getDefault_internet_cost()}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
