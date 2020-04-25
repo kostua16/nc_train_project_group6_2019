@@ -10,6 +10,7 @@ import '../node_modules/materialize-css/dist/js/materialize'
 Vue.config.productionTip = false
 Vue.use(Vuelidate)
 Vue.use(Plugins)
+Vue.config.devtools = true;
 
 
 new Vue({
