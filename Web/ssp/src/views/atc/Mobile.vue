@@ -61,7 +61,7 @@
       stopOperation () {
         this.actionStoppedByUser = true;
       },
-      spend: async (resource, continueOperation) => {
+      async spend(resource, continueOperation) {
 
         if (!continueOperation) {
           this.actionDuration = 0;
@@ -87,9 +87,7 @@
               await this.$store.dispatch(operation, {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo});
               this.actionDuration += 1;
               var that = this;
-              setTimeout(function () {
-                that.spend(resource, true)
-              }, 1000);
+              setTimeout(() => that.spend(resource, true), 1000);
             } catch (e) {
               this.actionStoppedBySystem = true;
             }

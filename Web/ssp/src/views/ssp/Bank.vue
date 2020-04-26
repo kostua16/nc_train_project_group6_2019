@@ -57,7 +57,6 @@
       },
       fadeOut: function(el, done) {
         var that = this;
-
         setTimeout(function() {
           that.show = false;
           that.showSuccess = false;
