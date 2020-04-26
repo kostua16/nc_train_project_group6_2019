@@ -136,41 +136,52 @@ export default new Vuex.Store({
 
     SYNC_CURRENT_USER: async (context) => {
       let currentToken = localStorage.getItem("TOKEN");
+      console.log(`SYNC_CURRENT_USER.Started(${currentToken})`);
       if(currentToken!=null){
         try {
           const user = await context.dispatch("LOAD_USER", currentToken);
           await context.commit('SET_TOKEN', currentToken);
           await context.commit("SET_CURRENT_USER", user);
+          console.log(`SYNC_CURRENT_USER.Done(${currentToken}, ${JSON.stringify(user)})`);
         } catch (e) {
+          console.log(`SYNC_CURRENT_USER.Fail(${currentToken}})`);
           await context.dispatch("LOGOUT");
         }
       }
     },
 
     LOGIN: async (context, data) => {
-      let currentToken = null;
-      if(context.state.STUB_MODE){
-        const userDetails = context.state.STUB_USERS.find(user => user.name === data.login && user.pass === data.password);
-        if(userDetails!=null){
-          currentToken = userDetails.name;
+      console.log(`LOGIN.Start(${JSON.stringify(data)})`);
+      try {
+        let currentToken = null;
+        if(context.state.STUB_MODE){
+          const userDetails = context.state.STUB_USERS.find(user => user.name === data.login && user.pass === data.password);
+          if(userDetails!=null){
+            currentToken = userDetails.name;
+          } else {
+            throw new Error("User not found:" + data.login);
+          }
         } else {
-          throw new Error("User not found:" + data.login);
+          const loginResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/login/?login=${data.login}&password=${data.password}`);
+          if(loginResponse!=null && loginResponse.data!=null){
+            currentToken = loginResponse.data;
+          } else {
+            throw new Error("User not found:" + data.login);
+          }
         }
-      } else {
-        const loginResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/login/?login=${data.login}&password=${data.password}`);
-        if(loginResponse!=null && loginResponse.data!=null){
-          currentToken = loginResponse.data;
-        } else {
-          throw new Error("User not found:" + data.login);
+        const user = await context.dispatch("LOAD_USER", currentToken);
+        if(user==null){
+          throw new Error("User not found:" + data.login + ", token:" + currentToken);
         }
+        await context.commit('SET_TOKEN', currentToken);
+        await context.commit("SET_CURRENT_USER", user);
+        await localStorage.setItem("TOKEN", currentToken);
+        console.log(`LOGIN.Done(${currentToken}, ${JSON.stringify(user)})`);
+      } catch (e) {
+        var message = `Login.Fail(${JSON.stringify(data)}, ${JSON.stringify(e)})`;
+        console.log(message);
+        throw new Error(message);
       }
-      const user = await context.dispatch("LOAD_USER", currentToken);
-      if(user==null){
-        throw new Error("User not found:" + data.login + ", token:" + currentToken);
-      }
-      await context.commit('SET_TOKEN', currentToken);
-      await context.commit("SET_CURRENT_USER", user);
-      await localStorage.setItem("TOKEN", currentToken);
     },
 
     LOAD_USER: async (context, currentToken) => {
@@ -217,6 +228,7 @@ export default new Vuex.Store({
       await context.commit('SET_TOKEN', null);
       await context.commit('SET_CURRENT_USER', null);
       await localStorage.removeItem("TOKEN");
+      console.log(`LOGOUT.Done()`);
     },
 
     UPDATE_USER_BALANCE: async (context, data) => {
