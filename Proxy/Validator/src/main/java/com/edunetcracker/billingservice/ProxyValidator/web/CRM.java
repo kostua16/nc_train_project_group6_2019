@@ -134,6 +134,31 @@ public class CRM {
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
+    /**
+     * создание тарифа
+     * {
+     *   "login": "1",
+     *   "password": "1",
+     *   "name": "1",
+     *   "telephone": "1",
+     *   "tariff": "1"
+     * }
+     */
+    @PostMapping("changeA")
+    public ResponseEntity<Boolean> changeA(@RequestParam("token") String token,
+                                           @RequestBody Map<String, String> map){
+        String Mylogin = checks.getLoginByTokenAndCheck(token);
+        if(Mylogin == null) {
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        }
+        String rang = helpers.getAccount(Mylogin).getRang();
+        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+            String url = helpers.getUrlProxy() + "/changeA";
+            Boolean response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity<>(map, new HttpHeaders()), Boolean.class).getBody();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
     //  http://localhost:8101/changeT/?token=!!!&login=111@mail.ru@tariff=BIG_GIB
     @PostMapping("changeT")
     public ResponseEntity<Boolean> changeT(@RequestParam("token") String token,
@@ -161,6 +186,21 @@ public class CRM {
         if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/showA";
             Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+    @GetMapping("getA")
+    public ResponseEntity<Map<String, String>> getA(@RequestParam("login") String login,
+                                                    @RequestParam("token") String token){
+        String Mylogin = checks.getLoginByTokenAndCheck(token);
+        if(Mylogin == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        String rang = helpers.getAccount(Mylogin).getRang();
+        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+            String url = helpers.getUrlProxy() + "/getA/?login=" + login;
+            Map<String, String> response = new RestTemplate().exchange(url, HttpMethod.GET,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
