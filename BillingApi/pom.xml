@@ -11,7 +11,7 @@
 	<groupId>com.edu-netcracker.billing-service</groupId>
 	<artifactId>BillingApi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Proxy</name>
+	<name>BillingApi</name>
 	<packaging>pom</packaging>
 
 	<properties>

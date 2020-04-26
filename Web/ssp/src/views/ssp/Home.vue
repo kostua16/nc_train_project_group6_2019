@@ -4,7 +4,7 @@
   <div class="page-title">
     <h3>Счет</h3>
 
-    <button class="btn waves-effect waves-light btn-small">
+    <button class="btn waves-effect waves-light btn-small"  @click.prevent="refreshData">
       <i class="material-icons">refresh</i>
     </button>
   </div>
