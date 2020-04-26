@@ -19,7 +19,7 @@
         </div>
       </div>
     </form>
-    <button class="btn waves-effect" @click="upBalance" >Пополнить счет <i class="material-icons right">attach_money</i>
+    <button class="btn waves-effect" @click="updateBalance" >Пополнить счет <i class="material-icons right">attach_money</i>
     </button>
     <transition name="statusUpdate" v-on:enter="fadeOut">
       <p v-if="showSuccess && show" class="green--text">Баланс пополнен на <span v-text="upbalance"/> руб. </p>
@@ -44,14 +44,14 @@
       show: false
     }),
     computed: mapState({
-      userPhone: state => state.CURRENT_USER!==null ? state.CURRENT_USER.telephone : ''
+      userPhone: state => state.CURRENT_USER!=null ? state.CURRENT_USER.telephone : ''
     }),
     mounted() {
       this.phone = this.userPhone;
     },
     methods: {
-      upBalance() {
-        this.$store.dispatch("UPDATE_USER_BALANCE", {amount: this.upBalance, phone: this.phone } )
+      updateBalance() {
+        this.$store.dispatch("UPDATE_USER_BALANCE", {amount: this.upbalance, phone: this.phone } )
           .then(()=>{this.showSuccess = true; this.showFail = false; this.show = true;})
           .catch(()=>{this.showSuccess = false; this.showFail = true; this.show = true;});
       },

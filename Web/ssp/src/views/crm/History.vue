@@ -32,7 +32,7 @@
         loginRoute: '/crm/login',
       }),
       computed: mapState({
-        histories: state => state.CURRENT_USER!==null ? state.CURRENT_USER.history : []
+        histories: state => state.CURRENT_USER!=null ? state.CURRENT_USER.history : []
       }),
     }
 </script>

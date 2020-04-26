@@ -1,7 +1,7 @@
 <script>
   import {mapState} from "vuex";
   export default {
-    name: 'basePage',
+    name: 'baseComponent',
     data: () => ({
       defaultPage: '/',
     }),
@@ -11,6 +11,9 @@
         lastPage: state => state.LAST_PATH,
         haveLastPage: state => state.LAST_PATH != null
       })
+    },
+    beforeCreate: async () => {
+      await this.$store.dispatch("WAIT_INITIALIZATION");
     },
     methods: {
       goToLastPage() {

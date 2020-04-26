@@ -14,7 +14,7 @@
 
 
 <script>
-  import BasePage from '../components/base/BasePage'
+  import BasePage from '../components/base/BaseComponent'
   import {mapState} from "vuex";
   export default {
     extends: BasePage,

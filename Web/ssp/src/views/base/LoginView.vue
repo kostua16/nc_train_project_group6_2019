@@ -33,7 +33,7 @@
 
 
 <script>
-  import BasePage from "../../components/base/BasePage"
+  import BasePage from "../../components/base/BaseComponent"
   import {mapState} from 'vuex'
   import {email, minLength, required} from 'vuelidate/lib/validators'
 

@@ -64,11 +64,11 @@ export default {
   extends: UserPage,
   data: () => ({ loginRoute: '/ssp/login' }),
   computed: mapState({
-    balance: state => state.CURRENT_USER!==null ? state.CURRENT_USER.balance : null,
-    minutes: state => state.CURRENT_USER!==null ? state.CURRENT_USER.minutes : null,
-    sms: state => state.CURRENT_USER!==null ? state.CURRENT_USER.sms : null,
-    internet: state => state.CURRENT_USER!==null ? state.CURRENT_USER.internet : null,
-    userPhone: state => state.CURRENT_USER!==null ? state.CURRENT_USER.telephone : ''
+    balance: state => state.CURRENT_USER!=null ? state.CURRENT_USER.balance : null,
+    minutes: state => state.CURRENT_USER!=null ? state.CURRENT_USER.minutes : null,
+    sms: state => state.CURRENT_USER!=null ? state.CURRENT_USER.sms : null,
+    internet: state => state.CURRENT_USER!=null ? state.CURRENT_USER.internet : null,
+    userPhone: state => state.CURRENT_USER!=null ? state.CURRENT_USER.telephone : ''
   }),
   methods: {
     refreshData(){
