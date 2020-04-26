@@ -303,7 +303,10 @@ export default new Vuex.Store({
           throw new Error("User not found:" + info.telephoneFrom);
         }
       } else {
-        await Vue.axios.get(`${context.state.PROXY_URL}/callFromTo/?telephoneFrom=${info.telephoneFrom}&minutes=1&telephoneTo=${info.telephoneTo}`);
+        const response = await Vue.axios.get(`${context.state.PROXY_URL}/callFromTo/?telephoneFrom=${info.telephoneFrom}&minutes=1&telephoneTo=${info.telephoneTo}`);
+        if("true" !== response.data){
+          throw new Error("User unable to make call");
+        }
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
@@ -328,7 +331,10 @@ export default new Vuex.Store({
           throw new Error("User not found:" + info.telephoneFrom);
         }
       } else {
-        await Vue.axios.get(`${context.state.PROXY_URL}/smsFromTo/?telephoneFrom=${info.telephoneFrom}&sms=1&telephoneTo=${info.telephoneTo}`);
+        const response = await Vue.axios.get(`${context.state.PROXY_URL}/smsFromTo/?telephoneFrom=${info.telephoneFrom}&sms=1&telephoneTo=${info.telephoneTo}`);
+        if("true" !== response.data){
+          throw new Error("User unable to send sms");
+        }
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
@@ -353,7 +359,10 @@ export default new Vuex.Store({
           throw new Error("User not found:" + info.telephoneFrom);
         }
       } else {
-        await Vue.axios.get(`${context.state.PROXY_URL}/useInternet/?telephoneFrom=${info.telephoneFrom}&kilobytes=1000&telephoneTo=${info.telephoneTo}`);
+        const response = await Vue.axios.get(`${context.state.PROXY_URL}/useInternet/?telephoneFrom=${info.telephoneFrom}&kilobytes=1000&telephoneTo=${info.telephoneTo}`);
+        if("true" !== response.data){
+          throw new Error("User unable to establish internet connection");
+        }
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
