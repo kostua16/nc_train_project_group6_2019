@@ -46,10 +46,13 @@
 
 <script>
   import Modal from "./Modal";
-  import BasePage from "../../components/base/BasePage";
+
+  const actionNotStarted = 0;
+  const actionStarted = 1;
+  const actionStoppedByUser = 2;
+  const actionStoppedBySystem = 3;
 
   export default {
-    extends: BasePage,
     data: () => ({
       telephoneFrom: '',
       telephoneTo: '',
