@@ -3,36 +3,12 @@
   <div class="modal-mask">
     <div class="modal-wrapper">
       <div class="modal-container">
-        <!--<div class="modal-header">
-          <slot name="header">
-            default header
-          </slot>
-        </div>-->
-        <div class="modal-body">
-          <slot v-if="type==='call'" name="body">
-            Обонент звонит. Осталось минут: {{minutes}}
-          </slot>
-          <slot v-if="type==='sms'" name="body">
-            Обонент отправляет sms. Осталось: {{sms}} шт
-          </slot>
-          <slot v-if="type==='internet'" name="body">
-            Обонент использует интернет. Осталось: {{internet}} мб
-          </slot>
-        </div>
-        <div class="modal-footer">
-          <slot name="footer">
-           <!-- default footer-->
-            <!--<button class="modal-default-button" v-if="stopModal === true" @click="$emit('stopM')">
-              STOP
-            </button>-->
-
-            <!--:disabled="minutes > 0"-->
-
-            <button class="modal-default-button" @click="$emit('close')">
-              OK
-            </button>
-          </slot>
-        </div>
+        <slot name="body">{{text}}</slot>
+      </div>
+      <div class="modal-footer">
+        <slot name="footer">
+          <button class="modal-default-button" @click="$emit('close')">Закрыть</button>
+        </slot>
       </div>
     </div>
   </div>
@@ -42,11 +18,7 @@
 <script>
     export default {
         props:{
-            type: '',
-            minutes: '',
-            sms: '',
-            internet: '',/*
-            stopModal: false*/
+            text: '',
         }
     }
 </script>

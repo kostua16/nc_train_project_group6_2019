@@ -19,63 +19,21 @@
 
     <form class="col s12">
       <div class="row">
-        <div class="input-field col s6">
-          <i class="material-icons prefix">phone</i>
-          <input id="minutes" type="tel" v-model.trim="minutes" class="validate">
-          <label for="minutes">Minutes</label>
+        <div class="input-field col s4">
+          <a class="waves-effect waves-light btn" @click.prevent="spend('call', false)">
+            <i class="material-icons right">send</i>Начать звонок</a>
         </div>
-        <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="spendMinutes" @click="multiplyActionsMinutes"><i
-            class="material-icons right">send</i>to spend</a>
-          <!--<div>
-            <span v-for="n in 1*minutes" :key="n">
-              {{n}}
-            </span>
-          </div>-->
+        <div class="input-field col s4">
+          <a class="waves-effect waves-light btn" @click.prevent="spend('sms', false)">
+            <i class="material-icons right">send</i>Отправить СМС</a>
+        </div>
+        <div class="input-field col s4">
+          <a class="waves-effect waves-light btn" @click.prevent="spend('internet', false)">
+            <i class="material-icons right">send</i>Включить интернет</a>
         </div>
       </div>
     </form>
-
-    <form class="col s12">
-      <div class="row">
-        <div class="input-field col s6">
-          <i class="material-icons prefix">sms</i>
-          <input id="sms" type="tel" v-model.trim="sms" class="validate">
-          <label for="sms">Sms</label>
-        </div>
-        <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="spendSms" @click="multiplyActionsSms"><i
-            class="material-icons right">send</i>to spend</a>
-        </div>
-      </div>
-    </form>
-
-    <form class="col s12">
-      <div class="row">
-        <div class="input-field col s6">
-          <i class="material-icons prefix">public</i>
-          <input id="Internet" type="tel" v-model.trim="internet" class="validate">
-          <label for="Internet">Internet</label>
-        </div>
-        <div class="input-field col s6">
-          <a class="waves-effect waves-light btn" @click.prevent="spendInternet" @click="multiplyActionsInternet"><i
-            class="material-icons right">send</i>to spend</a>
-        </div>
-      </div>
-    </form>
-    <!--
-        <form class="col s12">
-          <div class="row">
-
-            <div class="input-field col s6">
-              <a class="waves-effect waves-light btn" @click.prevent="spendAll"><i class="material-icons right">send</i>to spend all</a>
-            </div>
-          </div>
-        </form>-->
-    <!--<button id="show-modal" @click="showModal = true">Show Modal</button>-->
-    <modal v-if="showModal" v-bind:minutes="minutes" v-bind:sms="sms" v-bind:internet="internet" v-bind:type="typeModal"
-           @close="showModal = false">
-    </modal>
+    <modal v-if="showModal" v-bind:text="modalText"  @close="stopOperation" />
   </div>
 </template>
 
@@ -90,69 +48,94 @@
       sms: null,
       internet: null,
       showModal: false,
+      modalText: '',
+      actionStoppedByUser: false,
+      actionStoppedBySystem: false,
+      actionDuration: 0,
       typeModal: 'call',/*
     stopModal: true*/
     }),
     mounted() {
     },
     methods: {
-      multiplyActionsMinutes() {
-        this.typeModal = 'call'
-        this.showModal = true
+      stopOperation () {
+        this.actionStoppedByUser = true;
+      },
+      spend: async (resource, continueOperation) => {
 
-      },
-      multiplyActionsSms() {
-        this.typeModal = 'sms'
-        this.showModal = true
-      },
-      multiplyActionsInternet() {
-        this.typeModal = 'internet'
-        this.showModal = true
-      },
-      sleep(milliseconds) {
-        const date = Date.now();
-        let currentDate = null;
-        do {
-          currentDate = Date.now();
-        } while (currentDate - date < milliseconds);
-      },
-      spendMinutes() {
-        if (this.minutes > 0) {
-          this.$store.dispatch("DO_CALL", {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo})
-            .then(() => {
-              this.minutes -= 1;
-              this.sleep(1000);
-              this.spendMinutes()
-            })
-            .catch(e => {
-              console.log(e)
-            })
+        if (!continueOperation) {
+          this.actionDuration = 0;
+          this.showModal = true;
         }
-      },
-      spendSms() {
-        if (this.sms > 0) {
-          this.$store.dispatch("DO_SMS", {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo})
-            .then(() => {
-              this.sms -= 1;
-              this.sleep(1000);
-              this.spendSms()
-            })
-            .catch(e => {
-              console.log(e)
-            })
-        }
-      },
-      spendInternet() {//  http://localhost:8102/useInternet/?telephoneFrom=897654321&kilobytes=4
-        if (this.internet > 0) {
-          this.$store.dispatch("DO_INTERNET", {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo})
-            .then(() => {
-              this.internet -= 1;
-              this.sleep(1000);
-              this.spendInternet()
-            })
-            .catch(e => {
-              console.log(e)
-            })
+
+        if (this.showModal === true) {
+          if (!this.actionStoppedByUser && !this.actionStoppedBySystem) {
+            this.showModal = true;
+            try {
+              let operation = "";
+              switch (resource) {
+                case "call":
+                  operation = "DO_CALL";
+                  break;
+                case "sms":
+                  operation = "DO_SMS";
+                  break;
+                case "internet":
+                  operation = "DO_INTERNET";
+                  break;
+              }
+              await this.$store.dispatch(operation, {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo});
+              this.actionDuration += 1;
+              var that = this;
+              setTimeout(function () {
+                that.spend(resource, true)
+              }, 1000);
+            } catch (e) {
+              this.actionStoppedBySystem = true;
+            }
+          }
+
+          if (!this.actionStoppedByUser && !this.actionStoppedBySystem) {
+            switch (resource) {
+              case "call":
+                this.modalText = `Абонент производит звонок. Длительность - ${this.actionDuration}`;
+                break;
+              case "sms":
+                this.modalText = `Абонент отправляет смс. Количество - ${this.actionDuration}`;
+                break;
+              case "internet":
+                this.modalText = `Абонент использует интернет. Объем - ${this.actionDuration}`;
+                break;
+            }
+          } else {
+            if (this.actionStoppedByUser) {
+              switch (resource) {
+                case "call":
+                  this.modalText = `Звонок завершен абонентом. Длительность - ${this.actionDuration}`;
+                  break;
+                case "sms":
+                  this.modalText = `Отправка смс завершена абонентом. Количество - ${this.actionDuration}`;
+                  break;
+                case "internet":
+                  this.modalText = `Пользование интернетом завершено абонентом. Объем - ${this.actionDuration}`;
+                  break;
+              }
+            } else {
+              if (this.actionStoppedBySystem) {
+                switch (resource) {
+                  case "call":
+                    this.modalText = `Звонок прерван системой. Длительность - ${this.actionDuration}`;
+                    break;
+                  case "sms":
+                    this.modalText = `Отправка смс прервана системой. Количество - ${this.actionDuration}`;
+                    break;
+                  case "internet":
+                    this.modalText = `Пользование интернетом прервано системой. Объем - ${this.actionDuration}`;
+                    break;
+                }
+              }
+            }
+          }
         }
       },
     },
