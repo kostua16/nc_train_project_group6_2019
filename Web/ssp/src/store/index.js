@@ -258,7 +258,7 @@ export default new Vuex.Store({
       if (context.state.STUB_MODE) {
         await context.commit('UPDATE_USER', 'balance', data.amount);
       } else {
-        await Vue.axios.get(`${context.state.VALIDATOR_URL}/home/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`);
+        await Vue.axios.get(`${context.state.VALIDATOR_URL}/topup/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`);
         await context.commit('UPDATE_USER', 'balance', data.amount);
       }
     },

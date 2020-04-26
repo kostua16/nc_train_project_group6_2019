@@ -51,7 +51,8 @@
     },
     methods: {
       updateBalance() {
-        this.$store.dispatch("UPDATE_USER_BALANCE", {amount: this.upbalance, phone: this.phone } )
+        const incrBalance = this.upbalance;
+        this.$store.dispatch("UPDATE_USER_BALANCE", {amount: incrBalance, phone: this.phone } )
           .then(()=>{this.showSuccess = true; this.showFail = false; this.show = true;})
           .catch(()=>{this.showSuccess = false; this.showFail = true; this.show = true;});
       },

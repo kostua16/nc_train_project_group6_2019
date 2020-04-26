@@ -7,7 +7,7 @@
     <form class="form">
     </form>
     <div class="row">
-      <div lass="t" v-if="tariff.name != 'DEFAULT' &&  tariff.name != 'ADMINISTRATOR'" v-for="(tariff) in tariffs">
+      <div lass="t" v-if="tariff!=null && tariff.name!=null" v-for="(tariff) in tariffs">
         <div class="col s12 m6 l4">
           <div class="card orange darken-1 bill-card">
             <div class="card-content white-text">
@@ -60,7 +60,7 @@
     }),
     methods: {
       choiceTariff(newTariff) { //настроить адресс
-        if (newTariff !== '') {
+        if (newTariff!=null && newTariff !== '') {
           this.$store.dispatch("UPDATE_USER_PRICE_PLAN", newTariff);
         }
       }
