@@ -39,7 +39,7 @@
       v-bind:active="!actionStopped"
       @close="showModal = false"
       @deactivate="actionStoppedByUser = true"
-      @activate="spend(typeModal,false)"
+      @activate="spend(typeModal)"
     />
   </div>
 </template>
@@ -62,7 +62,7 @@
     }),
     computed: {
       actionStopped() {
-        return this.actionStoppedByUser || this.actionStoppedBySystem;
+        return this.actionStoppedByUser === true || this.actionStoppedBySystem === true;
       }
     },
     mounted() {
@@ -71,13 +71,20 @@
       startModal(type) {
         this.typeModal=type;
         this.showModal=true;
-      },
-      async spend(resource, continueOperation) {
-
-        if (!continueOperation) {
-          this.actionDuration = 0;
-          this.showModal = true;
+        switch (resource) {
+          case "call":
+            this.modalText = `Запустить звонок?`;
+            break;
+          case "sms":
+            this.modalText = `Отправить СМС?`;
+            break;
+          case "internet":
+            this.modalText = `Включить загрузку файлов через интернет?`;
+            break;
         }
+        this.actionDuration = 0;
+      },
+      async spend(resource) {
 
         if (this.showModal === true) {
           if (!this.actionStopped) {
@@ -98,7 +105,7 @@
               await this.$store.dispatch(operation, {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo});
               this.actionDuration += 1;
               var that = this;
-              setTimeout(() => that.spend(resource, true), 1000);
+              setTimeout(() => that.spend(resource), 1000);
             } catch (e) {
               this.actionStoppedBySystem = true;
             }

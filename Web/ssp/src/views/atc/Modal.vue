@@ -7,9 +7,9 @@
         </div>
         <div class="modal-footer">
           <slot name="footer">
-            <button class="modal-left-button" v-if="!active" @click.prevent="$emit('activate')">Запустить</button>
-            <button class="modal-left-button" v-if="active" @click.prevent="$emit('deactivate')">остановить</button>
-            <button class="modal-right-button" @click.prevent="$emit('close')">Закрыть</button>
+            <button v-if="!active" @click.prevent="$emit('activate')">Запустить</button>
+            <button v-if="active" @click.prevent="$emit('deactivate')">остановить</button>
+            <button @click.prevent="$emit('close')">Закрыть</button>
           </slot>
         </div>
       </div>
