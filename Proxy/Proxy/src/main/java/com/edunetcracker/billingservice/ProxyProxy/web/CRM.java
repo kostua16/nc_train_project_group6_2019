@@ -289,6 +289,19 @@ public class CRM {
         }
         return false;
     }
+    @PostMapping("changeA")
+    public Boolean changeA(@RequestBody Map<String, String> map ){
+        Account account = accountController.getAccount(map.get("login")).getBody();
+        if(account != null) {
+            account.setPassword(map.get("password"));
+            account.setName(map.get("name"));
+            account.setTelephone(map.get("telephone"));
+            account.setTariff(map.get("tariff"));
+            accountController.updateAccount(account);
+            return true;
+        }
+        return false;
+    }
 
     // изменяет выбранный тариф пользователя (если был тариф А, тостанет Тафри Б) (просто меняет строку)
     @PostMapping("changeT")
@@ -321,6 +334,20 @@ public class CRM {
         returnMap.put("accounts", returnA);
         return returnMap;
     }
+    @GetMapping("getA")
+    public Map<String, String> getA(@RequestParam("login") String login){
+
+        Account account = accountController.getAccount(login).getBody();
+
+        Map<String, String> returnA = new HashMap<>();
+        returnA = new HashMap<>();
+        returnA.put("password", account.getPassword());
+        returnA.put("name", account.getName());
+        returnA.put("telephone", account.getTelephone());
+        returnA.put("tariff", account.getTariff());
+        return returnA;
+    }
+
     @GetMapping("showT")
     public List<Map> showT(){
         List<CollectedTariff> tariffs = tariffController.getAllCollectedTariff().getBody();
