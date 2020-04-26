@@ -20,11 +20,11 @@
     </div>
     <div class="card-action">
       <div>
-        <button class="btn waves-effect waves-light auth-submit" type="submit">Войти
+        <button class="btn waves-effect waves-light auth-submit" type="submit" :disabled="loginStarted">Войти
           <i class="material-icons right"/>
         </button>
 
-        <button class="btn waves-effect waves-light auth-submit" type="submit" @click.prevent="goTo('/')">Назад</button>
+        <button class="btn waves-effect waves-light auth-submit" type="submit" :disabled="loginStarted" @click.prevent="goTo('/')">Назад</button>
         <small class="helper-text invalid" v-if="loginFailed">Неправильный логин или пароль</small>
       </div>
     </div>
@@ -45,6 +45,7 @@
       email: '',
       password: '',
       loginFailed: false,
+      loginStarted: false,
     }),
     computed: mapState({
       login_done: state => state.CURRENT_USER != null,
@@ -66,10 +67,14 @@
           this.$v.$touch()
           return
         }
+        this.loginStarted = true;
         this.$store.dispatch("LOGIN", {login: this.email, password: this.password}).then(() => {
+          this.loginFailed = false
+          this.loginStarted = false;
           this.goToLastPage();
         }).catch(() => {
-          this.loginFailed = true
+          this.loginFailed = true;
+          this.loginStarted = false;
         });
 
       }
