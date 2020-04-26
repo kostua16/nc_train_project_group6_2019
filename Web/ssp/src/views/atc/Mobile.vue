@@ -20,20 +20,27 @@
     <form class="col s12">
       <div class="row">
         <div class="input-field col s4">
-          <a class="waves-effect waves-light btn" @click.prevent="spend('call', false)">
+          <a class="waves-effect waves-light btn" @click.prevent="startModal('call')">
             <i class="material-icons right">send</i>Начать звонок</a>
         </div>
         <div class="input-field col s4">
-          <a class="waves-effect waves-light btn" @click.prevent="spend('sms', false)">
+          <a class="waves-effect waves-light btn" @click.prevent="startModal('sms')">
             <i class="material-icons right">send</i>Отправить СМС</a>
         </div>
         <div class="input-field col s4">
-          <a class="waves-effect waves-light btn" @click.prevent="spend('internet', false)">
+          <a class="waves-effect waves-light btn" @click.prevent="startModal('internet')">
             <i class="material-icons right">send</i>Включить интернет</a>
         </div>
       </div>
     </form>
-    <modal v-if="showModal" v-bind:text="modalText"  @close="stopOperation" />
+    <modal
+      v-if="showModal"
+      v-bind:text="modalText"
+      v-bind:active="!actionStopped"
+      @close="showModal = false"
+      @deactivate="actionStoppedByUser = true"
+      @activate="spend(typeModal,false)"
+    />
   </div>
 </template>
 
@@ -46,22 +53,24 @@
     data: () => ({
       telephoneFrom: '',
       telephoneTo: '',
-      minutes: null,
-      sms: null,
-      internet: null,
       showModal: false,
       modalText: '',
       actionStoppedByUser: false,
       actionStoppedBySystem: false,
       actionDuration: 0,
-      typeModal: 'call',/*
-    stopModal: true*/
+      typeModal: 'call',
     }),
+    computed: {
+      actionStopped() {
+        return this.actionStoppedByUser || this.actionStoppedBySystem;
+      }
+    },
     mounted() {
     },
     methods: {
-      stopOperation () {
-        this.actionStoppedByUser = true;
+      startModal(type) {
+        this.typeModal=type;
+        this.showModal=true;
       },
       async spend(resource, continueOperation) {
 
@@ -71,7 +80,7 @@
         }
 
         if (this.showModal === true) {
-          if (!this.actionStoppedByUser && !this.actionStoppedBySystem) {
+          if (!this.actionStopped) {
             this.showModal = true;
             try {
               let operation = "";
