@@ -6,6 +6,8 @@ import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Call;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -27,6 +29,7 @@ public class AccountController {
 
     @Autowired
     private Checks checks;
+    Logger LOG = LoggerFactory.getLogger(AccountController.class);
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +58,7 @@ public class AccountController {
     }
     public ResponseEntity<Account> getAccountByTelephone(String telephone) {
         try {
-            System.out.println("getAccountByTelephone");
+            LOG.info("getAccountByTelephone");
             String url = helpers.getUrlBilling() + "/getAccountByTelephone/?telephone=" + telephone;
             ResponseEntity<Account> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
             return responseAccount;
