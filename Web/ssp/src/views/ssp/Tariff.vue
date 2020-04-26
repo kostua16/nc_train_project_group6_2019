@@ -55,8 +55,8 @@
       loginRoute: '/ssp/login'
     }),
     computed: mapState({
-      tariffs: state => state.CURRENT_USER.availableTariffs,
-      myTariff: state => state.CURRENT_USER.tariff,
+      tariffs: state => state.CURRENT_USER!==null ? state.CURRENT_USER.availableTariffs : [],
+      myTariff: state => state.CURRENT_USER!==null ? state.CURRENT_USER.tariff : '',
     }),
     mounted() { //запускает сразу какогда ap вставится в ap
       this.choiceTariff()

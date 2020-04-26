@@ -59,10 +59,10 @@ export default {
   extends: UserPage,
   data: () => ({ loginRoute: '/ssp/login' }),
   computed: mapState({
-    balance: state => state.CURRENT_USER.balance,
-    minutes: state => state.CURRENT_USER.minutes,
-    sms: state => state.CURRENT_USER.sms,
-    internet: state => state.CURRENT_USER.internet
+    balance: state => state.CURRENT_USER!==null ? state.CURRENT_USER.balance : null,
+    minutes: state => state.CURRENT_USER!==null ? state.CURRENT_USER.minutes : null,
+    sms: state => state.CURRENT_USER!==null ? state.CURRENT_USER.sms : null,
+    internet: state => state.CURRENT_USER!==null ? state.CURRENT_USER.internet : null
   }),
 }
 </script>
