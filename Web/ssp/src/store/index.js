@@ -5,6 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    INITIALIZATION_COMPLETED: false,
+    INITIALIZATION_IN_PROGRESS: false,
     CURRENT_USER: null,
     STUB_MODE: false,
     STUB_USERS: [
@@ -67,6 +69,12 @@ export default new Vuex.Store({
     SET_STUB_MODE: (state, payload) => {
       Vue.set(state, 'STUB_MODE', payload);
     },
+    SET_INITIALIZATION_IN_PROGRESS: (state, payload) => {
+      Vue.set(state, 'INITIALIZATION_IN_PROGRESS', payload);
+    },
+    SET_INITIALIZATION_COMPLETED: (state, payload) => {
+      Vue.set(state, 'INITIALIZATION_COMPLETED', payload);
+    },
     SET_CURRENT_USER: (state, payload) => {
       Vue.set(state, 'CURRENT_USER', payload);
     },
@@ -114,24 +122,39 @@ export default new Vuex.Store({
     STORE_LAST_PATH: async (context, lastPath) => {
       context.commit('SET_LAST_PATH', lastPath);
     },
-
+    SLEEP: (context, ms) => {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
     INITIALIZE: async (context) => {
       try {
-        const serverDetailsResponse = await Vue.axios.get(`/serversDetails`);
-        await context.commit('SET_VALIDATOR_URL', serverDetailsResponse.data.validator);
-        await context.commit('SET_PROXY_URL', serverDetailsResponse.data.proxy);
-        await context.commit('SET_DEFAULT_USER_NAME', '');
-        await context.commit('SET_DEFAULT_USER_PASS', '');
-        console.log("switch to production mode");
-        await context.dispatch("CREATE_USERS");
-      } catch(e) {
-        await context.commit('SET_VALIDATOR_URL', 'http://localhost:8101');
-        await context.commit('SET_PROXY_URL', 'http://localhost:8102');
-        await context.commit('SET_STUB_MODE', true);
-        await context.commit('SET_DEFAULT_USER_NAME', 'stub@stub.com');
-        await context.commit('SET_DEFAULT_USER_PASS', 'stub123');
+        context.commit("SET_INITIALIZATION_IN_PROGRESS", true);
+        try {
+          const serverDetailsResponse = await Vue.axios.get(`/serversDetails`);
+          await context.commit('SET_VALIDATOR_URL', serverDetailsResponse.data.validator);
+          await context.commit('SET_PROXY_URL', serverDetailsResponse.data.proxy);
+          await context.commit('SET_DEFAULT_USER_NAME', '');
+          await context.commit('SET_DEFAULT_USER_PASS', '');
+          console.log("switch to production mode");
+          await context.dispatch("CREATE_USERS");
+        } catch(e) {
+          await context.commit('SET_VALIDATOR_URL', 'http://localhost:8101');
+          await context.commit('SET_PROXY_URL', 'http://localhost:8102');
+          await context.commit('SET_STUB_MODE', true);
+          await context.commit('SET_DEFAULT_USER_NAME', 'stub@stub.com');
+          await context.commit('SET_DEFAULT_USER_PASS', 'stub123');
+        }
+        await context.dispatch("SYNC_CURRENT_USER");
+        context.commit("SET_INITIALIZATION_IN_PROGRESS", false);
+        context.commit("SET_INITIALIZATION_COMPLETED", true);
+      } catch (e) {
+        context.commit("SET_INITIALIZATION_IN_PROGRESS", false);
       }
-      await context.dispatch("SYNC_CURRENT_USER");
+
+    },
+    WAIT_INITIALIZATION: async (context) => {
+      while (context.state.INITIALIZATION_IN_PROGRESS === true){
+        await context.dispatch("SLEEP", 100);
+      }
     },
 
     SYNC_CURRENT_USER: async (context) => {

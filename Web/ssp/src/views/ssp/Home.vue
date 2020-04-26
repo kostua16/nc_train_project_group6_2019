@@ -18,6 +18,11 @@
           <p class="currency-line">
             <span>{{balance}} Р</span>
           </p>
+          <br/>
+          <span class="card-title">Номер телефона</span>
+          <p class="currency-line">
+            <span><i class="material-icons prefix">phone</i> {{userPhone}}</span>
+          </p>
         </div>
       </div>
     </div>
@@ -62,8 +67,14 @@ export default {
     balance: state => state.CURRENT_USER!==null ? state.CURRENT_USER.balance : null,
     minutes: state => state.CURRENT_USER!==null ? state.CURRENT_USER.minutes : null,
     sms: state => state.CURRENT_USER!==null ? state.CURRENT_USER.sms : null,
-    internet: state => state.CURRENT_USER!==null ? state.CURRENT_USER.internet : null
+    internet: state => state.CURRENT_USER!==null ? state.CURRENT_USER.internet : null,
+    userPhone: state => state.CURRENT_USER!==null ? state.CURRENT_USER.telephone : ''
   }),
+  methods: {
+    refreshData(){
+      this.$store.dispatch("SYNC_CURRENT_USER");
+    }
+  }
 }
 </script>
 
