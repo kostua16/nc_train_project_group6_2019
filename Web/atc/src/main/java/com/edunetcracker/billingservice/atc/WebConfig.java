@@ -23,5 +23,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public void addViewControllers(ViewControllerRegistry registry) {
         super.addViewControllers(registry);
         registry.addViewController("/").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/ssp").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/ssp/login").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/ssp/bank").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/ssp/tariff").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/crm").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/crm/login").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/crm/tariffadmin").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/crm/history").setViewName("forward:/pwa/index.html");
+        registry.addViewController("/atc").setViewName("forward:/pwa/index.html");
     }
 }
