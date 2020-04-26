@@ -170,6 +170,7 @@ export default new Vuex.Store({
       }
       await context.commit('SET_TOKEN', currentToken);
       await context.commit("SET_CURRENT_USER", user);
+      await localStorage.setItem("TOKEN", currentToken);
     },
 
     LOAD_USER: async (context, currentToken) => {
