@@ -38,27 +38,27 @@ export default new Vuex.Store({
     ACTIVE_MODULES: [
       {
         name: 'ATC',
-        url: '/atc',
+        url: '/#/atc',
         links: [
-          {title: 'Mobile', url: '/atc'}
+          {title: 'Mobile', url: '/#/atc'}
         ]
       },
       {
         name: 'CRM',
-        url: '/crm',
+        url: '/#/crm',
         links: [
-          {title: 'Пользователи', url: '/crm'},
-          {title: 'Тарифы', url: '/crm/tariffadmin'},
-          {title: 'История', url: '/crm/history'}
+          {title: 'Пользователи', url: '/#/crm'},
+          {title: 'Тарифы', url: '/#/crm/tariffadmin'},
+          {title: 'История', url: '/#/crm/history'}
         ]
       },
       {
         name: 'SSP',
-        url: '/ssp',
+        url: '/#/ssp',
         links: [
-          {title: 'Счет', url: '/ssp', exact: true},
-          {title: 'Пополнить счет', url: '/ssp/bank'},
-          {title: 'Изменить тариф', url: '/ssp/tariff'},
+          {title: 'Счет', url: '/#/ssp', exact: true},
+          {title: 'Пополнить счет', url: '/#/ssp/bank'},
+          {title: 'Изменить тариф', url: '/#/ssp/tariff'},
         ]
       }
     ]

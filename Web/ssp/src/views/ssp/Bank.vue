@@ -37,7 +37,7 @@
     extends: UserPage,
     data: () => ({
       upbalance: 0,
-      loginRoute: '/ssp/login',
+      loginRoute: '/#/ssp/login',
       phone: '',
       showSuccess: false,
       showFail: false,

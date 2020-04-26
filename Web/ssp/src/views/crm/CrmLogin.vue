@@ -4,7 +4,7 @@
   export default {
     extends: LoginBase,
     data: () => ({
-      defaultPage: '/crm',
+      defaultPage: '/#/crm',
       title: 'Личный кабинет',
     }),
   }

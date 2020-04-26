@@ -108,7 +108,7 @@
 export default {
   extends: UserPage,
   data: () => ({
-    loginRoute: '/crm/login',
+    loginRoute: '/#/crm/login',
     newTariffName: '',
     Call_cost: '',
     Call_balance: '',

@@ -6,61 +6,61 @@ Vue.use(VueRouter)
 const routes = [
 
   {
-    path: '',
+    path: '/',
     name: 'swith',
     meta: {layout: 'Empty'},
     component: () => import('../views/Swith.vue') //главная страница
   },
   {
-    path: '/ssp/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
+    path: '/#/ssp/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
     name: 'sspLogin', //для себя имя
     meta: {layout: 'Empty'}, //задаём лаяуты //свойства имя, имя
     component: () => import('../views/ssp/SspLogin') //импортируем контент
   },
   {
-    path: '/crm/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
+    path: '/#/crm/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
     name: 'crmLogin', //для себя имя
     meta: {layout: 'Empty'}, //задаём лаяуты //свойства имя, имя
     component: () => import('../views/crm/CrmLogin') //импортируем контент
   },
   {
-    path: '/crm/tariffadmin',
+    path: '/#/crm/tariffadmin',
     name: 'tariffadmin',
     meta: {layout: 'Main', auth: true},
     component: () => import('../views/crm/TariffAdmin.vue')
   },
   {
-    path: '/crm',
+    path: '/#/crm',
     name: 'crmUser',
     meta: {layout: 'Main', auth: true},
     component: () => import('../views/crm/User.vue')
   },
   {
-    path: '/crm/history',
+    path: '/#/crm/history',
     name: 'crmHistory',
     meta: {layout: 'Main', auth: true},
     component: () => import('../views/crm/History.vue')
   },
   {
-    path: '/ssp',
+    path: '/#/ssp',
     name: 'sspHome',
     meta: {layout: 'Main', auth: true},
     component: () => import('../views/ssp/Home.vue')
   },
   {
-    path: '/ssp/bank',
+    path: '/#/ssp/bank',
     name: 'sspBank',
     meta: {layout: 'Main', auth: true},
     component: () => import('../views/ssp/Bank.vue')
   },
   {
-    path: '/ssp/tariff',
+    path: '/#/ssp/tariff',
     name: 'sspTariff',
     meta: {layout: 'Main', auth: true},
     component: () => import('../views/ssp/Tariff.vue')
   },
   {
-    path: '/atc',
+    path: '/#/atc',
     name: 'atcMobile',
     meta: {layout: 'Main'},
     component: () => import('../views/atc/Mobile.vue')

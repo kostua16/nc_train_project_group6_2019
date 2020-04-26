@@ -39,8 +39,10 @@
 
 <script>
   import Modal from "./Modal";
+  import BasePage from "../../components/base/BasePage";
 
   export default {
+    extends: BasePage,
     data: () => ({
       telephoneFrom: '',
       telephoneTo: '',
