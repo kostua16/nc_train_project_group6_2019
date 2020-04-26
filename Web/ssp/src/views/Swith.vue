@@ -5,11 +5,8 @@
       <span class="card-title ">Выберите модуль</span>
       <button
         class="btn waves-effect waves-light auth-submit"
-        type="submit"
-        v-for = "(module) in active_modules"
-        @click.prevent="goToModuleNoBack(module)">
-        {{module.name}}
-        <i class="material-icons right"/>
+        type="submit" v-for = "(module) in active_modules"
+        @click.prevent="goToModuleNoBack(module)">{{module.name}}<i class="material-icons right"/>
       </button>
     </div>
   </form>
@@ -31,6 +28,5 @@
 <style scoped>
   .btn {
     margin-bottom: 2rem;
-
   }
 </style>
