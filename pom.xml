@@ -32,7 +32,7 @@
 
     <modules>
         <module>Web</module>
-        <module>Proxy</module>
+        <module>BillingApi</module>
 		<module>Billing</module>
     </modules>
 

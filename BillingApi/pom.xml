@@ -9,7 +9,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.edu-netcracker.billing-service</groupId>
-	<artifactId>Proxy</artifactId>
+	<artifactId>BillingApi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Proxy</name>
 	<packaging>pom</packaging>
