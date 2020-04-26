@@ -122,7 +122,7 @@ export default {
     deleteTariffName: ''
   }),
   computed: mapState({
-    tariffs: state => state.ALL_PRICE_PLANS
+    tariffs: state => state.CURRENT_USER.availableTariffs
   }),
   methods: {
     deleteTariff(){

@@ -44,7 +44,7 @@
       show: false
     }),
     computed: mapState({
-      userPhone: state => state.USER_PHONE_NUM
+      userPhone: state => state.CURRENT_USER.telephone
     }),
     mounted() {
       this.phone = this.userPhone;

@@ -34,6 +34,7 @@
 
 <script>
   import BasePage from "../../components/base/BasePage"
+  import {mapState} from 'vuex'
   import {email, minLength, required} from 'vuelidate/lib/validators'
 
   export default {
@@ -45,10 +46,13 @@
       password: '',
       loginFailed: false,
     }),
+    computed: mapState({
+      login_done: state => state.CURRENT_USER != null,
+    }),
     mounted() {
       this.email = this.$store.state.DEFAULT_USER_NAME;
       this.password = this.$store.state.DEFAULT_USER_PASS;
-      if(this.$store.state.LOGIN_SUCCESS){
+      if(this.login_done){
         this.goToLastPage();
       }
     },

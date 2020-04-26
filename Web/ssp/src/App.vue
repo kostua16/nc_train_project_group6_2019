@@ -18,7 +18,7 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch('LOAD_SERVERS_DETAILS');
+    this.$store.dispatch('INITIALIZE');
   },
   components: {
     EmptyLayout,

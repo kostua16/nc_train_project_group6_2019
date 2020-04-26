@@ -45,8 +45,8 @@ export default {
     dropdown: null,
   }),
   computed: mapState({
-    username: state => state.USER_NAME,
-    login_done: state => state.LOGIN_SUCCESS === true,
+    username: state => state.CURRENT_USER != null ? state.CURRENT_USER.name : "Not Logged in",
+    login_done: state => state.CURRENT_USER != null,
     active_modules: state => state.ACTIVE_MODULES,
     navbarName: state => state.NAVBAR_NAME
   }),

@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    CURRENT_USER: null,
     STUB_MODE: false,
     STUB_USERS: [
       {
@@ -31,22 +32,6 @@ export default new Vuex.Store({
     VALIDATOR_URL: 'http://localhost:8101',
     PROXY_URL: 'http://localhost:8102',
     TOKEN: "",
-    USER_NAME: "Not logged in",
-    USER_LOADED: false,
-    USER_PRICE_PLAN: '',
-    USER_BALANCE: 0,
-    USER_MINUTES: 0,
-    USER_SMS: 0,
-    USER_INTERNET: 0,
-    USER_PHONE_NUM: "",
-    USER_HISTORY: [],
-    LOGIN_SUCCESS: false,
-    LOGIN_FAILED: false,
-    AVAILABLE_PRICE_PLANS: [],
-    ALL_PRICE_PLANS: [],
-    DELETED_USER: '',
-    CREATED_USER: '',
-    ATC_SUCCESS: true,
     LAST_PATH: null,
     SIDEBAR_LINKS: [],
     NAVBAR_NAME: '',
@@ -82,6 +67,9 @@ export default new Vuex.Store({
     SET_STUB_MODE: (state, payload) => {
       Vue.set(state, 'STUB_MODE', payload);
     },
+    SET_CURRENT_USER: (state, payload) => {
+      Vue.set(state, 'CURRENT_USER', payload);
+    },
     SET_LAST_PATH: (state, payload) => {
       Vue.set(state, 'LAST_PATH', payload);
     },
@@ -106,59 +94,16 @@ export default new Vuex.Store({
     SET_TOKEN: (state, payload) => {
       Vue.set(state, 'TOKEN', payload);
     },
-    SET_USER_NAME: (state, payload) => {
-      Vue.set(state, 'USER_NAME', payload);
-    },
-    SET_LOGIN_FAIL: (state, payload) => {
-      Vue.set(state, 'LOGIN_FAILED', payload);
-    },
-    SET_LOGIN_SUCCESS: (state, payload) => {
-      Vue.set(state, 'LOGIN_SUCCESS', payload);
-    },
-    SET_USER_LOADED: (state, payload) => {
-      Vue.set(state, 'USER_LOADED', payload);
-    },
-    SET_USER_BALANCE: (state, payload) => {
-      Vue.set(state, 'USER_BALANCE', payload);
-    },
-    SET_USER_MINUTES: (state, payload) => {
-      Vue.set(state, 'USER_MINUTES', payload);
-    },
-    SET_USER_SMS: (state, payload) => {
-      Vue.set(state, 'USER_SMS', payload);
-    },
-    SET_USER_INTERNET: (state, payload) => {
-      Vue.set(state, 'USER_INTERNET', payload);
-    },
-    SET_USER_PHONE: (state, payload) => {
-      Vue.set(state, 'USER_PHONE_NUM', payload);
-    },
-    SET_USER_PRICE_PLAN: (state, payload) => {
-      Vue.set(state, 'USER_PRICE_PLAN', payload);
-    },
-    SET_AVAILABLE_PRICE_PLANS: (state, payload) => {
-      Vue.set(state, 'AVAILABLE_PRICE_PLANS', payload);
-    },
-    SET_ALL_PRICE_PLANS: (state, payload) => {
-      Vue.set(state, 'ALL_PRICE_PLANS', payload);
+    UPDATE_USER: (state, key, value) => {
+      if(state.CURRENT_USER!=null){
+        Vue.set(state.CURRENT_USER, key, value);
+      }
     },
     SET_STUB_PRICE_PLANS: (state, payload) => {
       Vue.set(state, 'STUB_PRICE_PLANS', payload);
     },
-    SET_USER_HISTORY: (state, payload) => {
-      Vue.set(state, 'USER_HISTORY', payload);
-    },
-    SET_DELETED_USER: (state, payload) => {
-      Vue.set(state, 'DELETED_USER', payload);
-    },
-    SET_CREATED_USER: (state, payload) => {
-      Vue.set(state, 'CREATED_USER', payload);
-    },
     SET_STUB_USERS: (state, payload) => {
       Vue.set(state, 'STUB_USERS', payload);
-    },
-    SET_ATC_SUCCESS: (state, payload) => {
-      Vue.set(state, 'ATC_SUCCESS', payload);
     },
   },
   actions: {
@@ -169,218 +114,129 @@ export default new Vuex.Store({
     STORE_LAST_PATH: async (context, lastPath) => {
       context.commit('SET_LAST_PATH', lastPath);
     },
-    LOAD_ALL_PRICE_PLANS: async (context) => {
-      if (context.state.STUB_MODE) {
-        context.commit('SET_ALL_PRICE_PLANS', context.state.STUB_PRICE_PLANS);
-      } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/showT/?token=${context.state.TOKEN}`).then(response => {
-          context.commit('SET_ALL_PRICE_PLANS', response.data);
-          console.log('Loaded all price plans');
-          console.log(response.data);
-        }).catch(e => {
-          console.log(e);
-        });
+
+    INITIALIZE: async (context) => {
+      try {
+        const serverDetailsResponse = await Vue.axios.get(`/serversDetails`);
+        await context.commit('SET_VALIDATOR_URL', serverDetailsResponse.data.validator);
+        await context.commit('SET_PROXY_URL', serverDetailsResponse.data.proxy);
+        await context.commit('SET_DEFAULT_USER_NAME', '');
+        await context.commit('SET_DEFAULT_USER_PASS', '');
+        console.log("switch to production mode");
+        await context.dispatch("CREATE_USERS");
+      } catch(e) {
+        await context.commit('SET_VALIDATOR_URL', 'http://localhost:8101');
+        await context.commit('SET_PROXY_URL', 'http://localhost:8102');
+        await context.commit('SET_STUB_MODE', true);
+        await context.commit('SET_DEFAULT_USER_NAME', 'stub@stub.com');
+        await context.commit('SET_DEFAULT_USER_PASS', 'stub123');
       }
+      await context.dispatch("SYNC_CURRENT_USER");
     },
 
-    LOAD_SERVERS_DETAILS: async (context) => {
-      Vue.axios.get(`/serversDetails`)
-        .then((response) => {
-          context.commit('SET_VALIDATOR_URL', response.data.validator);
-          context.commit('SET_PROXY_URL', response.data.proxy);
-          console.log("switch to production mode");
-          context.dispatch("CREATE_USERS");
-        }).catch(() => {
-        context.commit('SET_VALIDATOR_URL', 'http://localhost:8101');
-        context.commit('SET_PROXY_URL', 'http://localhost:8102');
-        context.commit('SET_STUB_MODE', true);
-        context.commit('SET_DEFAULT_USER_NAME', 'stub@stub.com');
-        context.commit('SET_DEFAULT_USER_PASS', 'stub123');
-        console.log("switch to stub mode");
-      });
-    },
-    LOGIN: async (context, data) => {
-      const setup = (token, error) => {
-        if (error != null) {
-          console.log("login failed:" + error);
-          context.commit('SET_LOGIN_FAIL', true);
-          context.commit('SET_LOGIN_SUCCESS', false);
-          localStorage.removeItem("TOKEN");
-          throw new Error("Login fail:" + error);
-        } else {
-          console.log("login success:" + token);
-          context.commit('SET_TOKEN', token);
-          context.commit('SET_LOGIN_FAIL', false);
-          context.commit('SET_LOGIN_SUCCESS', true);
-          localStorage.setItem("TOKEN", token);
-          context.dispatch("LOAD_USER_DETAILS");
-        }
-      };
-
-      const currentToken = localStorage.getItem("TOKEN");
+    SYNC_CURRENT_USER: async (context) => {
+      let currentToken = localStorage.getItem("TOKEN");
       if(currentToken!=null){
-        setup(currentToken, null);
-      } else {
-        if (context.state.STUB_MODE) {
-          const user = context.state.STUB_USERS.find(user => user.name === data.login && user.pass === data.password);
-          if (user != null) {
-            setup(user.name, null);
-          } else {
-            setup(null, "Cant find user");
-          }
-        } else {
-          Vue.axios.get(`${context.state.VALIDATOR_URL}/login/?login=${data.login}&password=${data.password}`)
-            .then((response) => {
-              setup(response.data, null);
-            }).catch((error) => {
-            console.log(error);
-            setup(null, error);
-          });
+        try {
+          const user = await context.dispatch("LOAD_USER", currentToken);
+          await context.commit('SET_TOKEN', currentToken);
+          await context.commit("SET_CURRENT_USER", user);
+        } catch (e) {
+          await context.dispatch("LOGOUT");
         }
       }
+    },
 
+    LOGIN: async (context, data) => {
+      let currentToken = null;
+      if(context.state.STUB_MODE){
+        const userDetails = context.state.STUB_USERS.find(user => user.name === data.login && user.pass === data.password);
+        if(userDetails!=null){
+          currentToken = userDetails.name;
+        } else {
+          throw new Error("User not found:" + data.login);
+        }
+      } else {
+        const loginResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/login/?login=${data.login}&password=${data.password}`);
+        if(loginResponse!=null && loginResponse.data!=null){
+          currentToken = loginResponse.data;
+        } else {
+          throw new Error("User not found:" + data.login);
+        }
+      }
+      const user = await context.dispatch("LOAD_USER", currentToken);
+      if(user==null){
+        throw new Error("User not found:" + data.login + ", token:" + currentToken);
+      }
+      await context.commit('SET_TOKEN', currentToken);
+      await context.commit("SET_CURRENT_USER", user);
+    },
+
+    LOAD_USER: async (context, currentToken) => {
+      let userDetails = null;
+
+      if (context.state.STUB_MODE) {
+        userDetails = context.state.STUB_USERS.find(user => user.name === currentToken);
+        if(userDetails==null){
+          throw new Error("User not found by token:"+ currentToken)
+        }
+        userDetails.availableTariffs = context.state.STUB_PRICE_PLANS;
+        userDetails.history = [];
+      } else {
+        const userResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/home/?token=${currentToken}`);
+        userDetails = userResponse.data;
+
+        if(userDetails==null){
+          throw new Error("User not found by token:"+ currentToken)
+        }
+
+        const userTariffsResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/showtariff/?token=${currentToken}`);
+        userDetails.tariff = userTariffsResponse.data.user;
+
+        try {
+          const allTariffsResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/showT/?token=${currentToken}`);
+          userDetails.availableTariffs = allTariffsResponse.data
+        } catch (e) {
+          userDetails.availableTariffs = userTariffsResponse.data.tariffs;
+        }
+
+        try{
+          const historyResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/showHistory/?token=${currentToken}`);
+          userDetails.history = historyResponse.data;
+        } catch (e) {
+          userDetails.history = [];
+        }
+
+      }
+
+      return userDetails;
 
     },
     LOGOUT: async (context) => {
-      context.commit('SET_TOKEN', null);
-      context.commit('SET_LOGIN_FAIL', false);
-      context.commit('SET_LOGIN_SUCCESS', false);
-      context.commit('SET_USER_LOADED', false);
-      context.commit('SET_USER_NAME', 'Not Logged in');
-      context.commit('SET_USER_BALANCE', 0);
-      context.commit('SET_USER_MINUTES', 0);
-      context.commit('SET_USER_SMS', 0);
-      context.commit('SET_USER_INTERNET', 0);
-      context.commit('SET_USER_PHONE', 0);
-      context.commit('SET_USER_PRICE_PLAN', '');
-      localStorage.removeItem("TOKEN");
-    },
-
-    LOAD_USER_DETAILS: async (context) => {
-      const setup = (data, error) => {
-        if (error != null) {
-          console.log(error);
-          context.commit('SET_USER_LOADED', false);
-          context.dispatch("LOGOUT");
-          throw new Error("Load User Fail:" + error);
-        } else {
-          context.commit('SET_USER_NAME', data.name);
-          context.commit('SET_USER_BALANCE', data.balance);
-          context.commit('SET_USER_MINUTES', data.minutes);
-          context.commit('SET_USER_SMS', data.sms);
-          context.commit('SET_USER_INTERNET', data.internet);
-          context.commit('SET_USER_PHONE', data.telephone);
-          context.commit('SET_USER_LOADED', true);
-          context.dispatch('LOAD_AVAILABLE_PRICE_PLANS');
-          context.dispatch('LOAD_ALL_PRICE_PLANS');
-          context.dispatch('LOAD_HISTORY');
-          context.commit('SET_USER_HISTORY', []);
-          console.log("user_loaded");
-          console.log(data);
-        }
-      };
-      if (context.state.STUB_MODE) {
-        const user = context.state.STUB_USERS.find(user => user.name === context.state.TOKEN);
-        if (user != null) {
-          setup(user, null);
-        } else {
-          setup(null, "User not found");
-        }
-      } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/home/?token=${context.state.TOKEN}`).then(response => {
-          setup(response.data, null);
-        }).catch(e => {
-          setup(null, e);
-        });
-      }
-    },
-    LOAD_AVAILABLE_PRICE_PLANS: async (context) => {
-      const setup = (data, error) => {
-        if (error != null) {
-          console.log(error);
-          context.commit('SET_USER_PRICE_PLAN', '');
-          throw new Error("Load available price plans Fail:" + error);
-        } else {
-          context.commit('SET_AVAILABLE_PRICE_PLANS', data.tariffs);
-          context.commit('SET_USER_PRICE_PLAN', data.user);
-          console.log('Loaded available price plans');
-          console.log(data);
-        }
-      };
-      if (context.state.STUB_MODE) {
-        const user = context.state.STUB_USERS.find(user => user.name === context.state.TOKEN);
-        if (user != null) {
-          setup({tariffs: context.state.STUB_PRICE_PLANS, user: user.tariff}, null);
-        } else {
-          setup(null, "User not found");
-        }
-      } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/showtariff/?token=${context.state.TOKEN}`).then(response => {
-          setup(response.data, null);
-        }).catch(e => {
-          setup(null, e);
-        });
-      }
-    },
-
-    LOAD_HISTORY: async (context) => {
-      const setup = (data, error) => {
-        if (error != null) {
-          console.log(error);
-          throw new Error("Load history Fail:" + error);
-        } else {
-          context.commit('SET_USER_HISTORY', data);
-          console.log('Loaded user history');
-          console.log(data);
-        }
-      };
-      if (context.state.STUB_MODE) {
-        setup([], null);
-      } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/showHistory/?token=${context.state.TOKEN}`).then(response => {
-          setup(response.data, null);
-        }).catch(e => {
-          setup(null, e);
-        });
-      }
+      await context.commit('SET_TOKEN', null);
+      await context.commit('SET_CURRENT_USER', null);
+      await localStorage.removeItem("TOKEN");
     },
 
     UPDATE_USER_BALANCE: async (context, data) => {
       if (context.state.STUB_MODE) {
-        context.commit('SET_USER_BALANCE', money);
+        await context.commit('UPDATE_USER', 'balance', data.amount);
       } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/home/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`).then(() => {
-          context.commit('SET_USER_BALANCE', money);
-          console.log('updated user balance');
-          console.log(data);
-        }).catch(e => {
-          console.log(e);
-          throw new Error("Update user balance Fail:" + e);
-        });
+        await Vue.axios.get(`${context.state.VALIDATOR_URL}/home/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`);
+        await context.commit('UPDATE_USER', 'balance', data.amount);
       }
     },
     UPDATE_USER_PRICE_PLAN: async (context, tariff) => {
       if (context.state.STUB_MODE) {
-        context.commit('SET_USER_PRICE_PLAN', tariff);
+        await context.commit('UPDATE_USER', 'tariff', tariff);
       } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/choicetariff/?token=${context.state.TOKEN}&tariff=${tariff}`).then(() => {
-          context.commit('SET_USER_PRICE_PLAN', tariff);
-          console.log('updated user price plan');
-          console.log(tariff);
-        }).catch(e => {
-          console.log(e);
-          throw new Error("Update user price plan Fail:" + e);
-        });
+        await Vue.axios.get(`${context.state.VALIDATOR_URL}/choicetariff/?token=${context.state.TOKEN}&tariff=${tariff}`);
+        await context.commit('UPDATE_USER', 'tariff', tariff);
       }
     },
     CREATE_USERS: async (context) => {
       if (!context.state.STUB_MODE) {
-        Vue.axios.post(`${context.state.PROXY_URL}/start`).then(() => {
-          console.log("SSP users created");
-        }).catch(e => {
-          console.log(e);
-          throw new Error("Create users Fail:" + e);
-        });
+        await Vue.axios.post(`${context.state.PROXY_URL}/start`);
       }
     },
 
@@ -389,36 +245,21 @@ export default new Vuex.Store({
         var pricePlans = context.state.STUB_PRICE_PLANS;
         const idx = pricePlans.findIndex(plan => plan.name === tariff);
         pricePlans.splice(idx, 1);
-        context.commit('SET_STUB_PRICE_PLANS', pricePlans);
-        await context.dispatch('LOAD_AVAILABLE_PRICE_PLANS');
-        await context.dispatch('LOAD_ALL_PRICE_PLANS');
+        await context.commit('SET_STUB_PRICE_PLANS', pricePlans);
       } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/deleteT/?token=${context.state.TOKEN}&name=${tariff}`).then(() => {
-          context.dispatch('LOAD_AVAILABLE_PRICE_PLANS');
-          context.dispatch('LOAD_ALL_PRICE_PLANS');
-        }).catch(e => {
-          console.log(e);
-          throw new Error("Delete price plan Fail:" + e);
-        });
+        await Vue.axios.get(`${context.state.VALIDATOR_URL}/deleteT/?token=${context.state.TOKEN}&name=${tariff}`);
       }
+      await context.dispatch("SYNC_CURRENT_USER");
     },
     CREATE_PRICE_PLAN: async (context, tariffData) => {
       if (context.state.STUB_MODE) {
         var pricePlans = context.state.STUB_PRICE_PLANS;
         pricePlans.push(tariffData);
         context.commit('SET_STUB_PRICE_PLANS', pricePlans);
-        await context.dispatch('LOAD_AVAILABLE_PRICE_PLANS');
-        await context.dispatch('LOAD_ALL_PRICE_PLANS');
       } else {
-        Vue.axios.post(`${context.state.VALIDATOR_URL}/createT/?token=${context.state.TOKEN}`, tariffData).then(() => {
-          context.dispatch('LOAD_AVAILABLE_PRICE_PLANS');
-          context.dispatch('LOAD_ALL_PRICE_PLANS');
-        }).catch(e => {
-          console.log(tariffData);
-          console.log(e);
-          throw new Error("Create price plan Fail:" + e);
-        });
+        await Vue.axios.post(`${context.state.VALIDATOR_URL}/createT/?token=${context.state.TOKEN}`, tariffData);
       }
+      await context.dispatch("SYNC_CURRENT_USER");
     },
 
     DELETE_USER: async (context, user) => {
@@ -427,33 +268,20 @@ export default new Vuex.Store({
         const idx = stubUsers.findIndex(user => user.name === user);
         stubUsers.splice(idx, 1);
         context.commit('SET_STUB_USERS', stubUsers);
-        context.commit('SET_DELETED_USER', user);
       } else {
-        Vue.axios.get(`${context.state.VALIDATOR_URL}/deleteA/?token=${context.state.TOKEN}&login=${user}`).then((responce) => {
-          context.commit('SET_DELETED_USER', user);
-          console.log(responce.data);
-        }).catch(e => {
-          console.log(e);
-          throw new Error("Delete user Fail:" + e);
-        });
+        await Vue.axios.get(`${context.state.VALIDATOR_URL}/deleteA/?token=${context.state.TOKEN}&login=${user}`);
       }
+      await context.dispatch("SYNC_CURRENT_USER");
     },
     CREATE_USER: async (context, userData) => {
       if (context.state.STUB_MODE) {
         var stubUsers = context.state.STUB_USERS;
         stubUsers.push(userData);
         context.commit('SET_STUB_USERS', stubUsers);
-        context.commit('SET_CREATED_USER', userData.name);
       } else {
-        Vue.axios.post(`${context.state.VALIDATOR_URL}/createA/?token=${context.state.TOKEN}`, userData).then((responce) => {
-          context.commit('SET_CREATED_USER', userData.name);
-          console.log(responce.data);
-        }).catch(e => {
-          console.log(userData);
-          console.log(e);
-          throw new Error("Create user Fail:" + e);
-        });
+        await Vue.axios.post(`${context.state.VALIDATOR_URL}/createA/?token=${context.state.TOKEN}`, userData);
       }
+      await context.dispatch("SYNC_CURRENT_USER");
     },
 
     DO_CALL: async (context, info) => {
@@ -475,15 +303,10 @@ export default new Vuex.Store({
           throw new Error("User not found:" + info.telephoneFrom);
         }
       } else {
-        Vue.axios.get(`${context.state.PROXY_URL}/callFromTo/?telephoneFrom=${info.telephoneFrom}&minutes=1&telephoneTo=${info.telephoneTo}`).then((responce) => {
-          context.commit('SET_ATC_SUCCESS', true);
-          console.log(responce.data);
-        }).catch(e => {
-          console.log(userData);
-          console.log(e);
-          context.commit('SET_ATC_SUCCESS', false);
-          throw new Error("Call failed:" + e);
-        });
+        await Vue.axios.get(`${context.state.PROXY_URL}/callFromTo/?telephoneFrom=${info.telephoneFrom}&minutes=1&telephoneTo=${info.telephoneTo}`);
+      }
+      if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
+        await context.dispatch("SYNC_CURRENT_USER");
       }
     },
     DO_SMS: async (context, info) => {
@@ -505,15 +328,10 @@ export default new Vuex.Store({
           throw new Error("User not found:" + info.telephoneFrom);
         }
       } else {
-        Vue.axios.get(`${context.state.PROXY_URL}/smsFromTo/?telephoneFrom=${info.telephoneFrom}&sms=1&telephoneTo=${info.telephoneTo}`).then((responce) => {
-          context.commit('SET_ATC_SUCCESS', true);
-          console.log(responce.data);
-        }).catch(e => {
-          console.log(userData);
-          console.log(e);
-          context.commit('SET_ATC_SUCCESS', false);
-          throw new Error("Call failed:" + e);
-        });
+        await Vue.axios.get(`${context.state.PROXY_URL}/smsFromTo/?telephoneFrom=${info.telephoneFrom}&sms=1&telephoneTo=${info.telephoneTo}`);
+      }
+      if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
+        await context.dispatch("SYNC_CURRENT_USER");
       }
     },
     DO_INTERNET: async (context, info) => {
@@ -535,15 +353,10 @@ export default new Vuex.Store({
           throw new Error("User not found:" + info.telephoneFrom);
         }
       } else {
-        Vue.axios.get(`${context.state.PROXY_URL}/useInternet/?telephoneFrom=${info.telephoneFrom}&kilobytes=1000&telephoneTo=${info.telephoneTo}`).then((responce) => {
-          context.commit('SET_ATC_SUCCESS', true);
-          console.log(responce.data);
-        }).catch(e => {
-          console.log(userData);
-          console.log(e);
-          context.commit('SET_ATC_SUCCESS', false);
-          throw new Error("Call failed:" + e);
-        });
+        await Vue.axios.get(`${context.state.PROXY_URL}/useInternet/?telephoneFrom=${info.telephoneFrom}&kilobytes=1000&telephoneTo=${info.telephoneTo}`);
+      }
+      if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
+        await context.dispatch("SYNC_CURRENT_USER");
       }
     },
   },
