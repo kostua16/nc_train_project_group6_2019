@@ -8,13 +8,13 @@ const routes = [
   {
     path: '',
     name: 'swith',
-    meta: {layout: 'Empty'},
+    meta: {layout: 'Main'},
     component: () => import('../views/Swith.vue') //главная страница
   },
   {
     path: '/ssp/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
     name: 'sspLogin', //для себя имя
-    meta: {layout: 'Empty'}, //задаём лаяуты //свойства имя, имя
+    meta: {layout: 'Main'}, //задаём лаяуты //свойства имя, имя
     component: () => import('../views/ssp/SspLogin') //импортируем контент
   },
   {

@@ -1,5 +1,5 @@
 <template>
-  <form class="card auth-card" @submit.prevent="loginClick">
+  <form class="card auth-card" @submit.prevent="loginClick" v-if="app_initialized">
     <div class="card-content">
       <span class="card-title" v-text="title">Личный кабинет</span>
       <div class="input-field">
@@ -49,13 +49,18 @@
     }),
     computed: mapState({
       login_done: state => state.CURRENT_USER != null,
+      app_initialized: state => state.INITIALIZATION_COMPLETED,
+      app_initialization_in_progress: state => state.INITIALIZATION_IN_PROGRESS
     }),
     mounted() {
-      this.email = this.$store.state.DEFAULT_USER_NAME;
-      this.password = this.$store.state.DEFAULT_USER_PASS;
-      if(this.login_done){
-        this.goToLastPage();
-      }
+      this.$store.dispatch("WAIT_INITIALIZATION").then(() => {
+        this.email = this.$store.state.DEFAULT_USER_NAME;
+        this.password = this.$store.state.DEFAULT_USER_PASS;
+        if(this.login_done){
+          this.goToLastPage();
+        }
+      })
+
     },
     validations: {
       email: {email, required}, /* required - пустое поле не принимаем*/
