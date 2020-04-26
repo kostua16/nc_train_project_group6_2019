@@ -29,8 +29,8 @@ public class IndexController {
     }
 
 
-//    @GetMapping
-//    public String index(){
-//        return "index";
-//    }
+    @GetMapping(path = {"/", "/atc/*", "/ssp/*", "/crm/*"})
+    public String index(){
+        return "forward:/pwa/index.html";
+    }
 }
