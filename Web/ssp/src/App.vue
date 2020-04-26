@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import EmptyLayout from '@/layouts/EmptyLayout'
 import MainLayout from '@/layouts/MainLayout'
 export default {
   computed: {
@@ -21,7 +20,6 @@ export default {
     this.$store.dispatch('INITIALIZE');
   },
   components: {
-    EmptyLayout,
     MainLayout,
   }
 }
