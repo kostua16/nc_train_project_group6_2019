@@ -5,7 +5,7 @@
     extends: BasePage,
     name: 'userPage', //имя данной странице
     data: () => ({
-      loginRoute: '/'
+      loginRoute: '/home'
     }),
     computed: mapState({
       login_done: state => state.CURRENT_USER != null,

@@ -57,7 +57,7 @@
   import {mapState} from "vuex";
 export default {
   extends: UserPage,
-  data: () => ({ loginRoute: '/#/ssp/login' }),
+  data: () => ({ loginRoute: '/ssp/login' }),
   computed: mapState({
     balance: state => state.CURRENT_USER!==null ? state.CURRENT_USER.balance : null,
     minutes: state => state.CURRENT_USER!==null ? state.CURRENT_USER.minutes : null,

@@ -29,7 +29,7 @@
     export default {
       extends: UserPage,
       data: () => ({
-        loginRoute: '/#/crm/login',
+        loginRoute: '/crm/login',
       }),
       computed: mapState({
         histories: state => state.CURRENT_USER!==null ? state.CURRENT_USER.history : []

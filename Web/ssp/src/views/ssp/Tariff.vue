@@ -52,7 +52,7 @@
     extends: UserPage,
     data: () => ({
       changeTariff: '',
-      loginRoute: '/#/ssp/login'
+      loginRoute: '/ssp/login'
     }),
     computed: mapState({
       tariffs: state => state.CURRENT_USER!==null ? state.CURRENT_USER.availableTariffs : [],

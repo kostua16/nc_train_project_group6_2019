@@ -77,7 +77,7 @@ export default {
        tariff: "DEFAULT",
        telephone: "88005553538",
        rang: "USER",*/
-          loginRoute: '/#/crm/login',
+          loginRoute: '/crm/login',
           login: "",
           logindelet: "",
           password: "",
