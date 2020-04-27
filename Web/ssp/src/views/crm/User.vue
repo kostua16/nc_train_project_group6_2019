@@ -1,21 +1,21 @@
 <template>
 
-  <div class="row col s12">
-    <div class="row col s12">
-      <form class="col s6" @submit.prevent="search">
+  <div class="col s12">
+    <div class="row">
+      <form class="col s12" @submit.prevent="search">
         <div class="input-field col s10">
           <input id="query" type="text" v-model.trim="searchQuery" class="validate" :disabled="searchCalled">
           <label for="query">Поиск</label>
         </div>
         <div class="input-field col s2">
-          <button class="btn waves-effect waves-light auth-submit" type="submit" :disabled="searchCalled">
+          <button class="btn waves-effect waves-light auth-submit" type="submit" :disabled="searchCalled">Поиск
             <i class="material-icons right"/>
           </button>
         </div>
       </form>
     </div>
-    <div class="row col s12">
-      <table>
+    <div class="row">
+      <table class="col s12">
         <tr>
           <th>Login</th>
           <th>ФИО</th>
@@ -32,26 +32,25 @@
         </tr>
       </table>
     </div>
-  </div>
 
 
-  <div class="row col s12">
-    <form class="col s6">
-      <div class="row">
-        <div class="input-field col s12">
+    <div class="row">
+      <form class="col s6">
+        <div class="row">
+          <div class="input-field col s12">
             <input id="email" type="email" v-model="login" class="validate">
             <label for="email">Email</label>
           </div>
-        <div class="input-field col s12">
+          <div class="input-field col s12">
             <input id="password" type="password"  v-model="password" class="validate">
             <label for="password">Password</label>
           </div>
 
-        <div class="input-field col s12">
-              <input id="first_name" type="text" v-model="name" class="validate">
-              <label for="first_name">First Name</label>
-        </div>
-        <div class="input-field col s12">
+          <div class="input-field col s12">
+            <input id="first_name" type="text" v-model="name" class="validate">
+            <label for="first_name">First Name</label>
+          </div>
+          <div class="input-field col s12">
             <input id="balance" type="number" v-model="balance" class="validate">
             <label for="balance">balance</label>
           </div>
@@ -60,42 +59,36 @@
             <label for="telephone_numbe">telephone number</label>
           </div>
 
-        <div class="input-field col s12">
-          <input id="tariff" type="text" v-model="tariff" class="validate">
-          <label for="tariff">tariff</label>
-        </div>
-        <div class="input-field col s12">
-          <input id="rang" type="text" v-model="rang" class="validate">
-          <label for="rang">rang</label>
-        </div>
+          <div class="input-field col s12">
+            <input id="tariff" type="text" v-model="tariff" class="validate">
+            <label for="tariff">tariff</label>
+          </div>
+          <div class="input-field col s12">
+            <input id="rang" type="text" v-model="rang" class="validate">
+            <label for="rang">rang</label>
+          </div>
 
-        <div class="input-field col s12">
-         <!-- <button class="btn waves-effect waves-light" type="submit" @click.prevent="pustUser" name="action">Добавить пользователя
-            <i class="material-icons right">send</i>
-          </button>-->
-          <a class="waves-effect waves-light btn" @click.prevent="pustUser"><i class="material-icons right">send
-          </i>Добавить пользователя</a>
+          <div class="input-field col s12">
+            <a class="waves-effect waves-light btn" @click.prevent="pustUser"><i class="material-icons right">send
+            </i>Добавить пользователя</a>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
 
-    <form class="col s6">
-      <div class="row">
-        <div class="input-field col s12">
+      <form class="col s6">
+        <div class="row">
+          <div class="input-field col s12">
             <input id="email2" type="email"  v-model="logindelet" class="validate">
             <label for="email2">Email</label>
           </div>
-
-
           <button class="btn waves-effect waves-light" type="submit" @click.prevent="deleteAk" name="action">Удалить пользователя
-             <i class="material-icons right">send</i>
+            <i class="material-icons right">send</i>
           </button>
-      </div>
-    </form>
-
-
-
+        </div>
+      </form>
+    </div>
   </div>
+
 
 </template>
 
