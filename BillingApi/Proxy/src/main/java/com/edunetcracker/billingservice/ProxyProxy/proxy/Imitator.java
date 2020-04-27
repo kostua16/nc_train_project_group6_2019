@@ -78,7 +78,7 @@ public class Imitator {
                             account.setLogin(login);
                             account.setPassword("123456");
                             account.setName("user" + accUid);
-                            account.setBalance(0L);
+                            account.setBalance(currentRandom.nextLong(0, 100));
 
                             account.setTelephone(phoneNum);
                             account.setRang("USER");
