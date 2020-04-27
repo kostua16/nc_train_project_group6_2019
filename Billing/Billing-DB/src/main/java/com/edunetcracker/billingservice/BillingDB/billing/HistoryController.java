@@ -31,7 +31,7 @@ public class HistoryController {
 
     @GetMapping("getHistory")
     public ResponseEntity<List<History>> getHistory(@RequestParam(value = "page", defaultValue = "0") Integer page) {
-        List<History> histories = new ArrayList<>(historyRepository.findAll(PageRequest.of(page, 100)).toSet());
+        List<History> histories = new ArrayList<>(historyRepository.findAll(PageRequest.of(page, 100, Sort.Direction.DESC, "id")).toSet());
         return new ResponseEntity<>(histories, HttpStatus.OK);
         //return new ResponseEntity<>(null, HttpStatus.OK);
     }

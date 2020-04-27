@@ -383,8 +383,8 @@ public class CRM {
     }
     //  http://localhost:8102/showHistory
     @GetMapping("showHistory")
-    public List<History> showHistory(){
-        String url = helpers.getUrlBilling() + "/getHistory";
+    public List<History> showHistory(@RequestParam(value = "page", defaultValue = "0") Integer page){
+        String url = helpers.getUrlBilling() + "/getHistory?page=" + page;
         List<History> response = (List<History>) new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
         return response;
     }

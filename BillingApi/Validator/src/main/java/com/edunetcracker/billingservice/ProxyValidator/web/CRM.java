@@ -236,14 +236,14 @@ public class CRM {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
     @GetMapping("showHistory")
-    public ResponseEntity<List<History>> showHistory(@RequestParam("token") String token){
+    public ResponseEntity<List<History>> showHistory(@RequestParam("token") String token, @RequestParam(value = "page", defaultValue = "0") Integer page){
         String login = checks.getLoginByTokenAndCheck(token);
         if(login == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
-            String url = helpers.getUrlProxy() + "/showHistory";
+            String url = helpers.getUrlProxy() + "/showHistory?page=" + page;
             List<History> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

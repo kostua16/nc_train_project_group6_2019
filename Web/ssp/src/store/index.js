@@ -12,6 +12,7 @@ export default new Vuex.Store({
     INITIALIZATION_IN_PROGRESS: false,
     CURRENT_USER: null,
     ACTIONS_HISTORY: [],
+    HISTORY_PAGE: 0,
     IMITATOR_STATE: false,
     STUB_MODE: false,
     LIST_ACCOUNTS: [],
@@ -92,6 +93,9 @@ export default new Vuex.Store({
     },
     SET_ACTIONS_HISTORY: (state, payload) => {
       Vue.set(state, 'ACTIONS_HISTORY', payload);
+    },
+    SET_HISTORY_PAGE: (state, payload) => {
+      Vue.set(state, 'HISTORY_PAGE', payload);
     },
     SET_LAST_PATH: (state, payload) => {
       Vue.set(state, 'LAST_PATH', payload);
@@ -334,13 +338,17 @@ export default new Vuex.Store({
       return userDetails;
 
     },
+    UPDATE_HISTORY_PAGE: async (context, value) => {
+      await context.commit("SET_HISTORY_PAGE", value);
+      await context.dispatch("LOAD_HISTORY");
+    },
     LOAD_HISTORY: async (context) => {
       if(context.state.STUB_MODE) {
         await context.commit("SET_ACTIONS_HISTORY", []);
       } else {
         try{
           if(context.state.TOKEN!=null){
-            const historyResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/showHistory/?token=${context.state.TOKEN}`);
+            const historyResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/showHistory/?token=${context.state.TOKEN}&page=${context.state.HISTORY_PAGE}`);
             if(historyResponse==null || historyResponse.data==null){
               await context.commit("SET_ACTIONS_HISTORY", []);
             } else {
