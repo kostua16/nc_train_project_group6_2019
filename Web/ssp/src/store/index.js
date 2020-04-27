@@ -32,8 +32,8 @@ export default new Vuex.Store({
         sms: 10,
       }
     ],
-    DEFAULT_USER_NAME: "stub@stub.com",
-    DEFAULT_USER_PASS: "stub123",
+    DEFAULT_USER_NAME: "",
+    DEFAULT_USER_PASS: "",
     VALIDATOR_URL: 'http://localhost:8101',
     PROXY_URL: 'http://localhost:8102',
     TOKEN: "",
@@ -216,28 +216,34 @@ export default new Vuex.Store({
           const serverDetailsResponse = await Vue.axios.get(`/serversDetails`);
           await context.commit('SET_VALIDATOR_URL', serverDetailsResponse.data.validator);
           await context.commit('SET_PROXY_URL', serverDetailsResponse.data.proxy);
-          await context.commit('SET_DEFAULT_USER_NAME', '');
-          await context.commit('SET_DEFAULT_USER_PASS', '');
+          await context.commit('SET_STUB_MODE', false);
           console.log("switch to production mode");I
         } catch(e) {
+          console.log(e);
           await context.commit('SET_VALIDATOR_URL', 'http://localhost:8101');
           await context.commit('SET_PROXY_URL', 'http://localhost:8102');
           await context.commit('SET_STUB_MODE', true);
-          await context.commit('SET_DEFAULT_USER_NAME', 'stub@stub.com');
-          await context.commit('SET_DEFAULT_USER_PASS', 'stub123');
         }
         await context.dispatch("SYNC_CURRENT_USER");
         await context.dispatch("SYNC_IMITATOR");
         context.commit("SET_INITIALIZATION_IN_PROGRESS", false);
         context.commit("SET_INITIALIZATION_COMPLETED", true);
       } catch (e) {
+        console.log(e);
         context.commit("SET_INITIALIZATION_IN_PROGRESS", false);
       }
 
     },
     WAIT_INITIALIZATION: async (context) => {
-      while (context.state.INITIALIZATION_IN_PROGRESS === true){
-        await context.dispatch("SLEEP", 100);
+      if(context.state.INITIALIZATION_COMPLETED === false){
+        if(context.state.INITIALIZATION_IN_PROGRESS === true){
+          while (context.state.INITIALIZATION_IN_PROGRESS === true){
+            await context.dispatch("SLEEP", 100);
+          }
+        } else {
+          await context.dispatch("INITIALIZE");
+          await context.dispatch("WAIT_INITIALIZATION");
+        }
       }
     },
 
@@ -258,7 +264,9 @@ export default new Vuex.Store({
     },
 
     LOGIN: async (context, data) => {
-      console.log(`LOGIN.Start(${JSON.stringify(data)})`);
+
+      console.log(`LOGIN.Start(${JSON.stringify(data)}, ${context.state.INITIALIZATION_COMPLETED})`);
+      await context.dispatch("WAIT_INITIALIZATION");
       try {
         let currentToken = null;
         if(context.state.STUB_MODE){
@@ -285,7 +293,7 @@ export default new Vuex.Store({
         await localStorage.setItem("TOKEN", currentToken);
         console.log(`LOGIN.Done(${currentToken}, ${JSON.stringify(user)})`);
       } catch (e) {
-        var message = `Login.Fail(${JSON.stringify(data)}, ${JSON.stringify(e)})`;
+        var message = `Login.Fail(${JSON.stringify(data)}, ${JSON.stringify(e)}, ${e})`;
         console.log(message);
         throw new Error(message);
       }
