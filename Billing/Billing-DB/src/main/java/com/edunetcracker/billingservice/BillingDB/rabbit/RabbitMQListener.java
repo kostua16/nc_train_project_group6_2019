@@ -299,7 +299,7 @@ public class RabbitMQListener {
     private void addToHistory(String type, String body){
         String time = LocalDate.now().toString() + " " + LocalTime.now().toString();
         History history = new History(time, type, body);
-        LOG.info("addToHistory " + type);
+        LOG.info("addToHistory {} => {}", type, body);
         //History history = new History();//new History(LocalDate.now().toString(), type, body);
         historyRepository.save(history);
     }
