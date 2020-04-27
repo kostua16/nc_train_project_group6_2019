@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,16 @@ public class CRM {
     AccountController accountController;
 
     Logger LOG = LoggerFactory.getLogger(CRM.class);
+
+    @PostConstruct
+    public void postConstruct() {
+        try{
+            start();
+        } catch (JsonProcessingException e){
+            LOG.error("START.Failed", e);
+        }
+
+    }
 
     /**
      * admin@mail.ru
