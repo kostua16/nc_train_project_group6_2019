@@ -48,6 +48,16 @@ public class TariffInternet {
         return default_internet_cost;
     }
 
+    @Override
+    public String toString() {
+        return "TariffInternet{" +
+                "name='" + name + '\'' +
+                ", internet_cost=" + internet_cost +
+                ", internet_balance=" + internet_balance +
+                ", default_internet_cost=" + default_internet_cost +
+                '}';
+    }
+
     public void setDefault_internet_cost(Float default_internet_cost) {
         this.default_internet_cost = default_internet_cost;
     }

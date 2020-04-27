@@ -45,6 +45,16 @@ public class Call {
         return default_call_cost;
     }
 
+    @Override
+    public String toString() {
+        return "Call{" +
+                "login='" + login + '\'' +
+                ", call_cost=" + call_cost +
+                ", call_balance=" + call_balance +
+                ", default_call_cost=" + default_call_cost +
+                '}';
+    }
+
     public void setDefault_call_cost(Float default_call_cost) {
         this.default_call_cost = default_call_cost;
     }

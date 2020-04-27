@@ -53,4 +53,13 @@ public class Internet {
         this.default_internet_cost = default_internet_cost;
     }
 
+    @Override
+    public String toString() {
+        return "Internet{" +
+                "login='" + login + '\'' +
+                ", internet_cost=" + internet_cost +
+                ", internet_balance=" + internet_balance +
+                ", default_internet_cost=" + default_internet_cost +
+                '}';
+    }
 }

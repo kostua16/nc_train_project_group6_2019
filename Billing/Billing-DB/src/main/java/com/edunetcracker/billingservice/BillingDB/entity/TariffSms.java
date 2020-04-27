@@ -52,4 +52,13 @@ public class TariffSms {
         this.default_sms_cost = default_sms_cost;
     }
 
+    @Override
+    public String toString() {
+        return "TariffSms{" +
+                "name='" + name + '\'' +
+                ", sms_cost=" + sms_cost +
+                ", sms_balance=" + sms_balance +
+                ", default_sms_cost=" + default_sms_cost +
+                '}';
+    }
 }

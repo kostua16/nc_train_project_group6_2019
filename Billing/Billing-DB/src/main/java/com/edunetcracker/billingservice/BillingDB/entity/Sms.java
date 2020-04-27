@@ -48,6 +48,16 @@ public class Sms {
         return default_sms_cost;
     }
 
+    @Override
+    public String toString() {
+        return "Sms{" +
+                "login='" + login + '\'' +
+                ", sms_cost=" + sms_cost +
+                ", sms_balance=" + sms_balance +
+                ", default_sms_cost=" + default_sms_cost +
+                '}';
+    }
+
     public void setDefault_sms_cost(Float default_sms_cost) {
         this.default_sms_cost = default_sms_cost;
     }
