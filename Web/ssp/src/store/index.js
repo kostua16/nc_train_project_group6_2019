@@ -217,7 +217,7 @@ export default new Vuex.Store({
           await context.commit('SET_VALIDATOR_URL', serverDetailsResponse.data.validator);
           await context.commit('SET_PROXY_URL', serverDetailsResponse.data.proxy);
           await context.commit('SET_STUB_MODE', false);
-          console.log("switch to production mode");I
+          console.log("switch to production mode");
         } catch(e) {
           console.log(e);
           await context.commit('SET_VALIDATOR_URL', 'http://localhost:8101');
