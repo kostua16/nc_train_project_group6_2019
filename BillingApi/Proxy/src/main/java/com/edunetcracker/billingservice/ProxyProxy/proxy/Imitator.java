@@ -127,9 +127,10 @@ public class Imitator {
     public void madeCalls() {
 
         int maxToRun = ThreadLocalRandom.current().nextInt(0, 15);
+        int maxToIterate = ThreadLocalRandom.current().nextInt(0, 25);
         for (int i = 0; i < maxToRun; i++) {
             int prefix = ThreadLocalRandom.current().nextInt(1000, 8999);
-            for (int j = 0; j < 51; j++) {
+            for (int j = 0; j < maxToIterate; j++) {
                 int accUid = (prefix + j);
                 String phoneNum = "8801555" + accUid;
                 final ResponseEntity<Account> accountByTelephone = accountController.getAccountByTelephone(phoneNum);
@@ -141,9 +142,7 @@ public class Imitator {
                         case 2: smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3)); break;
                         case 3: internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000)); break;
                     }
-
                 }
-
             }
 
         }
