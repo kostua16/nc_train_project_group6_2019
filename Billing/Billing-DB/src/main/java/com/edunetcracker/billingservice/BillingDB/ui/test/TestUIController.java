@@ -80,7 +80,7 @@ public class TestUIController {
 
     @GetMapping("history")
     public String history(Model model){
-        List<History> historyList = new ArrayList<>(historyRepository.findAll(PageRequest.of(0, 600, Sort.Direction.DESC)).toSet());
+        List<History> historyList = new ArrayList<>(historyRepository.findAll(PageRequest.of(0, 600, Sort.Direction.DESC, "id")).toSet());
         model.addAttribute("history", historyList);
         return "ui/test/history";
     }
