@@ -1,6 +1,6 @@
 package com.edunetcracker.billingservice.ProxyProxy.web;
 
-import com.edunetcracker.billingservice.ProxyProxy.proxy.Imitator;
+import com.edunetcracker.billingservice.ProxyProxy.proxy.ImitatorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -11,31 +11,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class ImitatorRest {
 
     @Autowired
-    Imitator imitator;
+    ImitatorService imitatorService;
 
     @GetMapping("")
     public String imitator(Model model){
-        model.addAttribute("enabled", imitator.isStarted());
+        model.addAttribute("enabled", imitatorService.isStarted());
         return "ui/test/imitator";
     }
     @GetMapping("start")
     public Boolean imitatorStart(){
-        imitator.start();
+        imitatorService.start();
         return true;
     }
     @GetMapping("stop")
     public Boolean imitatorStop(){
-        imitator.stop();
+        imitatorService.stop();
         return true;
     }
     @GetMapping("oneGeneration")
     public Boolean imitatorRunGenerate() throws JsonProcessingException {
-        imitator.manuallyGenerateUsers();
+        imitatorService.manuallyGenerateUsers();
         return true;
     }
     @GetMapping("oneUsage")
     public Boolean imitatorRunUsage() {
-        imitator.manuallyMadeCalls();
+        imitatorService.manuallyMadeCalls();
         return true;
     }
 }

@@ -43,7 +43,7 @@ public class TestUIController {
     Helpers helpers;
 
     @Autowired
-    Imitator imitator;
+    ImitatorService imitatorService;
 
 
     @GetMapping("users")
@@ -87,27 +87,27 @@ public class TestUIController {
 
     @GetMapping("imitator")
     public String imitator(Model model){
-        model.addAttribute("enabled", imitator.isStarted());
+        model.addAttribute("enabled", imitatorService.isStarted());
         return "ui/test/imitator";
     }
     @GetMapping("imitator/start")
     public String imitatorStart(){
-        imitator.start();
+        imitatorService.start();
         return "redirect:/ui/test/imitator";
     }
     @GetMapping("imitator/stop")
     public String imitatorStop(){
-        imitator.stop();
+        imitatorService.stop();
         return "redirect:/ui/test/imitator";
     }
     @GetMapping("imitator/oneGeneration")
     public String imitatorRunGenerate() throws JsonProcessingException {
-        imitator.manuallyGenerateUsers();
+        imitatorService.manuallyGenerateUsers();
         return "redirect:/ui/test/imitator";
     }
     @GetMapping("imitator/oneUsage")
     public String imitatorRunUsage() {
-        imitator.manuallyMadeCalls();
+        imitatorService.manuallyMadeCalls();
         return "redirect:/ui/test/imitator";
     }
 }

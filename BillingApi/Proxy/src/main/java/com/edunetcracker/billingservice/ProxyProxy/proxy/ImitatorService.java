@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
-public class Imitator {
+public class ImitatorService {
     @Autowired
     private RabbitMQSender rabbitMQSender;
 
@@ -43,7 +43,7 @@ public class Imitator {
     @Autowired
     SmsController smsController;
 
-    Logger LOG = LoggerFactory.getLogger(Imitator.class);
+    Logger LOG = LoggerFactory.getLogger(ImitatorService.class);
 
     private boolean started = false;
 
