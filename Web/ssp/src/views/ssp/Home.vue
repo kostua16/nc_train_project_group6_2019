@@ -70,6 +70,9 @@ export default {
     internet: state => state.CURRENT_USER!=null ? state.CURRENT_USER.internet : null,
     userPhone: state => state.CURRENT_USER!=null ? state.CURRENT_USER.telephone : ''
   }),
+  mounted() {
+    this.refreshData();
+  },
   methods: {
     refreshData(){
       this.$store.dispatch("SYNC_CURRENT_USER");

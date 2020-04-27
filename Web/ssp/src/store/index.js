@@ -273,18 +273,26 @@ export default new Vuex.Store({
 
     UPDATE_USER_BALANCE: async (context, data) => {
       if (context.state.STUB_MODE) {
-        await context.commit('UPDATE_USER', 'balance', data.amount);
+        const user = {
+          ...context.state.CURRENT_USER,
+          balance: data.amount
+        }
+        await context.commit('SET_CURRENT_USER', user);
       } else {
         await Vue.axios.get(`${context.state.VALIDATOR_URL}/topup/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`);
-        await context.commit('UPDATE_USER', 'balance', data.amount);
+        await context.dispatch("SYNC_CURRENT_USER");
       }
     },
     UPDATE_USER_PRICE_PLAN: async (context, tariff) => {
       if (context.state.STUB_MODE) {
-        await context.commit('UPDATE_USER', 'tariff', tariff);
+        const user = {
+          ...context.state.CURRENT_USER,
+          tariff: tariff
+        }
+        await context.commit('SET_CURRENT_USER', user);
       } else {
         await Vue.axios.get(`${context.state.VALIDATOR_URL}/choicetariff/?token=${context.state.TOKEN}&tariff=${tariff}`);
-        await context.commit('UPDATE_USER', 'tariff', tariff);
+        await context.dispatch("SYNC_CURRENT_USER");
       }
     },
     CREATE_USERS: async (context) => {
