@@ -137,18 +137,21 @@ public class ImitatorService {
                 final ResponseEntity<Account> accountByTelephone = accountController.getAccountByTelephone(phoneNum);
                 if (HttpStatus.OK.equals(accountByTelephone.getStatusCode())) {
                     Account accountFrom = accountByTelephone.getBody();
-                    final String login = accountFrom.getLogin();
-                    switch (ThreadLocalRandom.current().nextInt(1, 4)) {
-                        case 1:
-                            callController.callToMinutes(login, ThreadLocalRandom.current().nextInt(1, 3));
-                            break;
-                        case 2:
-                            smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3));
-                            break;
-                        case 3:
-                            internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000));
-                            break;
+                    if(accountFrom!=null){
+                        final String login = accountFrom.getLogin();
+                        switch (ThreadLocalRandom.current().nextInt(1, 4)) {
+                            case 1:
+                                callController.callToMinutes(login, ThreadLocalRandom.current().nextInt(1, 3));
+                                break;
+                            case 2:
+                                smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3));
+                                break;
+                            case 3:
+                                internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000));
+                                break;
+                        }
                     }
+
                 }
             }
         }
