@@ -9,15 +9,14 @@
       currentPage(){ return this.$route.path; },
       ...mapState({
         lastPage: state => state.LAST_PATH,
-        haveLastPage: state => state.LAST_PATH != null
+        haveLastPage: state => state.LAST_PATH != null,
+        appInitialized: state => state.INITIALIZATION_COMPLETED,
+        appInitializationInProgress: state => state.INITIALIZATION_IN_PROGRESS
       })
     },
-    beforeMount: async () => {
-      await this.$store.dispatch("WAIT_INITIALIZATION");
-    },
     methods: {
-      async waitInitialization() {
-        await this.$store.dispatch("WAIT_INITIALIZATION");
+      waitInitialization(then) {
+        this.$store.dispatch("WAIT_INITIALIZATION").then(() => { then() });
       },
       goToLastPage() {
         if(this.currentPage!==this.lastPage){

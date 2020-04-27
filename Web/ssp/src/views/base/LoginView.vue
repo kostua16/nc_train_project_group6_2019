@@ -1,5 +1,5 @@
 <template>
-  <form class="card auth-card" @submit.prevent="loginClick" v-if="app_initialized">
+  <form class="card auth-card" @submit.prevent="loginClick" v-if="appInitialized">
     <div class="card-content">
       <span class="card-title" v-text="title">Личный кабинет</span>
       <div class="input-field">
@@ -49,8 +49,6 @@
     }),
     computed: mapState({
       login_done: state => state.CURRENT_USER != null,
-      app_initialized: state => state.INITIALIZATION_COMPLETED,
-      app_initialization_in_progress: state => state.INITIALIZATION_IN_PROGRESS
     }),
     mounted() {
       this.$store.dispatch("WAIT_INITIALIZATION").then(() => {
@@ -85,7 +83,7 @@
       }
     }
   }
-</script> -->
+</script>
 
 <style scoped>
   .btn {
