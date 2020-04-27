@@ -5,6 +5,8 @@ import com.edunetcracker.billingservice.BillingDB.entity.History;
 import com.edunetcracker.billingservice.BillingDB.entity.Tariff;
 import com.edunetcracker.billingservice.BillingDB.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,7 +80,7 @@ public class TestUIController {
 
     @GetMapping("history")
     public String history(Model model){
-        final List<History> historyList = historyRepository.getAll();
+        List<History> historyList = new ArrayList<>(historyRepository.findAll(PageRequest.of(0, 600, Sort.Direction.DESC)).toSet());
         model.addAttribute("history", historyList);
         return "ui/test/history";
     }
