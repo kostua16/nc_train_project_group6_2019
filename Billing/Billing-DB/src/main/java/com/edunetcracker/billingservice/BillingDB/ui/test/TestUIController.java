@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,8 +80,15 @@ public class TestUIController {
     }
 
     @GetMapping("history")
-    public String history(Model model){
-        List<History> historyList = new ArrayList<>(historyRepository.findAll(PageRequest.of(0, 600, Sort.Direction.DESC, "Id")).toSet());
+    public String history(Model model, @RequestParam(value = "page", defaultValue = "0") Integer page){
+        List<History> historyList = new ArrayList<>(historyRepository.findAll(PageRequest.of(page, 600)).toSet());
+        model.addAttribute("history", historyList);
+        return "ui/test/history";
+    }
+
+    @GetMapping("historyDesc")
+    public String history2(Model model, @RequestParam(value = "page", defaultValue = "0") Integer page){
+        List<History> historyList = new ArrayList<>(historyRepository.findAll(PageRequest.of(page, 600, Sort.Direction.DESC, "id")).toSet());
         model.addAttribute("history", historyList);
         return "ui/test/history";
     }

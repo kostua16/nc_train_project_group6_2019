@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -29,8 +30,8 @@ public class HistoryController {
     }
 
     @GetMapping("getHistory")
-    public ResponseEntity<List<History>> getHistory() {
-        List<History> histories = new ArrayList<>(historyRepository.findAll(PageRequest.of(0, 100)).toSet());
+    public ResponseEntity<List<History>> getHistory(@RequestParam(value = "page", defaultValue = "0") Integer page) {
+        List<History> histories = new ArrayList<>(historyRepository.findAll(PageRequest.of(page, 100)).toSet());
         return new ResponseEntity<>(histories, HttpStatus.OK);
         //return new ResponseEntity<>(null, HttpStatus.OK);
     }

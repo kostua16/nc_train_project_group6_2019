@@ -1,7 +1,6 @@
 package com.edunetcracker.billingservice.BillingDB.entity;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "test_history")
@@ -10,7 +9,7 @@ public class History {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "history_generator")
-    private Long Id;
+    private Long id;
 
     private String date;
 
@@ -30,11 +29,11 @@ public class History {
     /**************************************/
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getDate() {
@@ -64,7 +63,7 @@ public class History {
     @Override
     public String toString() {
         return "History{" +
-                "Id=" + Id +
+                "Id=" + id +
                 ", date='" + date + '\'' +
                 ", type='" + type + '\'' +
                 ", body='" + body + '\'' +

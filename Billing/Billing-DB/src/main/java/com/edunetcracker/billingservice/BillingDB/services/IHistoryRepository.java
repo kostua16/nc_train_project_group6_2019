@@ -14,5 +14,4 @@ import java.util.List;
 
 @Repository
 public interface IHistoryRepository extends JpaRepository<History, Long> {
-    Page<History> findAllOrderByIdDesc(Pageable page);
 }
