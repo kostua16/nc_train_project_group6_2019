@@ -381,7 +381,7 @@ public class CRM {
     @GetMapping("showHistory")
     public List<History> showHistory(){
         String url = helpers.getUrlBilling() + "/getAllHistory";
-        List<History> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
+        List<History> response = (List<History>) new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
         return response;
     }
 

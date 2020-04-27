@@ -5,7 +5,6 @@ import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.*;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
-import com.edunetcracker.billingservice.ProxyProxy.web.CRM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -47,10 +45,20 @@ public class Imitator {
 
     Logger LOG = LoggerFactory.getLogger(Imitator.class);
 
+    private boolean started = false;
 
-    @Scheduled(cron = "* */1 * * * *")
-    public void generateUsers() throws JsonProcessingException {
+    public boolean isStarted() {
+        return started;
+    }
 
+    public void start(){
+        started = true;
+    }
+    public void stop(){
+        started = false;
+    }
+
+    public void manuallyGenerateUsers() throws JsonProcessingException {
         final ThreadLocalRandom currentRandom = ThreadLocalRandom.current();
         int maxToCreate = currentRandom.nextInt(0, 3);
         int prefix = currentRandom.nextInt(1000, 8999);
@@ -61,13 +69,13 @@ public class Imitator {
             final String login = "user" + accUid + "@mail.ru";
             if (!checks.isAccountExistsByPhone(phoneNum) && !checks.isAccountExists(login)) {
                 final List<Tariff> tariffs = tariffController.getAllTariff().getBody();
-                if(tariffs!=null && !tariffs.isEmpty()){
+                if (tariffs != null && !tariffs.isEmpty()) {
                     final Tariff currentTariff = tariffs.get(currentRandom.nextInt(0, tariffs.size() + 1));
-                    if(currentTariff!=null){
+                    if (currentTariff != null) {
                         final CollectedTariff collectedTariff = tariffController.getCollectedTariffByName(currentTariff.getName()).getBody();
 
 
-                        if(collectedTariff!=null){
+                        if (collectedTariff != null) {
 
                             final TariffCall tariffCall = collectedTariff.getTariffCall();
                             final TariffSms tariffSms = collectedTariff.getTariffSms();
@@ -113,19 +121,12 @@ public class Imitator {
                         }
 
                     }
-
                 }
-
-
             }
-
         }
     }
 
-
-    @Scheduled(cron = "* */1 * * * *")
-    public void madeCalls() {
-
+    public void manuallyMadeCalls() {
         int maxToRun = ThreadLocalRandom.current().nextInt(0, 15);
         int maxToIterate = ThreadLocalRandom.current().nextInt(0, 25);
         for (int i = 0; i < maxToRun; i++) {
@@ -134,20 +135,38 @@ public class Imitator {
                 int accUid = (prefix + j);
                 String phoneNum = "8801555" + accUid;
                 final ResponseEntity<Account> accountByTelephone = accountController.getAccountByTelephone(phoneNum);
-                if(HttpStatus.OK.equals(accountByTelephone.getStatusCode())){
+                if (HttpStatus.OK.equals(accountByTelephone.getStatusCode())) {
                     Account accountFrom = accountByTelephone.getBody();
                     final String login = accountFrom.getLogin();
-                    switch (ThreadLocalRandom.current().nextInt(1, 4)){
-                        case 1: callController.callToMinutes(login, ThreadLocalRandom.current().nextInt(1, 3)); break;
-                        case 2: smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3)); break;
-                        case 3: internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000)); break;
+                    switch (ThreadLocalRandom.current().nextInt(1, 4)) {
+                        case 1:
+                            callController.callToMinutes(login, ThreadLocalRandom.current().nextInt(1, 3));
+                            break;
+                        case 2:
+                            smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3));
+                            break;
+                        case 3:
+                            internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000));
+                            break;
                     }
                 }
             }
-
         }
+    }
 
 
+    @Scheduled(cron = "* */1 * * * *")
+    public void generateUsers() throws JsonProcessingException {
+        if (started) {
+            manuallyGenerateUsers();
+        }
+    }
 
+
+    @Scheduled(cron = "* */1 * * * *")
+    public void madeCalls() {
+        if (started) {
+            manuallyMadeCalls();
+        }
     }
 }

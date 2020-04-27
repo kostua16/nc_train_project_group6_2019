@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Users list</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div>
+    <table  border="1px">
+        <tr>
+            <th>Name</th>
+            <th>Login</th>
+            <th>Pass</th>
+            <th>Rang</th>
+            <th>Price Plan</th>
+            <th>Phone number</th>
+            <th>Money Balance</th>
+            <th>Calls Balance</th>
+            <th>Sms Balance</th>
+            <th>Internet Balance</th>
+        </tr>
+        <tr th:each="b : ${balances}">
+            <td th:text="${b.getAccount().getName()}"></td>
+            <td th:text="${b.getAccount().getLogin()}"></td>
+            <td th:text="${b.getAccount().getPassword()}"></td>
+            <td th:text="${b.getAccount().getRang()}"></td>
+            <td th:text="${b.getAccount().getTariff()}"></td>
+            <td th:text="${b.getAccount().getTelephone()}"></td>
+            <td th:text="${b.getAccount().getBalance()}"></td>
+            <td th:text="${b.getCallBalance().getCall_balance()}"></td>
+            <td th:text="${b.getSmsBalance().getSms_balance()}"></td>
+            <td th:text="${b.getInternetBalance().getInternet_balance()}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

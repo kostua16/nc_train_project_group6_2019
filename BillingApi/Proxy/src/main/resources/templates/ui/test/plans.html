@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Price plans list</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div>
+
+    <table border="1px">
+        <tr>
+            <th>Name</th>
+            <th>Call included-ammount</th>
+            <th>Call cost(Included)</th>
+            <th>Call cost(Exluded)</th>
+            <th>SMS included-ammount</th>
+            <th>SMS cost(Included)</th>
+            <th>SMS cost(Exluded)</th>
+            <th>Kilobytes included-ammount</th>
+            <th>Kilobytes cost(Included)</th>
+            <th>Kilobytes cost(Exluded)</th>
+        </tr>
+        <tr th:each="plan : ${plans}">
+            <td th:text="${plan.getName()}"></td>
+            <td th:text="${plan.getTariffCall().getCall_balance()}"></td>
+            <td th:text="${plan.getTariffCall().getCall_cost()}"></td>
+            <td th:text="${plan.getTariffCall().getDefault_call_cost()}"></td>
+
+            <td th:text="${plan.getTariffSms().getSms_balance()}"></td>
+            <td th:text="${plan.getTariffSms().getSms_cost()}"></td>
+            <td th:text="${plan.getTariffSms().getDefault_sms_cost()}"></td>
+
+            <td th:text="${plan.getTariffInternet().getInternet_balance()}"></td>
+            <td th:text="${plan.getTariffInternet().getInternet_cost()}"></td>
+            <td th:text="${plan.getTariffInternet().getDefault_internet_cost()}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
