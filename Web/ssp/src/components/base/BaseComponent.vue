@@ -12,10 +12,13 @@
         haveLastPage: state => state.LAST_PATH != null
       })
     },
-    beforeCreate: async () => {
+    beforeMount: async () => {
       await this.$store.dispatch("WAIT_INITIALIZATION");
     },
     methods: {
+      async waitInitialization() {
+        await this.$store.dispatch("WAIT_INITIALIZATION");
+      },
       goToLastPage() {
         if(this.currentPage!==this.lastPage){
           this.goTo(this.lastPage);
