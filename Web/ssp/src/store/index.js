@@ -8,6 +8,7 @@ export default new Vuex.Store({
     INITIALIZATION_COMPLETED: false,
     INITIALIZATION_IN_PROGRESS: false,
     CURRENT_USER: null,
+    ACTIONS_HISTORY: [],
     STUB_MODE: false,
     STUB_USERS: [
       {
@@ -77,6 +78,9 @@ export default new Vuex.Store({
     },
     SET_CURRENT_USER: (state, payload) => {
       Vue.set(state, 'CURRENT_USER', payload);
+    },
+    SET_ACTIONS_HISTORY: (state, payload) => {
+      Vue.set(state, 'ACTIONS_HISTORY', payload);
     },
     SET_LAST_PATH: (state, payload) => {
       Vue.set(state, 'LAST_PATH', payload);
@@ -216,7 +220,6 @@ export default new Vuex.Store({
           throw new Error("User not found by token:"+ currentToken)
         }
         userDetails.availableTariffs = context.state.STUB_PRICE_PLANS;
-        userDetails.history = [];
       } else {
         const userResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/home/?token=${currentToken}`);
         userDetails = userResponse.data;
@@ -235,17 +238,31 @@ export default new Vuex.Store({
           userDetails.availableTariffs = userTariffsResponse.data.tariffs;
         }
 
-        try{
-          const historyResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/showHistory/?token=${currentToken}`);
-          userDetails.history = historyResponse.data;
-        } catch (e) {
-          userDetails.history = [];
-        }
-
       }
 
       return userDetails;
 
+    },
+    LOAD_HISTORY: async (context) => {
+      if(context.state.STUB_MODE) {
+        await context.commit("SET_ACTIONS_HISTORY", []);
+      } else {
+        try{
+          if(context.state.TOKEN!=null){
+            const historyResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/showHistory/?token=${context.state.TOKEN}`);
+            if(historyResponse==null || historyResponse.data==null){
+              await context.commit("SET_ACTIONS_HISTORY", []);
+            } else {
+              await context.commit("SET_ACTIONS_HISTORY", historyResponse.data);
+            }
+          } else {
+            await context.commit("SET_ACTIONS_HISTORY", []);
+          }
+
+        } catch (e) {
+          await context.commit("SET_ACTIONS_HISTORY", []);
+        }
+      }
     },
     LOGOUT: async (context) => {
       await context.commit('SET_TOKEN', null);

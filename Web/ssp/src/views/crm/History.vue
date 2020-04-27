@@ -31,8 +31,11 @@
       data: () => ({
         loginRoute: '/crm/login',
       }),
+      mounted() {
+        this.$store.dispatch("LOAD_HISTORY");
+      },
       computed: mapState({
-        histories: state => state.CURRENT_USER!=null ? state.CURRENT_USER.history : []
+        histories: state => state.ACTIONS_HISTORY
       }),
     }
 </script>
