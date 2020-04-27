@@ -2,7 +2,6 @@
   <div class="row">
     <form class="col s12">
       <div class="row">
-
         <div class="input-field col s6">
           <i class="material-icons prefix">phone_forwarded</i>
           <input id="icon_telephone" type="tel" v-model.trim="telephoneFrom" class="validate">
@@ -13,7 +12,24 @@
           <input id="icon_telephone2" type="tel" v-model.trim="telephoneTo" class="validate">
           <label for="icon_telephone2">In the Phone</label>
         </div>
-
+      </div>
+      <div class="row">
+        <div class="input-field col s3">
+          <a class="waves-effect waves-light btn" @click.prevent="startImitator" :disabled="imitationState || imitatorCalled">
+            <i class="material-icons right">send</i>Включить имитацию</a>
+        </div>
+        <div class="input-field col s3">
+          <a class="waves-effect waves-light btn" @click.prevent="stopImitator" :disabled="!imitationState || imitatorCalled">
+            <i class="material-icons right">send</i>Выключить имитацию</a>
+        </div>
+        <div class="input-field col s3">
+          <a class="waves-effect waves-light btn" @click.prevent="runImReg" :disabled="imitatorCalled">
+            <i class="material-icons right">send</i>Имитация регистрации</a>
+        </div>
+        <div class="input-field col s3">
+          <a class="waves-effect waves-light btn" @click.prevent="runImUsage" :disabled="imitatorCalled">
+            <i class="material-icons right">send</i>Имитация пользования системой</a>
+        </div>
       </div>
     </form>
 
@@ -60,8 +76,12 @@
       actionDuration: 0,
       actionState:0,
       typeModal: 'call',
+      imitatorCalled: false
     }),
     computed: {
+      imitationState() {
+        return this.$store.state.IMITATOR_STATE;
+      },
       modalMessage() {
         switch (this.actionState) {
           case actionNotStarted:
@@ -99,6 +119,26 @@
     mounted() {
     },
     methods: {
+      async startImitator() {
+        this.imitatorCalled = true;
+        await this.$store.dispatch("START_IMITATOR");
+        this.imitatorCalled = false;
+      },
+      async stopImitator() {
+        this.imitatorCalled = true;
+        await this.$store.dispatch("STOP_IMITATOR");
+        this.imitatorCalled = false;
+      },
+      async runImReg() {
+        this.imitatorCalled = true;
+        await this.$store.dispatch("RUN_REGISTRATION_IMITATION");
+        this.imitatorCalled = false;
+      },
+      async runImUsage() {
+        this.imitatorCalled = true;
+        await this.$store.dispatch("RUN_USAGE_IMITATION");
+        this.imitatorCalled = false;
+      },
       startModal(type) {
         this.typeModal=type;
         this.actionDuration = 0;

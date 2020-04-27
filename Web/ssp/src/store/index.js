@@ -9,6 +9,7 @@ export default new Vuex.Store({
     INITIALIZATION_IN_PROGRESS: false,
     CURRENT_USER: null,
     ACTIONS_HISTORY: [],
+    IMITATOR_STATE: false,
     STUB_MODE: false,
     STUB_USERS: [
       {
@@ -67,6 +68,9 @@ export default new Vuex.Store({
     ]
   },
   mutations: {
+    SET_IMITATOR_STATE: (state, payload) => {
+      Vue.set(state, 'IMITATOR_STATE', payload);
+    },
     SET_STUB_MODE: (state, payload) => {
       Vue.set(state, 'STUB_MODE', payload);
     },
@@ -129,6 +133,66 @@ export default new Vuex.Store({
     SLEEP: (context, ms) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
+    SYNC_IMITATOR: async (context) => {
+      if(context.state.STUB_MODE){
+        await context.commit("SET_IMITATOR_STATE", false);
+      } else {
+        try {
+          const stateResponse = await Vue.axios.get(`${context.state.PROXY_URL}/imitator`);
+          await context.commit("SET_IMITATOR_STATE", stateResponse.data);
+        } catch (e) {
+          await context.commit("SET_IMITATOR_STATE", false);
+        }
+      }
+    },
+    START_IMITATOR: async (context) => {
+      if(!context.state.STUB_MODE){
+        try {
+          await Vue.axios.get(`${context.state.PROXY_URL}/imitator/start`);
+          console.log(`START_IMITATOR.Done()`);
+        } catch (e) {
+          console.log(`START_IMITATOR.Fail(${e})`);
+          throw new Error(`START_IMITATOR.Fail(${e})`);
+        }
+      }
+      await context.dispatch("SYNC_IMITATOR");
+    },
+    STOP_IMITATOR: async (context) => {
+      if(!context.state.STUB_MODE){
+        try {
+          await Vue.axios.get(`${context.state.PROXY_URL}/imitator/stop`);
+          console.log(`STOP_IMITATOR.Done()`);
+        } catch (e) {
+          console.log(`STOP_IMITATOR.Fail(${e})`);
+          throw new Error(`STOP_IMITATOR.Fail(${e})`);
+        }
+      }
+      await context.dispatch("SYNC_IMITATOR");
+    },
+    RUN_REGISTRATION_IMITATION: async (context) => {
+      if(!context.state.STUB_MODE){
+        try {
+          await Vue.axios.get(`${context.state.PROXY_URL}/imitator/oneGeneration`);
+          console.log(`RUN_REGISTRATION_IMITATION.Done()`);
+        } catch (e) {
+          console.log(`RUN_REGISTRATION_IMITATION.Fail(${e})`);
+          throw new Error(`RUN_REGISTRATION_IMITATION.Fail(${e})`);
+        }
+      }
+      await context.dispatch("SYNC_IMITATOR");
+    },
+    RUN_USAGE_IMITATION: async (context) => {
+      if(!context.state.STUB_MODE){
+        try {
+          await Vue.axios.get(`${context.state.PROXY_URL}/imitator/oneUsage`);
+          console.log(`RUN_USAGE_IMITATION.Done()`);
+        } catch (e) {
+          console.log(`RUN_USAGE_IMITATION.Fail(${e})`);
+          throw new Error(`RUN_USAGE_IMITATION.Fail(${e})`);
+        }
+      }
+      await context.dispatch("SYNC_IMITATOR");
+    },
     INITIALIZE: async (context) => {
       try {
         context.commit("SET_INITIALIZATION_IN_PROGRESS", true);
@@ -147,6 +211,7 @@ export default new Vuex.Store({
           await context.commit('SET_DEFAULT_USER_PASS', 'stub123');
         }
         await context.dispatch("SYNC_CURRENT_USER");
+        await context.dispatch("SYNC_IMITATOR");
         context.commit("SET_INITIALIZATION_IN_PROGRESS", false);
         context.commit("SET_INITIALIZATION_COMPLETED", true);
       } catch (e) {
