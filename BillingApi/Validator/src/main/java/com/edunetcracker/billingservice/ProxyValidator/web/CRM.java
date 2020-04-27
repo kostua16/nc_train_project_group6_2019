@@ -59,7 +59,7 @@ public class CRM {
                 return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
             String rang = helpers.getAccount(login).getRang();
-            if (checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+            if (checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
                 String url = helpers.getUrlProxy() + "/createA";
                 Boolean response = new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(newAccount, new HttpHeaders()), Boolean.class).getBody();
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -86,7 +86,7 @@ public class CRM {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/createT";
             Boolean response = new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(requestB, new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -106,7 +106,7 @@ public class CRM {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(Mylogin).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/deleteA/?login=" + login;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.DELETE,  new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -127,7 +127,7 @@ public class CRM {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }*/
         String rang = helpers.getAccount(Mylogin).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/deleteT/?name=" + name;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.DELETE,  new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -152,7 +152,7 @@ public class CRM {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(Mylogin).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/changeA";
             Boolean response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity<>(map, new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -169,7 +169,7 @@ public class CRM {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(Mylogin).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/changeT/?login=" + login + "&tariff=" + tariff;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -183,7 +183,7 @@ public class CRM {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/showA";
             Map<String, Object> response = new RestTemplate().exchange(url, HttpMethod.POST,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -198,10 +198,25 @@ public class CRM {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(Mylogin).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/getA/?login=" + login;
             Map<String, String> response = new RestTemplate().exchange(url, HttpMethod.GET,  new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("searchA")
+    public ResponseEntity<List<Account>> searchA(@RequestParam("query") String query,
+                                                    @RequestParam("token") String token){
+        String Mylogin = checks.getLoginByTokenAndCheck(token);
+        if(Mylogin == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        String rang = helpers.getAccount(Mylogin).getRang();
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
+            List<Account> accounts = helpers.searchAccounts(query);
+            return new ResponseEntity<>(accounts, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
@@ -213,7 +228,7 @@ public class CRM {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/showT";
             List<Map> response = new RestTemplate().exchange(url, HttpMethod.GET,  new HttpEntity(new HttpHeaders()), new ParameterizedTypeReference<List<Map>>() {}).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -227,7 +242,7 @@ public class CRM {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.ADMINISTRATOR)) {
+        if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/showHistory";
             List<History> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);

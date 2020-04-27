@@ -1,6 +1,43 @@
 <template>
-  <div class="row">
 
+  <div class="row col s12">
+    <div class="row col s12">
+      <form class="col s6" @submit.prevent="search">
+        <div class="input-field col s10">
+          <input id="query" type="text" v-model.trim="searchQuery" class="validate" :disabled="searchCalled">
+          <label for="query">Поиск</label>
+        </div>
+        <div class="input-field col s10">
+          <button class="btn waves-effect waves-light auth-submit" type="submit" :disabled="searchCalled">
+            <i class="material-icons right"/>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="row col s12">
+      <table>
+        <tr>
+          <th>Login</th>
+          <th>ФИО</th>
+          <th>Баланс</th>
+          <th>Тарифный план</th>
+          <th>Номер телефона</th>
+        </tr> <!--ряд с ячейками заголовков-->
+        <tr v-for = "(result) in searchResults">
+          <td>{{result.login}}</td>
+          <td>{{result.name}}</td>
+          <td>{{result.balance}}</td>
+          <td>{{result.tariff}}</td>
+          <td>{{result.telephone}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+
+
+
+  <div class="row">
     <form class="col s6">
       <div class="row">
         <div class="input-field col s12">
@@ -86,9 +123,21 @@ export default {
           tariff: "",
           telephone: "",
           rang: "",
+          searchQuery:"",
+          searchCalled:false
 
     }),
+  computed: {
+    searchResults() {
+      return this.$store.state.LIST_ACCOUNTS;
+    }
+  },
   methods: {//deleteA
+   async search() {
+     this.searchCalled = true;
+     await this.$store.dispatch("SEARCH_ACCOUNTS", this.searchQuery);
+     this.searchCalled = false;
+   } ,
    deleteAk() {
      this.$store.dispatch("DELETE_USER", this.logindelet);
     },

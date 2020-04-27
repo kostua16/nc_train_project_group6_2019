@@ -11,6 +11,7 @@ export default new Vuex.Store({
     ACTIONS_HISTORY: [],
     IMITATOR_STATE: false,
     STUB_MODE: false,
+    LIST_ACCOUNTS: [],
     STUB_USERS: [
       {
         name: "stub@stub.com",
@@ -70,6 +71,9 @@ export default new Vuex.Store({
   mutations: {
     SET_IMITATOR_STATE: (state, payload) => {
       Vue.set(state, 'IMITATOR_STATE', payload);
+    },
+    SET_ACCOUNTS: (state, payload) => {
+      Vue.set(state, 'LIST_ACCOUNTS', payload);
     },
     SET_STUB_MODE: (state, payload) => {
       Vue.set(state, 'STUB_MODE', payload);
@@ -142,6 +146,18 @@ export default new Vuex.Store({
           await context.commit("SET_IMITATOR_STATE", stateResponse.data);
         } catch (e) {
           await context.commit("SET_IMITATOR_STATE", false);
+        }
+      }
+    },
+    SEARCH_ACCOUNTS: async (context, query) => {
+      if(!context.state.STUB_MODE){
+        try {
+          const searchResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/searchA/?query=${query}&token=${context.state.TOKEN}`);
+          await context.commit("SET_ACCOUNTS", searchResponse.data);
+          console.log(`SEARCH_ACCOUNTS.Done(${query}, ${searchResponse.data})`);
+        } catch (e) {
+          console.log(`SEARCH_ACCOUNTS.Fail(${e})`);
+          throw new Error(`SEARCH_ACCOUNTS.Fail(${e})`);
         }
       }
     },

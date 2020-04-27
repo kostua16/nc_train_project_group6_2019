@@ -260,6 +260,10 @@ public class CRM {
         return false;
     }
 
+    @DeleteMapping("searchA")
+    public List<Account> searchA(@RequestParam("query") String query) throws JsonProcessingException {
+        return accountController.searchAccounts(query).getBody();
+    }
     //
     @DeleteMapping("deleteA")
     public Boolean deleteA(@RequestParam("login") String login) throws JsonProcessingException {

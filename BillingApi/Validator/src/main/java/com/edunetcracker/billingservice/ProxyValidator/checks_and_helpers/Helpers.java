@@ -8,6 +8,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Service
 public class Helpers {
 
@@ -34,5 +36,10 @@ public class Helpers {
         String url = getUrlBilling() + "/getAccountByLogin/?login=" + accountLogin;
         Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
         return account;
+    }
+
+    public List<Account> searchAccounts(String query){
+        String url = getUrlBilling() + "/searchAccounts/?query=" + query;
+        return  (List<Account>) new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
     }
 }

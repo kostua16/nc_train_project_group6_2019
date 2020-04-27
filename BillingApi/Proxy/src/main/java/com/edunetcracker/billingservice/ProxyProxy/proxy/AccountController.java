@@ -56,6 +56,16 @@ public class AccountController {
             return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
         }
     }
+    public ResponseEntity<List<Account>> searchAccounts(String query ) {
+        try {
+            String url = helpers.getUrlBilling() + "/searchAccounts/?query=" + query;
+            final List<Account> accounts = (List<Account>) new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
+            return new ResponseEntity<>( accounts, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
+        }
+    }
     public ResponseEntity<Account> getAccountByTelephone(String telephone) {
         try {
             LOG.info("getAccountByTelephone");

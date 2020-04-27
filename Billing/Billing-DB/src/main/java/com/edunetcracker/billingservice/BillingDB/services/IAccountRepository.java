@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 
 @Service
@@ -19,6 +20,10 @@ public interface IAccountRepository extends JpaRepository<Account, Long> {
     Account findAccountByLogin(String login);
     Account findAccountByTelephone(String telephone);
     //Account findAccountByTelephone(String telephone);
+
+    List<Account> findAccountsByLoginContains(String login);
+    List<Account> findAccountsByTelephoneContains(String telephone);
+    List<Account> findAccountsByNameContains(String name);
 
     @Transactional
     @Async

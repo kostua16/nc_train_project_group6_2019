@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,10 +34,35 @@ public class AccountController {
     }
     @GetMapping("getAccountByTelephone")
     public ResponseEntity<Account> getAccountByTelephone(@RequestParam("telephone") String telephone) {
-        LOG.info("getAccountByTelephone1");
+        LOG.info("getAccountByTelephone1 {}", telephone);
         Account account = AccountRepository.findAccountByTelephone(telephone);
-        LOG.info("getAccountByTelephone2");
+        LOG.info("getAccountByTelephone2 {}", account);
         return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+
+    @GetMapping("findAccountsByLogin")
+    public ResponseEntity<List<Account>> findAccountsByLogin(@RequestParam("login") String login) {
+
+        List<Account> accounts = AccountRepository.findAccountsByLoginContains(login);
+        return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
+    }
+    @GetMapping("findAccountsByTelephone")
+    public ResponseEntity<List<Account>> findAccountsByTelephone(@RequestParam("telephone") String telephone) {
+        LOG.info("findAccountsByTelephone {}", telephone);
+        List<Account> accounts = AccountRepository.findAccountsByTelephoneContains(telephone);
+        LOG.info("findAccountsByTelephone {}", accounts);
+        return new ResponseEntity<>(accounts, HttpStatus.OK);
+    }
+
+    @GetMapping("searchAccounts")
+    public ResponseEntity<List<Account>> searchAccounts(@RequestParam("query") String query) {
+        LOG.info("searchAccounts {}", query);
+        List<Account> result = new ArrayList<>();
+        result.addAll(AccountRepository.findAccountsByLoginContains(query));
+        result.addAll(AccountRepository.findAccountsByNameContains(query));
+        result.addAll(AccountRepository.findAccountsByTelephoneContains(query));
+        LOG.info("searchAccounts {}", result);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("getAllAccount")
