@@ -61,23 +61,24 @@ public class RabbitMQListener {
 
                 /** Account */
                 case CREATE_ACCOUNT: {  //message = Account
-                    LOG.info("CREATE_ACCOUNT");
+
                     Account account = objectMapper.readValue(message.getBody(), Account.class);
+                    LOG.info("CREATE_ACCOUNT {}", account);
                     LOG.info(account.getLogin() + "  " + account.getBalance());
                     AccountRepository.save(account);
                     addToHistory(CREATE_ACCOUNT, objectMapper.writeValueAsString(account));
                     break;
                 }
                 case DELETE_ACCOUNT: {  //message = String
-                    LOG.info("DELETE_ACCOUNT");
                     String accountLogin = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_ACCOUNT {}", accountLogin);
                     AccountRepository.deleteByLogin(accountLogin);
                     addToHistory(DELETE_ACCOUNT, objectMapper.writeValueAsString(accountLogin));
                     break;
                 }
                 case UPDATE_ACCOUNT: {  //message = Account
-                    LOG.info("UPDATE_ACCOUNT");
                     Account account = objectMapper.readValue(message.getBody(), Account.class);
+                    LOG.info("UPDATE_ACCOUNT {}", account);
                     AccountRepository.updateAccount(account);
                     addToHistory(UPDATE_ACCOUNT, objectMapper.writeValueAsString(account));
                     break;
@@ -85,8 +86,8 @@ public class RabbitMQListener {
                 /** Balance */
 
                 case ADD_BALANCE: { //message = Account
-                    LOG.info("ADD_BALANCE");
                     Account account = objectMapper.readValue(message.getBody(), Account.class);
+                    LOG.info("ADD_BALANCE {}", account);
                     Account realAccount = AccountRepository.findAccountByLogin(account.getLogin());
                     account.setBalance(account.getBalance() + realAccount.getBalance());
                     AccountRepository.addAccountBalance(account);
@@ -96,29 +97,29 @@ public class RabbitMQListener {
                 /** Call */
 
                 case CREATE_CALL: { //message = Call
-                    LOG.info("CREATE_CALL");
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
+                    LOG.info("CREATE_CALL {}", call);
                     CallRepository.save(call);
                     addToHistory(CREATE_CALL, objectMapper.writeValueAsString(call));
                     break;
                 }
                 case DELETE_CALL: { //message = String
-                    LOG.info("DELETE_CALL");
                     String login = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_CALL {}", login);
                     CallRepository.deleteByLogin(login);
                     addToHistory(DELETE_CALL, objectMapper.writeValueAsString(login));
                     break;
                 }
                 case UPDATE_CALL: { //message = Call
-                    LOG.info("UPDATE_CALL");
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
+                    LOG.info("UPDATE_CALL {}", call);
                     CallRepository.updateCall(call);
                     addToHistory(UPDATE_CALL, objectMapper.writeValueAsString(call));
                     break;
                 }
                 case CALL_ONE_MINUTE: { //message = Call
-                    LOG.info("CALL_ONE_SECOND");
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
+                    LOG.info("CALL_ONE_SECOND {}", call);
                     Call realCall = CallRepository.findCallByLogin(call.getLogin());
                     realCall.setCall_balance(realCall.getCall_balance() - call.getCall_balance());
                     CallRepository.updateCall(realCall);
@@ -126,8 +127,8 @@ public class RabbitMQListener {
                     break;
                 }
                 case CALL_ONE_SECOND: { //message = Call
-                    LOG.info("CALL_ONE_SECOND");
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
+                    LOG.info("CALL_ONE_SECOND {}", call);
                     Call realCall = CallRepository.findCallByLogin(call.getLogin());
                     realCall.setCall_balance(realCall.getCall_balance() - call.getCall_balance());
                     CallRepository.updateCall(realCall);
@@ -143,29 +144,29 @@ public class RabbitMQListener {
                 /** Internet */
 
                 case CREATE_INTERNET: { //message = Internet
-                    LOG.info("CREATE_INTERNET");
                     Internet internet = objectMapper.readValue(message.getBody(), Internet.class);
+                    LOG.info("CREATE_INTERNET {}", internet);
                     InternetRepository.save(internet);
                     addToHistory(CREATE_INTERNET, objectMapper.writeValueAsString(internet));
                     break;
                 }
                 case DELETE_INTERNET: { //message = String
-                    LOG.info("DELETE_INTERNET");
                     String login = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_INTERNET {}", login);
                     InternetRepository.deleteByLogin(login);
                     addToHistory(DELETE_INTERNET, objectMapper.writeValueAsString(login));
                     break;
                 }
                 case UPDATE_INTERNET: { //message = Call
-                    LOG.info("UPDATE_INTERNET");
                     Internet internet = objectMapper.readValue(message.getBody(), Internet.class);
+                    LOG.info("UPDATE_INTERNET {}", internet);
                     InternetRepository.updateInternet(internet);
                     addToHistory(UPDATE_INTERNET, objectMapper.writeValueAsString(internet));
                     break;
                 }
                 case INTERNET_USE_KILOBYTE: { //message = Call
-                    LOG.info("INTERNET_USE_KILOBYTE");
                     Internet internet = objectMapper.readValue(message.getBody(), Internet.class);
+                    LOG.info("INTERNET_USE_KILOBYTE {}", internet);
                     Internet realInternet = InternetRepository.findInternetByLogin(internet.getLogin());
                     realInternet.setInternet_balance(realInternet.getInternet_balance() - internet.getInternet_balance());
                     InternetRepository.updateInternet(realInternet);
@@ -175,30 +176,30 @@ public class RabbitMQListener {
                 /** Sms */
 
                 case CREATE_SMS: {
-                    LOG.info("CREATE_SMS");
                     Sms sms = objectMapper.readValue(message.getBody(), Sms.class);
+                    LOG.info("CREATE_SMS {}", sms);
                     SmsRepository.save(sms);
                     addToHistory(CREATE_SMS, objectMapper.writeValueAsString(sms));
                     break;
                 }
                 case DELETE_SMS: {
-                    LOG.info("DELETE_SMS");
                     String login = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_SMS {}", login);
                     SmsRepository.deleteByLogin(login);
                     addToHistory(DELETE_SMS, objectMapper.writeValueAsString(login));
                     break;
                 }
                 case UPDATE_SMS: {
-                    LOG.info("UPDATE_SMS");
                     Sms sms = objectMapper.readValue(message.getBody(), Sms.class);
+                    LOG.info("UPDATE_SMS {}", sms);
                     SmsRepository.updateSms(sms);
                     addToHistory(UPDATE_SMS, objectMapper.writeValueAsString(sms));
                     break;
                 }
 
                 case REQUEST_SMS: {
-                    LOG.info("REQUEST_SMS");
                     Sms sms = objectMapper.readValue(message.getBody(), Sms.class);
+                    LOG.info("REQUEST_SMS {}", sms);
                     Sms realSms = SmsRepository.findSmsByLogin(sms.getLogin());
                     realSms.setSms_balance(realSms.getSms_balance() - sms.getSms_balance());
                     SmsRepository.updateSms(realSms);
@@ -207,81 +208,81 @@ public class RabbitMQListener {
                 }
                 /** Tariff */
                 case CREATE_TARIFF: {
-                    LOG.info("CREATE_TARIFF");
                     Tariff tariff = objectMapper.readValue(message.getBody(), Tariff.class);
+                    LOG.info("CREATE_TARIFF {}", tariff);
                     TariffRepository.save(tariff);
                     addToHistory(CREATE_TARIFF, objectMapper.writeValueAsString(tariff));
                     break;
                 }
                 case DELETE_TARIFF: {
-                    LOG.info("DELETE_TARIFF");
                     String login = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_TARIFF {}", login);
                     TariffRepository.deleteTariffByName(login);
                     addToHistory(DELETE_TARIFF, objectMapper.writeValueAsString(login));
                     break;
                 }
                 /** Tariff Call */
                 case CREATE_TARIFF_CALL: {  //message = Account
-                    LOG.info("CREATE_TARIFF_CALL");
                     TariffCall t = objectMapper.readValue(message.getBody(), TariffCall.class);
+                    LOG.info("CREATE_TARIFF_CALL {}", t);
                     TariffCallRepository.save(t);
                     addToHistory(CREATE_TARIFF_CALL, objectMapper.writeValueAsString(t));
                     break;
                 }
                 case DELETE_TARIFF_CALL: {  //message = String
-                    LOG.info("DELETE_TARIFF_CALL");
                     String name = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_TARIFF_CALL {}", name);
                     TariffCallRepository.deleteByName(name);
                     addToHistory(DELETE_TARIFF_CALL, objectMapper.writeValueAsString(name));
                     break;
                 }
                 case UPDATE_TARIFF_CALL: {  //message = Account
-                    LOG.info("UPDATE_TARIFF_CALL");
                     TariffCall t = objectMapper.readValue(message.getBody(), TariffCall.class);
+                    LOG.info("UPDATE_TARIFF_CALL {}", t);
                     TariffCallRepository.updateTariffCall(t);
                     addToHistory(UPDATE_TARIFF_CALL, objectMapper.writeValueAsString(t));
                     break;
                 }
                 /** Tariff Internet */
                 case CREATE_TARIFF_INTERNET: {  //message = Account
-                    LOG.info("CREATE_TARIFF_INTERNET");
                     TariffInternet t = objectMapper.readValue(message.getBody(), TariffInternet.class);
+                    LOG.info("CREATE_TARIFF_INTERNET {}", t);
                     TariffInternetRepository.save(t);
                     addToHistory(CREATE_TARIFF_INTERNET, objectMapper.writeValueAsString(t));
                     break;
                 }
                 case DELETE_TARIFF_INTERNET: {  //message = String
-                    LOG.info("DELETE_TARIFF_INTERNET");
                     String name = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_TARIFF_INTERNET {}", name);
                     TariffInternetRepository.deleteByName(name);
                     addToHistory(DELETE_TARIFF_INTERNET, objectMapper.writeValueAsString(name));
                     break;
                 }
                 case UPDATE_TARIFF_INTERNET: {  //message = Account
-                    LOG.info("UPDATE_TARIFF_INTERNET");
                     TariffInternet t = objectMapper.readValue(message.getBody(), TariffInternet.class);
+                    LOG.info("UPDATE_TARIFF_INTERNET {}", t);
                     TariffInternetRepository.updateTariffInternet(t);
                     addToHistory(UPDATE_TARIFF_INTERNET, objectMapper.writeValueAsString(t));
                     break;
                 }
                 /** Tariff Call */
                 case CREATE_TARIFF_SMS: {  //message = Account
-                    LOG.info("CREATE_TARIFF_SMS");
                     TariffSms t = objectMapper.readValue(message.getBody(), TariffSms.class);
+                    LOG.info("CREATE_TARIFF_SMS {}", t);
                     TariffSmsRepository.save(t);
                     addToHistory(CREATE_TARIFF_SMS, objectMapper.writeValueAsString(t));
                     break;
                 }
                 case DELETE_TARIFF_SMS: {  //message = String
-                    LOG.info("DELETE_TARIFF_SMS");
                     String name = objectMapper.readValue(message.getBody(), String.class);
+                    LOG.info("DELETE_TARIFF_SMS {}", name);
                     TariffSmsRepository.deleteByName(name);
                     addToHistory(DELETE_TARIFF_SMS, objectMapper.writeValueAsString(name));
                     break;
                 }
                 case UPDATE_TARIFF_SMS: {  //message = Account
-                    LOG.info("UPDATE_TARIFF_SMS");
                     TariffSms t = objectMapper.readValue(message.getBody(), TariffSms.class);
+                    LOG.info("UPDATE_TARIFF_SMS {}", t);
                     TariffSmsRepository.updateTariffSms(t);
                     addToHistory(UPDATE_TARIFF_SMS, objectMapper.writeValueAsString(t));
                     break;
