@@ -68,10 +68,18 @@ public class SSP {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
+        if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
             String url = helpers.getUrlProxy() + "/topup/?login=" + login + "&amount=" + amount;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            if(response!=null){
+                if(response){
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+                }
+            }
+
+
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 

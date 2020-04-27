@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Price plans list</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div>
+
+    <table border="1px">
+        <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>History record</th>
+        </tr>
+        <tr th:each="h : ${history}">
+            <td th:text="${h.getId()}"></td>
+            <td th:text="${h.getDate()}"></td>
+            <td th:text="${h.getType()}"></td>
+            <td th:text="${h.getBody()}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

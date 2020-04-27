@@ -1,6 +1,7 @@
 package com.edunetcracker.billingservice.BillingDB.ui.test;
 
 import com.edunetcracker.billingservice.BillingDB.entity.Account;
+import com.edunetcracker.billingservice.BillingDB.entity.History;
 import com.edunetcracker.billingservice.BillingDB.entity.Tariff;
 import com.edunetcracker.billingservice.BillingDB.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class TestUIController {
     @Autowired
     private IInternetRepository internetRepository;
 
+    @Autowired
+    private IHistoryRepository historyRepository;
+
     @GetMapping("users")
     public String users(Model model){
         List<Account> allAccounts = accountRepository.findAll();
@@ -70,5 +74,12 @@ public class TestUIController {
         }
         model.addAttribute("plans", plans);
         return "ui/test/plans";
+    }
+
+    @GetMapping("history")
+    public String history(Model model){
+        final List<History> historyList = historyRepository.getAll();
+        model.addAttribute("history", historyList);
+        return "ui/test/history";
     }
 }

@@ -8,6 +8,8 @@ import com.edunetcracker.billingservice.ProxyProxy.proxy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -80,9 +82,12 @@ public class SSP {
     @GetMapping("topup")
     public Boolean topup (@RequestParam("login") String login,
                           @RequestParam("amount") Long amount ) {
-        Account account = accountController.getAccount(login).getBody();
-        if (amount > 0L && balanceController.addToBalance(login, amount).getBody())
-            return true;
+        final ResponseEntity<Account> accountResponce = accountController.getAccount(login);
+        if(HttpStatus.OK.equals(accountResponce.getStatusCode())){
+            Account account = accountResponce.getBody();
+            return amount > 0L && balanceController.addToBalance(account.getLogin(), amount).getBody();
+        }
+
         return false;
     }
     //  http://localhost:8102/showtariff/?login=tester@mail.ru

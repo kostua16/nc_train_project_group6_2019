@@ -68,11 +68,10 @@ public class BalanceController {
                 rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                 return new ResponseEntity<>(true, HttpStatus.OK);
             }
-            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
 
     }
 
