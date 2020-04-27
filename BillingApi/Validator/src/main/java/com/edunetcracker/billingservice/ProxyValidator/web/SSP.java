@@ -44,16 +44,16 @@ public class SSP {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        //if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
+        if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
             LOG.info("2");
             LOG.info("home " + login);
             String url = helpers.getUrlProxy() + "/home/?login=" + login;
             Map<String, String> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Map.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
-        /*}
+        }
 
         LOG.info("3");
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);*/
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
     }
     /**
@@ -115,7 +115,7 @@ public class SSP {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
+        if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
             String url = helpers.getUrlProxy() + "/choicetariff/?login=" + login + "&tariff=" + tariff;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -129,7 +129,7 @@ public class SSP {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
-        if(checks.isAvailableInRanges(rang) && rang.equals(checks.USER)) {
+        if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
             String url = helpers.getUrlProxy() + "/getTelephone/?login=" + login;
             String response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), String.class).getBody();
             return new ResponseEntity<>(response, HttpStatus.OK);
