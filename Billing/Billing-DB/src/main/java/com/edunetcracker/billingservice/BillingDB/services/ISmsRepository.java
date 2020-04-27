@@ -22,7 +22,7 @@ public interface ISmsRepository extends JpaRepository<Sms, Long> {
     @Transactional
     @Query("update Sms t set    t.sms_cost = :#{#sms.getSms_cost()}," +
             "                   t.sms_balance = :#{#sms.getSms_balance()}," +
-            "                   t.default_sms_cost = :#{#sms.getDefault_sms_cost()} where t.login = :#{#call.getLogin()} ")
+            "                   t.default_sms_cost = :#{#sms.getDefault_sms_cost()} where t.login = :#{#sms.getLogin()} ")
     void updateSms(@Param("sms") Sms sms);
 
 }
