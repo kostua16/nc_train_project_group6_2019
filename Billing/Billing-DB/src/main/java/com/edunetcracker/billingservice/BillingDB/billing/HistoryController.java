@@ -30,7 +30,7 @@ public class HistoryController {
 
     @GetMapping("getHistory")
     public ResponseEntity<List<History>> getHistory() {
-        List<History> histories = new ArrayList<>(historyRepository.findAll(PageRequest.of(0, 100, Sort.Direction.DESC)).toSet());
+        List<History> histories = new ArrayList<>(historyRepository.findAll(PageRequest.of(0, 100, Sort.Direction.DESC, "Id")).toSet());
         return new ResponseEntity<>(histories, HttpStatus.OK);
         //return new ResponseEntity<>(null, HttpStatus.OK);
     }
