@@ -1,62 +1,64 @@
 <template>
-  <div class="row">
-    <form class="col s12">
-      <div class="row">
-        <div class="input-field col s6">
-          <i class="material-icons prefix">phone_forwarded</i>
-          <input id="icon_telephone" type="tel" v-model.trim="telephoneFrom" class="validate">
-          <label for="icon_telephone">From the Telephone</label>
+  <div class="col s12">
+    <div class="row">
+      <form class="col s12">
+        <div class="row">
+          <div class="input-field col s6">
+            <i class="material-icons prefix">phone_forwarded</i>
+            <input id="icon_telephone" type="tel" v-model.trim="telephoneFrom" class="validate">
+            <label for="icon_telephone">From the Telephone</label>
+          </div>
+          <div class="input-field col s6">
+            <i class="material-icons prefix">phone_in_talk</i>
+            <input id="icon_telephone2" type="tel" v-model.trim="telephoneTo" class="validate">
+            <label for="icon_telephone2">In the Phone</label>
+          </div>
         </div>
-        <div class="input-field col s6">
-          <i class="material-icons prefix">phone_in_talk</i>
-          <input id="icon_telephone2" type="tel" v-model.trim="telephoneTo" class="validate">
-          <label for="icon_telephone2">In the Phone</label>
+      </form>
+    </div>
+    <div class="row">
+      <div class="input-field col s3">
+        <a class="waves-effect waves-light btn" @click.prevent="startImitator" :disabled="imitationState || imitatorCalled">
+          <i class="material-icons right">send</i>Включить имитацию</a>
+      </div>
+      <div class="input-field col s3">
+        <a class="waves-effect waves-light btn" @click.prevent="stopImitator" :disabled="!imitationState || imitatorCalled">
+          <i class="material-icons right">send</i>Выключить имитацию</a>
+      </div>
+      <div class="input-field col s3">
+        <a class="waves-effect waves-light btn" @click.prevent="runImReg" :disabled="imitatorCalled">
+          <i class="material-icons right">send</i>Имитация регистрации</a>
+      </div>
+      <div class="input-field col s3">
+        <a class="waves-effect waves-light btn" @click.prevent="runImUsage" :disabled="imitatorCalled">
+          <i class="material-icons right">send</i>Имитация пользования системой</a>
+      </div>
+    </div>
+    <div class="row">
+      <form class="col s12">
+        <div class="input-field col s4">
+          <a class="waves-effect waves-light btn" @click.prevent="startModal('call')">
+            <i class="material-icons right">send</i>Начать звонок</a>
         </div>
-      </div>
-    </form>
+        <div class="input-field col s4">
+          <a class="waves-effect waves-light btn" @click.prevent="startModal('sms')">
+            <i class="material-icons right">send</i>Отправить СМС</a>
+        </div>
+        <div class="input-field col s4">
+          <a class="waves-effect waves-light btn" @click.prevent="startModal('internet')">
+            <i class="material-icons right">send</i>Включить интернет</a>
+        </div>
+      </form>
+    </div>
+    <modal
+      v-if="showModal"
+      v-bind:text="modalMessage"
+      v-bind:active="actionState === actionStarted"
+      @close="stopModal"
+      @deactivate="stopOperation"
+      @activate="spend"
+    />
   </div>
-  <div class="row">
-    <div class="input-field col s3">
-      <a class="waves-effect waves-light btn" @click.prevent="startImitator" :disabled="imitationState || imitatorCalled">
-        <i class="material-icons right">send</i>Включить имитацию</a>
-    </div>
-    <div class="input-field col s3">
-      <a class="waves-effect waves-light btn" @click.prevent="stopImitator" :disabled="!imitationState || imitatorCalled">
-        <i class="material-icons right">send</i>Выключить имитацию</a>
-    </div>
-    <div class="input-field col s3">
-      <a class="waves-effect waves-light btn" @click.prevent="runImReg" :disabled="imitatorCalled">
-        <i class="material-icons right">send</i>Имитация регистрации</a>
-    </div>
-    <div class="input-field col s3">
-      <a class="waves-effect waves-light btn" @click.prevent="runImUsage" :disabled="imitatorCalled">
-        <i class="material-icons right">send</i>Имитация пользования системой</a>
-    </div>
-  </div>
-  <div class="row">
-    <form class="col s12">
-      <div class="input-field col s4">
-        <a class="waves-effect waves-light btn" @click.prevent="startModal('call')">
-          <i class="material-icons right">send</i>Начать звонок</a>
-      </div>
-      <div class="input-field col s4">
-        <a class="waves-effect waves-light btn" @click.prevent="startModal('sms')">
-          <i class="material-icons right">send</i>Отправить СМС</a>
-      </div>
-      <div class="input-field col s4">
-        <a class="waves-effect waves-light btn" @click.prevent="startModal('internet')">
-          <i class="material-icons right">send</i>Включить интернет</a>
-      </div>
-    </form>
-  </div>
-  <modal
-    v-if="showModal"
-    v-bind:text="modalMessage"
-    v-bind:active="actionState === actionStarted"
-    @close="stopModal"
-    @deactivate="stopOperation"
-    @activate="spend"
-  />
 </template>
 
 <script>
