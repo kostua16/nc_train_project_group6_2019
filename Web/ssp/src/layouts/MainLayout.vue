@@ -1,5 +1,5 @@
 <template>
-  <div class="app-main-layout" v-if="app_initialized">
+  <div class="app-main-layout" v-if="appInitialized">
 
     <Navbar @click="isOpen =!isOpen"/> <!-- Титульник  --> <!-- сушаем значение клик  -->
     <Sidebar v-model="isOpen"/> <!-- меню слева  -->
@@ -11,10 +11,10 @@
       </div>
     </main>
   </div>
-  <div class="app-main-layout" v-if="!app_initialized && app_initialization_in_progress">
+  <div class="app-main-layout" v-if="!appInitialized && appInitializationInProgress">
     <div>Интерфейс загружается</div>
   </div>
-  <div class="app-main-layout" v-if="!app_initialized && !app_initialization_in_progress">
+  <div class="app-main-layout" v-if="!appInitialized && !appInitializationInProgress">
     <div>Не удалось загрузить интерфейс</div>
   </div>
 </template>
@@ -22,15 +22,12 @@
 <script>
   import Navbar from '../components/base/BaseNavbar'
   import Sidebar from '../components/base/BaseSidebar'
-  import {mapState} from 'vuex'
+  import BaseComponent from "../components/base/BaseComponent";
   export default {
+    extends: BaseComponent,
     name: 'main-layout', //любое имя можно задать
     data: () => ({
       isOpen: true
-    }),
-    computed: mapState({
-      app_initialized: state => state.INITIALIZATION_COMPLETED,
-      app_initialization_in_progress: state => state.INITIALIZATION_IN_PROGRESS
     }),
     components: {
       Navbar, Sidebar
