@@ -11,7 +11,9 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class AccountController {
@@ -57,12 +59,12 @@ public class AccountController {
     @GetMapping("searchAccounts")
     public ResponseEntity<List<Account>> searchAccounts(@RequestParam("query") String query) {
         LOG.info("searchAccounts {}", query);
-        List<Account> result = new ArrayList<>();
+        Set<Account> result = new LinkedHashSet<Account>();
         result.addAll(AccountRepository.findAccountsByLoginContains(query));
         result.addAll(AccountRepository.findAccountsByNameContains(query));
         result.addAll(AccountRepository.findAccountsByTelephoneContains(query));
         LOG.info("searchAccounts {}", result);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(new ArrayList<>(result), HttpStatus.OK);
     }
 
     @GetMapping("getAllAccount")
