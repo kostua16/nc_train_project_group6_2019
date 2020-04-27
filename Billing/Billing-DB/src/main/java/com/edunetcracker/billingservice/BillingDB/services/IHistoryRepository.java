@@ -1,6 +1,8 @@
 package com.edunetcracker.billingservice.BillingDB.services;
 
 import com.edunetcracker.billingservice.BillingDB.entity.History;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,4 +14,5 @@ import java.util.List;
 
 @Repository
 public interface IHistoryRepository extends JpaRepository<History, Long> {
+    Page<History> findAllOrderByIdDesc(Pageable page);
 }
