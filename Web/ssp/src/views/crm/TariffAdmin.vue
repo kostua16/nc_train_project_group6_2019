@@ -131,8 +131,8 @@ export default {
     createTariff(){
         var s={
             'tariff': {'tariffName': this.newTariffName},
-            'tariffCall': {"Call_cost": this.Call_cost*60,"Call_balance": this.Call_balance,"Default_call_cost": this.Default_call_cost},
-            'tariffInternet': {"Internet_cost": this.Internet_cost*1000,"Internet_balance": this.Internet_balance,"Default_internet_cost": this.Default_internet_cost},
+            'tariffCall': {"Call_cost": this.Call_cost,"Call_balance": this.Call_balance*60,"Default_call_cost": this.Default_call_cost},
+            'tariffInternet': {"Internet_cost": this.Internet_cost,"Internet_balance": this.Internet_balance*1000,"Default_internet_cost": this.Default_internet_cost},
             'tariffSms': {"Sms_cost": this.Sms_cost,"Sms_balance": this.Sms_balance, "Default_sms_cost": this.Default_sms_cost}
         }
       this.$store.dispatch("CREATE_PRICE_PLAN", s);
