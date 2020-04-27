@@ -16,26 +16,36 @@
     </div>
     <div class="row">
       <table class="col s12">
-        <tr>
-          <th>Login</th>
-          <th>ФИО</th>
-          <th>Баланс</th>
-          <th>Тарифный план</th>
-          <th>Номер телефона</th>
+        <tr class="row">
+          <th class="col s2">Login</th>
+          <th class="col s2">ФИО</th>
+          <th class="col s2">Баланс</th>
+          <th class="col s2">Тарифный план</th>
+          <th class="col s2">Номер телефона</th>
+          <th class="col s2">Пополнение</th>
+          <th class="col s2">Удаление</th>
         </tr> <!--ряд с ячейками заголовков-->
         <tr v-for = "(result) in searchResults">
-          <td>{{result.login}}</td>
-          <td>{{result.name}}</td>
-          <td>{{result.balance}}</td>
-          <td>{{result.tariff}}</td>
-          <td>{{result.telephone}}</td>
+          <td class="col s2">{{result.login}}</td>
+          <td class="col s2">{{result.name}}</td>
+          <td class="col s2">{{result.balance}}</td>
+          <td class="col s2">{{result.tariff}}</td>
+          <td class="col s2">{{result.telephone}}</td>
+          <td class="col s2">
+            <editable-number-field v-bind:label="'Сумма пополнения'" v-bind:init-value="0" v-bind:callback="(amt) => {updateBalance(result.telephone, amt)}" />
+          </td>
+          <td class="col s2">
+            <button class="btn waves-effect waves-light" type="submit" @click.prevent="deleteAk(result.login)" name="deleteAction">Удалить
+              <i class="material-icons right">send</i>
+            </button>
+          </td>
         </tr>
       </table>
     </div>
 
 
     <div class="row">
-      <form class="col s6">
+      <form class="col s12">
         <div class="row">
           <div class="input-field col s12">
             <input id="email" type="email" v-model="login" class="validate">
@@ -75,17 +85,17 @@
         </div>
       </form>
 
-      <form class="col s6">
-        <div class="row">
-          <div class="input-field col s12">
-            <input id="email2" type="email"  v-model="logindelet" class="validate">
-            <label for="email2">Email</label>
-          </div>
-          <button class="btn waves-effect waves-light" type="submit" @click.prevent="deleteAk" name="action">Удалить пользователя
-            <i class="material-icons right">send</i>
-          </button>
-        </div>
-      </form>
+<!--      <form class="col s6">-->
+<!--        <div class="row">-->
+<!--          <div class="input-field col s12">-->
+<!--            <input id="email2" type="email"  v-model="logindelet" class="validate">-->
+<!--            <label for="email2">Email</label>-->
+<!--          </div>-->
+<!--          <button class="btn waves-effect waves-light" type="submit" @click.prevent="deleteAk" name="action">Удалить пользователя-->
+<!--            <i class="material-icons right">send</i>-->
+<!--          </button>-->
+<!--        </div>-->
+<!--      </form>-->
     </div>
   </div>
 
@@ -94,6 +104,9 @@
 
 <script>
   import UserPage from '../base/UserView'
+  import EditableNumberField from "../ssp/EditableNumberField";
+  import Navbar from "../../components/base/BaseNavbar";
+  import Sidebar from "../../components/base/BaseSidebar";
 export default {
   extends: UserPage,
   data: ()=>  ({
@@ -129,10 +142,15 @@ export default {
      await this.$store.dispatch("SEARCH_ACCOUNTS", this.searchQuery);
      this.searchCalled = false;
    } ,
-   deleteAk() {
-     this.$store.dispatch("DELETE_USER", this.logindelet);
+    async updateBalance(phone, amt) {
+      await this.$store.dispatch("UPDATE_USER_BALANCE", {amount: amt, phone: phone } );
+      await this.search();
     },
-      pustUser() {
+    async deleteAk(login) {
+     await this.$store.dispatch("DELETE_USER", login);
+     await this.search();
+    },
+    pustUser() {
         var s={
             'login': this.login,
             'password': this.password,
@@ -145,5 +163,8 @@ export default {
         this.$store.dispatch("CREATE_USER", s);
     },
   },
+  components: {
+    EditableNumberField
+  }
 }
 </script>
