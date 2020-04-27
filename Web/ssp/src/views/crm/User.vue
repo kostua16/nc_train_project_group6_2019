@@ -7,7 +7,7 @@
           <input id="query" type="text" v-model.trim="searchQuery" class="validate" :disabled="searchCalled">
           <label for="query">Поиск</label>
         </div>
-        <div class="input-field col s10">
+        <div class="input-field col s2">
           <button class="btn waves-effect waves-light auth-submit" type="submit" :disabled="searchCalled">
             <i class="material-icons right"/>
           </button>
@@ -35,9 +35,7 @@
   </div>
 
 
-
-
-  <div class="row">
+  <div class="row col s12">
     <form class="col s6">
       <div class="row">
         <div class="input-field col s12">
