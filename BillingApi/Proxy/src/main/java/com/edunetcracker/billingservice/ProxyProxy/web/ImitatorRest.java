@@ -7,32 +7,32 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/imitator")
+@RestController
 public class ImitatorRest {
 
     @Autowired
     ImitatorService imitatorService;
 
-    @GetMapping("status")
+    @GetMapping("imitator/status")
     public Boolean imitator(){
         return imitatorService.isStarted();
     }
-    @GetMapping("start")
+    @GetMapping("imitator/start")
     public Boolean imitatorStart(){
         imitatorService.start();
         return true;
     }
-    @GetMapping("stop")
+    @GetMapping("imitator/stop")
     public Boolean imitatorStop(){
         imitatorService.stop();
         return true;
     }
-    @GetMapping("oneGeneration")
+    @GetMapping("imitator/oneGeneration")
     public Boolean imitatorRunGenerate() throws JsonProcessingException {
         imitatorService.manuallyGenerateUsers();
         return true;
     }
-    @GetMapping("oneUsage")
+    @GetMapping("imitator/oneUsage")
     public Boolean imitatorRunUsage() {
         imitatorService.manuallyMadeCalls();
         return true;
