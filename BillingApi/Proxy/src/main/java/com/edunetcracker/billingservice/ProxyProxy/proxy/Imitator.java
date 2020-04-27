@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -50,45 +51,74 @@ public class Imitator {
     @Scheduled(cron = "* */1 * * * *")
     public void generateUsers() throws JsonProcessingException {
 
-        int maxToCreate = ThreadLocalRandom.current().nextInt(0, 10);
-        int prefix = ThreadLocalRandom.current().nextInt(1000, 8999);
+        final ThreadLocalRandom currentRandom = ThreadLocalRandom.current();
+        int maxToCreate = currentRandom.nextInt(0, 3);
+        int prefix = currentRandom.nextInt(1000, 8999);
 
         for (int i = 0; i < maxToCreate; i++) {
-            int accUid = (prefix + i);
-            Account account = new Account();
-            account.setLogin("user" + accUid + "@mail.ru");
-            account.setPassword("123456");
-            account.setName("user" + accUid);
-            account.setBalance(0L);
-            account.setTariff("DEFAULT");
-            account.setTelephone("8801555" + accUid);
-            account.setRang("USER");
+            final int accUid = (prefix + i);
+            final String phoneNum = "8801555" + accUid;
+            final String login = "user" + accUid + "@mail.ru";
+            if (!checks.isAccountExistsByPhone(phoneNum) && !checks.isAccountExists(login)) {
+                final List<Tariff> tariffs = tariffController.getAllTariff().getBody();
+                if(tariffs!=null && !tariffs.isEmpty()){
+                    final Tariff currentTariff = tariffs.get(currentRandom.nextInt(0, tariffs.size() + 1));
+                    if(currentTariff!=null){
+                        final CollectedTariff collectedTariff = tariffController.getCollectedTariffByName(currentTariff.getName()).getBody();
 
-            // взять тариф и присвоить его
-            Call call = new Call();
-            call.setLogin(account.getLogin());
-            call.setCall_cost(0F);
-            call.setCall_balance(1800L);
-            call.setDefault_call_cost(0.0834F);
 
-            Internet internet = new Internet();
-            internet.setLogin(account.getLogin());
-            internet.setInternet_cost(0F);
-            internet.setInternet_balance(1000000L);
-            internet.setDefault_internet_cost(0.001F);
+                        if(collectedTariff!=null){
 
-            Sms sms = new Sms();
-            sms.setLogin(account.getLogin());
-            sms.setSms_cost(0F);
-            sms.setSms_balance(30L);
-            sms.setDefault_sms_cost(2F);
+                            final TariffCall tariffCall = collectedTariff.getTariffCall();
+                            final TariffSms tariffSms = collectedTariff.getTariffSms();
+                            final TariffInternet tariffInternet = collectedTariff.getTariffInternet();
 
-            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
-            rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
-            rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
-            rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
+                            Account account = new Account();
 
-            LOG.info("Generated account - {} [sms:{}, calls:{}, internet:{}]", account, sms, call, internet);
+                            account.setLogin(login);
+                            account.setPassword("123456");
+                            account.setName("user" + accUid);
+                            account.setBalance(0L);
+
+                            account.setTelephone(phoneNum);
+                            account.setRang("USER");
+
+                            account.setTariff(currentTariff.getName());
+
+                            // взять тариф и присвоить его
+                            Call call = new Call();
+                            call.setLogin(account.getLogin());
+                            call.setCall_cost(tariffCall.getCall_cost());
+                            call.setCall_balance(currentRandom.nextLong(0, 100));
+                            call.setDefault_call_cost(tariffCall.getDefault_call_cost());
+
+                            Internet internet = new Internet();
+                            internet.setLogin(account.getLogin());
+                            internet.setInternet_cost(tariffInternet.getInternet_cost());
+                            internet.setInternet_balance(currentRandom.nextLong(0, 50));
+                            internet.setDefault_internet_cost(tariffInternet.getDefault_internet_cost());
+
+                            Sms sms = new Sms();
+                            sms.setLogin(account.getLogin());
+                            sms.setSms_cost(tariffSms.getSms_cost());
+                            sms.setSms_balance(currentRandom.nextLong(0, 50000));
+                            sms.setDefault_sms_cost(tariffSms.getDefault_sms_cost());
+
+                            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
+                            rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
+                            rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
+                            rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
+
+                            LOG.info("Generated account - {} [sms:{}, calls:{}, internet:{}]", account, sms, call, internet);
+                        }
+
+                    }
+
+                }
+
+
+            }
+
         }
     }
 

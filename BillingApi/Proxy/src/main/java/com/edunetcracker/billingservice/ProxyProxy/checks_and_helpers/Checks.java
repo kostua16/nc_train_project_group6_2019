@@ -6,10 +6,7 @@ import com.edunetcracker.billingservice.ProxyProxy.proxy.CallController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,12 +27,31 @@ public class Checks {
     public Boolean isAccountExists(String accountLogin) {
         try {
             String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + accountLogin;
-            Account account = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class).getBody();
-            LOG.info("isAccountExists" + (account!=null ? account.getBalance() : null));
-            if (account == null)
+            final ResponseEntity<Account> result = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
+            if(HttpStatus.NOT_FOUND.equals(result.getStatusCode())){
                 return false;
+            } else {
+                Account account = result.getBody();
+                LOG.info("isAccountExists" + (account!=null ? account.getBalance() : null));
+                return account != null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-            return true;
+    public Boolean isAccountExistsByPhone(String phoneNum) {
+        try {
+            String url = helpers.getUrlBilling() + "/getAccountByTelephone/?telephone=" + phoneNum;
+            final ResponseEntity<Account> result = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
+            if(HttpStatus.NOT_FOUND.equals(result.getStatusCode())){
+                return false;
+            } else {
+                Account account = result.getBody();
+                LOG.info("isAccountExistsByPhone" + (account!=null ? account.getBalance() : null));
+                return account != null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
