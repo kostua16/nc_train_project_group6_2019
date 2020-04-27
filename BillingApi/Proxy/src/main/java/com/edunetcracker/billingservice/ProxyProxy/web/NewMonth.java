@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 
 @RestController
 public class NewMonth {
@@ -45,7 +43,7 @@ public class NewMonth {
     @GetMapping("newMonth")
     @Scheduled(cron = "* */10 * * * *")
     public boolean newMonth(){
-        LOG.info("newMonth started");
+        LOG.info("newMonth started {}", Date.from(Instant.now()));
 
         List<Account> accounts = accountController.getAllAccount().getBody();   // получим имена тарифов
         List<CollectedTariff> collectedTariffs = tariffController.getAllCollectedTariff().getBody();    // получим деф значения
