@@ -7,16 +7,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("imitator")
+@RestController("/imitator")
 public class ImitatorRest {
 
     @Autowired
     ImitatorService imitatorService;
 
-    @GetMapping("")
-    public String imitator(Model model){
-        model.addAttribute("enabled", imitatorService.isStarted());
-        return "ui/test/imitator";
+    @GetMapping("status")
+    public Boolean imitator(){
+        return imitatorService.isStarted();
     }
     @GetMapping("start")
     public Boolean imitatorStart(){

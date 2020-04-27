@@ -137,18 +137,6 @@ export default new Vuex.Store({
     SLEEP: (context, ms) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
-    SYNC_IMITATOR: async (context) => {
-      if(context.state.STUB_MODE){
-        await context.commit("SET_IMITATOR_STATE", false);
-      } else {
-        try {
-          const stateResponse = await Vue.axios.get(`${context.state.PROXY_URL}/imitator`);
-          await context.commit("SET_IMITATOR_STATE", stateResponse.data);
-        } catch (e) {
-          await context.commit("SET_IMITATOR_STATE", false);
-        }
-      }
-    },
     SEARCH_ACCOUNTS: async (context, query) => {
       if(!context.state.STUB_MODE){
         try {
@@ -158,6 +146,18 @@ export default new Vuex.Store({
         } catch (e) {
           console.log(`SEARCH_ACCOUNTS.Fail(${e})`);
           throw new Error(`SEARCH_ACCOUNTS.Fail(${e})`);
+        }
+      }
+    },
+    SYNC_IMITATOR: async (context) => {
+      if(context.state.STUB_MODE){
+        await context.commit("SET_IMITATOR_STATE", false);
+      } else {
+        try {
+          const stateResponse = await Vue.axios.get(`${context.state.PROXY_URL}/imitator/status`);
+          await context.commit("SET_IMITATOR_STATE", stateResponse.data);
+        } catch (e) {
+          await context.commit("SET_IMITATOR_STATE", false);
         }
       }
     },
