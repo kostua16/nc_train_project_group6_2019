@@ -31,11 +31,12 @@
           <td class="col s1">{{result.balance}}</td>
           <td class="col s2">{{result.tariff}}</td>
           <td class="col s1">{{result.telephone}}</td>
-          <td class="col s1">
+          <td class="col s2">
             <balance-field
               v-bind:label="'Сумма пополнения'"
               v-bind:init-value="0"
               v-bind:phone-number="result.telephone"
+              v-bind:small-Window='true'
               @changed="search" />
           </td>
           <td class="col s2">
