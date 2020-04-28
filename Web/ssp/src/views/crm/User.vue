@@ -138,12 +138,8 @@
       tariffs: state => state.CURRENT_USER!=null ? state.CURRENT_USER.availableTariffs : [],
     }),
     mounted() {
-      this.tariffSelect = M.FormSelect.init(this.$refs.tariff, {
-        constrainWidth: true
-      });
-      this.rangSelect = M.FormSelect.init(this.$refs.rang, {
-        constrainWidth: true
-      });
+      this.tariffSelect = M.FormSelect.init(this.$refs.tariff, {});
+      this.rangSelect = M.FormSelect.init(this.$refs.rang, {});
     },
     methods: {//deleteA
       async search() {
