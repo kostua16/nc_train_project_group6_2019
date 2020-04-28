@@ -56,7 +56,7 @@ export default new Vuex.Store({
         name: 'CRM',
         url: '/crm',
         links: [
-          {title: 'Пользователи', url: '/crm'},
+          {title: 'Пользователи', url: '/crm', exact: true},
           {title: 'Тарифы', url: '/crm/tariffadmin'},
           {title: 'История', url: '/crm/history'}
         ]
@@ -378,7 +378,7 @@ export default new Vuex.Store({
         }
         await context.commit('SET_CURRENT_USER', user);
       } else {
-        await Vue.axios.get(`${context.state.VALIDATOR_URL}/topup/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`);
+        await Vue.axios.get(`${context.state.VALIDATOR_URL}/topUpByTelephone/?token=${context.state.TOKEN}&amount=${data.amount}&telephone=${data.phone}`);
         await context.dispatch("SYNC_CURRENT_USER");
       }
     },
