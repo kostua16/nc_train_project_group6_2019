@@ -84,7 +84,7 @@ public class AccountController {
     }
 
     public List<Account> searchAccounts(String query) {
-        return operationsService.requestList("/searchAccounts/?query=" + query, HttpMethod.GET, Account.class);
+        return operationsService.requestList("/searchAccounts/?query=" + query, HttpMethod.GET, Account[].class);
     }
 
     public Account getAccountByTelephone(String telephone) {
@@ -92,7 +92,7 @@ public class AccountController {
     }
 
     public List<Account> getAllAccount() {
-        return operationsService.requestList("/getAllAccount", HttpMethod.GET, Account.class);
+        return operationsService.requestList("/getAllAccount", HttpMethod.GET, Account[].class);
     }
 
     public Boolean migrateToTariff(String oldTariff, String newTariff) {

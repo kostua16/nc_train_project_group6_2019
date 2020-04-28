@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -51,14 +53,19 @@ public class OperationsService {
             return null;
         }
     }
-    public  <T> List<T> requestList(String url, HttpMethod method, Class<T> requiredType){
+    public  <T> List<T> requestList(String url, HttpMethod method, Class<T[]> requiredType){
         try {
-            final ResponseEntity<List> result = new RestTemplate().exchange(getUrlBilling() + url, method, new HttpEntity(new HttpHeaders()), List.class);
+            final ResponseEntity<T[]> result = new RestTemplate().exchange(getUrlBilling() + url, method, new HttpEntity(new HttpHeaders()), requiredType);
             if(HttpStatus.NOT_FOUND.equals(result.getStatusCode())){
                 LOG.info("request [{}, {}, {}] => Null", url, method, requiredType);
                 return null;
             } else {
-                List<T> resultBody = (List<T>) result.getBody();
+                List<T> resultBody;
+                if(result.getBody()!=null){
+                    resultBody = Arrays.asList(result.getBody()) ;
+                } else {
+                    resultBody = new ArrayList<>();
+                }
                 LOG.info("request [{}, {}, {}] => {}", url, method, requiredType, resultBody);
                 return resultBody;
             }
@@ -72,7 +79,7 @@ public class OperationsService {
         return notNull(request(url, method, requiredType));
     }
 
-    public  <T> ResponseEntity<List<T>> requestListEntity(String url, HttpMethod method, Class<T> requiredType){
+    public  <T> ResponseEntity<List<T>> requestListEntity(String url, HttpMethod method, Class<T[]> requiredType){
         return notNull(requestList(url, method, requiredType));
     }
 

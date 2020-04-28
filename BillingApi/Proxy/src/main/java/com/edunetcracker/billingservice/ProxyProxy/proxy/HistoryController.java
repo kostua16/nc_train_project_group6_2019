@@ -17,7 +17,7 @@ public class HistoryController {
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     public List<History> showHistory(Integer page) {
-        return operationsService.requestList("/getHistory?page=" + page, HttpMethod.GET, History.class);
+        return operationsService.requestList("/getHistory?page=" + page, HttpMethod.GET, History[].class);
     }
 
 }

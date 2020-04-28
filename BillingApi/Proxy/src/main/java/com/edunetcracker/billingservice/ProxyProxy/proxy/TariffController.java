@@ -62,7 +62,7 @@ public class TariffController {
     }
 
     public List<Tariff> getAllBaseTariffs() {
-        return operationsService.requestList("/getAllTariff", HttpMethod.GET, Tariff.class);
+        return operationsService.requestList("/getAllTariff", HttpMethod.GET, Tariff[].class);
     }
 
     public List<CollectedTariff> getAllCollectedTariff() {
