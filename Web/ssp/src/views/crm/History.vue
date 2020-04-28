@@ -12,11 +12,11 @@
         <div class="input-field col s2">
           <a class="waves-effect waves-light btn" @click.prevent="changePage(page-1)"><i class="material-icons right">arrow_back</i>{{page-1}}</a>
         </div>
-        <div class="input-field col s8">
+        <div class="input-field col s2">
           <label for="history_page">Номер страницы</label>
           <input name="history_page" id="history_page" class="input-field" type="number" v-model="page" />
         </div>
-        <div class="input-field col s2">
+        <div class="input-field col s2 ">
           <a class="waves-effect waves-light btn" @click.prevent="changePage(page+1)">{{page+1}}<i class="material-icons right">arrow_forward</i></a>
         </div>
       </form>

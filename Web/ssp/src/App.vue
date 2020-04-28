@@ -13,7 +13,7 @@ export default {
     layout(){ //свойство- возвращает строку названия лаяута которое будет использоватся из 21 строчки
        //console.log(this.$route.meta.layout)
       //this.$route.meta.layout возврашает empty или main
-       return (this.$route.meta.layout || 'Empty') + '-Layout' //возврашаяет состояние <router-view/> свойство и имя
+       return (this.$route.meta.layout || 'Main') + '-Layout' //возврашаяет состояние <router-view/> свойство и имя
     }
   },
   mounted() {
