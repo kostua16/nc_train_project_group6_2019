@@ -102,4 +102,9 @@ public class TestUIController {
         imitatorService.manuallyMadeCalls();
         return "redirect:/ui/test/imitator";
     }
+    @GetMapping("imitator/init")
+    public String imitatorInitSystem() {
+        imitatorService.initBaseUsers();
+        return "redirect:/ui/test/imitator";
+    }
 }

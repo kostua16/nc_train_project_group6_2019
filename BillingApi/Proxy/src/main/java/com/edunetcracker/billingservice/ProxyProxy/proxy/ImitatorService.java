@@ -113,6 +113,7 @@ public class ImitatorService {
 
         try {
             if (!tariffController.isTariffExists("DEFAULT")) {
+                LOG.info("initBaseUsers.create DEFAULT tariff");
                 tariffController.createTariff(
                         new CollectedTariff("DEFAULT",
                                 new TariffCall("DEFAULT", 0F, 1800L, 0.0834F),
@@ -121,6 +122,7 @@ public class ImitatorService {
                         ));
             }
             if (!tariffController.isTariffExists("ADMINISTRATOR")) {
+                LOG.info("initBaseUsers.create ADMINISTRATOR tariff");
                 tariffController.createTariff(
                         new CollectedTariff("ADMINISTRATOR",
                                 new TariffCall("ADMINISTRATOR", 0F, 0L, 0F),
@@ -130,6 +132,7 @@ public class ImitatorService {
             }
 
             if (!accountController.isAccountExists("admin@mail.ru")) {
+                LOG.info("initBaseUsers.create ADMINISTRATOR account");
                 accountController.createAccount(
                         new Account(
                                 "admin@mail.ru", "123456", "admin",
@@ -139,6 +142,7 @@ public class ImitatorService {
             }
 
             if (!accountController.isAccountExists("user@mail.ru")) {
+                LOG.info("initBaseUsers.create USER account");
                 accountController.createAccount(
                         new Account(
                                 "user@mail.ru", "123456", "user",
