@@ -32,8 +32,11 @@
           <td class="col s2">{{result.tariff}}</td>
           <td class="col s1">{{result.telephone}}</td>
           <td class="col s2">
-            <editable-number-field v-bind:label="'Сумма пополнения'" v-bind:init-value="0"
-                                   v-bind:callback="(amt) => {updateBalance(result.telephone, amt)}"/>
+            <balance-field
+              v-bind:label="'Сумма пополнения'"
+              v-bind:init-value="0"
+              v-bind:phone-number="result.telephone"
+              @changed="search" />
           </td>
           <td class="col s2">
             <button class="btn waves-effect waves-light" type="submit" @click.prevent="deleteAk(result.login)"
@@ -100,7 +103,7 @@
 
 <script>
   import UserPage from '../base/UserView'
-  import EditableNumberField from "../ssp/EditableNumberField";
+  import BalanceField from "../base/BalanceField";
   import {mapState} from "vuex";
 
   export default {
@@ -154,10 +157,6 @@
         await this.$store.dispatch("SEARCH_ACCOUNTS", this.searchQuery);
         this.searchCalled = false;
       },
-      async updateBalance(phone, amt) {
-        await this.$store.dispatch("UPDATE_USER_BALANCE", {amount: amt, phone: phone});
-        await this.search();
-      },
       async deleteAk(login) {
         await this.$store.dispatch("DELETE_USER", login);
         await this.search();
@@ -176,7 +175,7 @@
       },
     },
     components: {
-      EditableNumberField
+      BalanceField
     }
   }
 </script>

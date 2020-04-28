@@ -1,8 +1,11 @@
 <template>
-  <form class="input-field" @submit.prevent="onSubmit">
+  <form class="input-field" @submit.prevent="updateBalance">
     <label for="inputField">{{label}}</label><input id="inputField" type="number" v-model.trim="value" class="validate">
     <div class="error" v-if="!$v.value.required">Введите сумму</div>
     <div class="error" v-if="!$v.value.isNumber">Введите числовое значение</div>
+    <button class="btn waves-effect waves-light" type="submit" @click.prevent="updateBalance" name="up">
+      <i class="material-icons right">send</i>
+    </button>
   </form>
 </template>
 <script>
@@ -12,8 +15,7 @@
     props: {
       label: '',
       initValue: 0,
-      callback: (value) => {
-      }
+      phoneNumber: 0
     },
     data: () => ({
       value: 0
@@ -27,7 +29,11 @@
     methods: {
       onSubmit() {
         this.callback(this.value);
-      }
+      },
+      async updateBalance() {
+        await this.$store.dispatch("UPDATE_USER_BALANCE", {amount: this.value, phone: this.phoneNumber});
+        await this.$emit('changed');
+      },
     }
   }
 </script>
