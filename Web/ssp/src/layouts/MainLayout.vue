@@ -6,7 +6,7 @@
 
     <main class="app-content" :class="{full: !isOpen}">
       <!-- значение клика если не активировано то дописываем full в класс  -->
-      <div class="app-page" >
+      <div class="app-page container" >
         <router-view/>
       </div>
     </main>
