@@ -6,10 +6,10 @@
       </component>
     </div>
     <div id="appLoading" v-if="!appInitialized && appInitializationInProgress">
-      <h2 class="">Приложение загружается</h2>
+      <h3 class="">Приложение загружается</h3>
     </div>
     <div id="appLoadFailed" v-if="!appInitialized && !appInitializationInProgress">
-      <h2 class="">Не удалось загрузить приложение</h2>
+      <h3 class="">Не удалось загрузить приложение</h3>
     </div>
   </div>
 

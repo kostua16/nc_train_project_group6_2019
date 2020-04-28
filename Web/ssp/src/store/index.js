@@ -407,7 +407,7 @@ export default new Vuex.Store({
         pricePlans.splice(idx, 1);
         await context.commit('SET_STUB_PRICE_PLANS', pricePlans);
       } else {
-        await Vue.axios.get(`${context.state.VALIDATOR_URL}/deleteT/?token=${context.state.TOKEN}&name=${tariff}`);
+        await Vue.axios.delete(`${context.state.VALIDATOR_URL}/deleteT/?token=${context.state.TOKEN}&name=${tariff}`);
       }
       await context.dispatch("SYNC_CURRENT_USER");
     },
@@ -429,7 +429,7 @@ export default new Vuex.Store({
         stubUsers.splice(idx, 1);
         context.commit('SET_STUB_USERS', stubUsers);
       } else {
-        await Vue.axios.get(`${context.state.VALIDATOR_URL}/deleteA/?token=${context.state.TOKEN}&login=${user}`);
+        await Vue.axios.delete(`${context.state.VALIDATOR_URL}/deleteA/?token=${context.state.TOKEN}&login=${user}`);
       }
       await context.dispatch("SYNC_CURRENT_USER");
     },
