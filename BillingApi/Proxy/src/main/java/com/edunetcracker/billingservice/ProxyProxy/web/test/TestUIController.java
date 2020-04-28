@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -78,8 +79,8 @@ public class TestUIController {
     }
 
     @GetMapping("history")
-    public String history(Model model){
-        String url = helpers.getUrlBilling() + "/getAllHistory";
+    public String history(Model model, @RequestParam(value = "page", defaultValue = "0") Integer page){
+        String url = helpers.getUrlBilling() + "/getHistory?page=" + page;
         final List<History> historyList =  (List<History>) new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
         model.addAttribute("history", historyList);
         return "ui/test/history";
