@@ -128,7 +128,9 @@
       searchQuery: "",
       searchCalled: false,
       creationCalled: false,
-      creationFailed: false
+      creationFailed: false,
+      tariffSelect: null,
+      rangSelect: null,
 
     }),
     computed: mapState({
@@ -136,10 +138,10 @@
       tariffs: state => state.CURRENT_USER!=null ? state.CURRENT_USER.availableTariffs : [],
     }),
     mounted() {
-      this.dropdown = M.FormSelect.init(this.$refs.tariff, {
+      this.tariffSelect = M.FormSelect.init(this.$refs.tariff, {
         constrainWidth: true
       });
-      this.dropdown = M.FormSelect.init(this.$refs.rang, {
+      this.rangSelect = M.FormSelect.init(this.$refs.rang, {
         constrainWidth: true
       });
     },
