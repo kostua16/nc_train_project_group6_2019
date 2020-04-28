@@ -1,26 +1,15 @@
 package com.edunetcracker.billingservice.ProxyProxy.web;
 
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.*;
 import com.edunetcracker.billingservice.ProxyProxy.proxy.AccountController;
 import com.edunetcracker.billingservice.ProxyProxy.proxy.HistoryController;
 import com.edunetcracker.billingservice.ProxyProxy.proxy.TariffController;
-import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
-import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,18 +30,17 @@ public class CRM {
     Logger LOG = LoggerFactory.getLogger(CRM.class);
 
 
-
-
     //  http://localhost:8102/createA
+
     /**
      * {
-     *   "login": "111",
-     *   "password": "222",
-     *   "name": "333",
-     *   "balance": "444",
-     *   "tariff": "555",
-     *   "telephone": "123",
-     *   "rang": "666"
+     * "login": "111",
+     * "password": "222",
+     * "name": "333",
+     * "balance": "444",
+     * "tariff": "555",
+     * "telephone": "123",
+     * "rang": "666"
      * }
      */
     @PostMapping("createA")
@@ -66,10 +54,10 @@ public class CRM {
 
     /**
      * {
-     *   "tariff": {"tariffName":"BIG_GIB"},
-     *   "tariffCall": {"Call_cost": "4.5","Call_balance": "100","Default_call_cost": "14.0"},
-     *   "tariffInternet": {"Internet_cost": "4.5","Internet_balance": "100","Default_internet_cost": "14.0"},
-     *   "tariffSms": {"Sms_cost": "4.5","Sms_balance": "100","Default_sms_cost": "14.0"}
+     * "tariff": {"tariffName":"BIG_GIB"},
+     * "tariffCall": {"Call_cost": "4.5","Call_balance": "100","Default_call_cost": "14.0"},
+     * "tariffInternet": {"Internet_cost": "4.5","Internet_balance": "100","Default_internet_cost": "14.0"},
+     * "tariffSms": {"Sms_cost": "4.5","Sms_balance": "100","Default_sms_cost": "14.0"}
      * }
      */
     @PostMapping("createT")
@@ -96,6 +84,7 @@ public class CRM {
     public List<Account> searchA(@RequestParam("query") String query) {
         return accountController.searchAccounts(query);
     }
+
     //
     @DeleteMapping("deleteA")
     public Boolean deleteA(@RequestParam("login") String login) {
@@ -117,10 +106,11 @@ public class CRM {
         }
         return false;
     }
+
     @PostMapping("changeA")
-    public Boolean changeA(@RequestBody Map<String, String> map ){
+    public Boolean changeA(@RequestBody Map<String, String> map) {
         Account account = accountController.getAccount(map.get("login"));
-        if(account != null) {
+        if (account != null) {
             account.setPassword(map.get("password"));
             account.setName(map.get("name"));
             account.setTelephone(map.get("telephone"));
@@ -134,21 +124,22 @@ public class CRM {
     // изменяет выбранный тариф пользователя (если был тариф А, тостанет Тафри Б) (просто меняет строку)
     @PostMapping("changeT")
     public Boolean changeT(@RequestParam("login") String login,
-                           @RequestParam("tariff") String tariff){
+                           @RequestParam("tariff") String tariff) {
         Account account = accountController.getAccount(login);
-        if(account != null && tariffController.isTariffExists(tariff)) {
+        if (account != null && tariffController.isTariffExists(tariff)) {
             account.setTariff(tariff);
             accountController.updateAccount(account);
             return true;
         }
         return false;
     }
+
     @GetMapping("showA")
-    public Map<String, Object> showA(){
+    public Map<String, Object> showA() {
         List<Account> accounts = accountController.getAllAccount();
         Map<String, Map<String, String>> returnA = new HashMap<>();
         Map<String, String> acc;
-        for (int a = 0; a< accounts.size(); a++){
+        for (int a = 0; a < accounts.size(); a++) {
             acc = new HashMap<>();
             acc.put("password", accounts.get(a).getPassword());
             acc.put("name", accounts.get(a).getName());
@@ -162,13 +153,14 @@ public class CRM {
         returnMap.put("accounts", returnA);
         return returnMap;
     }
+
     @GetMapping("getA")
-    public Map<String, String> getA(@RequestParam("login") String login){
+    public Map<String, String> getA(@RequestParam("login") String login) {
 
         Map<String, String> returnA = new HashMap<>();
 
         Account account = accountController.getAccount(login);
-        if(account!=null){
+        if (account != null) {
             returnA.put("password", account.getPassword());
             returnA.put("name", account.getName());
             returnA.put("telephone", account.getTelephone());
@@ -179,12 +171,13 @@ public class CRM {
     }
 
     @GetMapping("showT")
-    public List<Map> showT(){
+    public List<Map> showT() {
         return tariffController.getAllCollectedTariffAsMapList();
     }
+
     //  http://localhost:8102/showHistory
     @GetMapping("showHistory")
-    public List<History> showHistory(@RequestParam(value = "page", defaultValue = "0") Integer page){
+    public List<History> showHistory(@RequestParam(value = "page", defaultValue = "0") Integer page) {
         return historyController.showHistory(page);
     }
 }

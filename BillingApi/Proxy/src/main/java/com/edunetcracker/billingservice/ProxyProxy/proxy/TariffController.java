@@ -1,20 +1,19 @@
 package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.*;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*@RestController*/
 @Service
@@ -23,12 +22,6 @@ public class TariffController {
     @Autowired
     private RabbitMQSender rabbitMQSender;
 
-
-    @Autowired
-    private Checks checks;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Autowired
     OperationsService operationsService;
@@ -42,7 +35,7 @@ public class TariffController {
     }
 
     public Boolean createTariff(CollectedTariff tariff) throws JsonProcessingException {
-        if(tariff!=null && !checks.isTariffExists(tariff.getName())){
+        if (tariff != null && !isTariffExists(tariff.getName())) {
             final Tariff baseTariff = new Tariff();
             baseTariff.setName(tariff.getName());
             rabbitMQSender.send(baseTariff, RabbitMQMessageType.CREATE_TARIFF);
@@ -55,7 +48,7 @@ public class TariffController {
     }
 
     public CollectedTariff getTariff(String tariffName) {
-        if(isTariffExists(tariffName)){
+        if (isTariffExists(tariffName)) {
             try {
                 final TariffCall tariffCall = operationsService.request("/getTariffCallByName/?name=" + tariffName, HttpMethod.GET, TariffCall.class);
                 final TariffInternet tariffInternet = operationsService.request("/getTariffInternetByName/?name=" + tariffName, HttpMethod.GET, TariffInternet.class);
@@ -86,7 +79,7 @@ public class TariffController {
         return collectedTariffs;
     }
 
-    public List<Map> getAllCollectedTariffAsMapList(){
+    public List<Map> getAllCollectedTariffAsMapList() {
         List<Map> returnT = new ArrayList<>();
 
         List<CollectedTariff> tariffs = getAllCollectedTariff();
@@ -102,7 +95,7 @@ public class TariffController {
     }
 
     public Boolean updateTariff(Tariff newTariff) {
-        if(isTariffExists(newTariff.getName())){
+        if (isTariffExists(newTariff.getName())) {
             try {
                 rabbitMQSender.send(newTariff, RabbitMQMessageType.UPDATE_TARIFF);
                 return true;
@@ -115,7 +108,7 @@ public class TariffController {
     }
 
     public Boolean deleteTariff(String name) {
-        if(isTariffExists(name)){
+        if (isTariffExists(name)) {
             try {
                 rabbitMQSender.send(name, RabbitMQMessageType.DELETE_TARIFF);
                 rabbitMQSender.send(name, RabbitMQMessageType.DELETE_TARIFF_CALL);

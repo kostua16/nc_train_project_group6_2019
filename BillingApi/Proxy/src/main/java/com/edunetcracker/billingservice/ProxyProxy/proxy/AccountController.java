@@ -1,7 +1,5 @@
 package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.*;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
@@ -9,11 +7,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -34,7 +29,6 @@ public class AccountController {
     TariffController tariffController;
 
 
-
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     /*************checks**************/
@@ -47,10 +41,10 @@ public class AccountController {
     }
 
     public Boolean createAccount(Account account) throws JsonProcessingException {
-        if(account!=null && !isAccountExists(account.getLogin()) && !isAccountExistsByPhone(account.getTelephone()) && tariffController.isTariffExists(account.getTariff())){
+        if (account != null && !isAccountExists(account.getLogin()) && !isAccountExistsByPhone(account.getTelephone()) && tariffController.isTariffExists(account.getTariff())) {
 
             final CollectedTariff currentTarrif = tariffController.getTariff(account.getTariff());
-            if(currentTarrif!=null){
+            if (currentTarrif != null) {
                 final TariffInternet tariffInternet = currentTarrif.getTariffInternet();
                 final TariffSms tariffSms = currentTarrif.getTariffSms();
                 final TariffCall tariffCall = currentTarrif.getTariffCall();
@@ -88,22 +82,25 @@ public class AccountController {
     public Account getAccount(String login) {
         return operationsService.request("/getAccountByLogin/?login=" + login, HttpMethod.GET, Account.class);
     }
-    public List<Account> searchAccounts(String query ) {
+
+    public List<Account> searchAccounts(String query) {
         return operationsService.requestList("/searchAccounts/?query=" + query, HttpMethod.GET, Account.class);
     }
+
     public Account getAccountByTelephone(String telephone) {
         return operationsService.request("/getAccountByTelephone/?telephone=" + telephone, HttpMethod.GET, Account.class);
     }
+
     public List<Account> getAllAccount() {
         return operationsService.requestList("/getAllAccount", HttpMethod.GET, Account.class);
     }
 
     public Boolean migrateToTariff(String oldTariff, String newTariff) {
-        if(tariffController.isTariffExists(oldTariff) && tariffController.isTariffExists(newTariff)){
+        if (tariffController.isTariffExists(oldTariff) && tariffController.isTariffExists(newTariff)) {
             for (Account account : getAllAccount()) {
-                if(oldTariff.equals(account.getTariff())) {
+                if (oldTariff.equals(account.getTariff())) {
                     account.setTariff(newTariff);
-                    if(!updateAccount(account)){
+                    if (!updateAccount(account)) {
                         return false;
                     }
                 }
@@ -115,11 +112,11 @@ public class AccountController {
 
 
     public Boolean updateAccount(Account newAccountData) {
-        if(isAccountExists(newAccountData.getLogin())){
+        if (isAccountExists(newAccountData.getLogin())) {
             try {
                 rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
                 return true;
-            } catch (JsonProcessingException e){
+            } catch (JsonProcessingException e) {
                 LOG.error("updateAccount failed", e);
             }
 
@@ -128,7 +125,7 @@ public class AccountController {
     }
 
     public Boolean deleteAccountByLogin(String login) {
-        if(isAccountExists(login)){
+        if (isAccountExists(login)) {
             try {
                 rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
                 return true;
@@ -173,11 +170,26 @@ public class AccountController {
     public Internet getInternetBalance(String login) {
         return operationsService.request("/getInternetByLogin/?login=" + login, HttpMethod.GET, Internet.class);
     }
+
     public Call getCallBalance(String login) {
         return operationsService.request("/getCallByLogin/?login=" + login, HttpMethod.GET, Call.class);
     }
+
     public Sms getSmsBalance(String login) {
         return operationsService.request("/getSmsByLogin/?login=" + login, HttpMethod.GET, Sms.class);
+    }
+
+    public Boolean updateCallBalance(Call call) throws JsonProcessingException {
+        rabbitMQSender.send(call, RabbitMQMessageType.UPDATE_CALL);
+        return true;
+    }
+    public Boolean updateSmsBalance(Sms sms) throws JsonProcessingException {
+        rabbitMQSender.send(sms, RabbitMQMessageType.UPDATE_SMS);
+        return true;
+    }
+    public Boolean updateInternetBalance(Internet internet) throws JsonProcessingException {
+        rabbitMQSender.send(internet, RabbitMQMessageType.UPDATE_INTERNET);
+        return true;
     }
 
     private Long[] calcPrice(long halfPriceBalance, long chargeCount, float halfPriceCost, float fullPriceCost) {
@@ -185,7 +197,7 @@ public class AccountController {
         final long halfPriceCount = halfPriceBalance >= chargeCount ? chargeCount : chargeCount - halfPriceBalance;
         final long fullPriceCount = chargeCount - halfPriceCount;
 
-        result[0] = (long)(halfPriceCount * halfPriceCost + fullPriceCount * fullPriceCost);
+        result[0] = (long) (halfPriceCount * halfPriceCost + fullPriceCount * fullPriceCost);
         result[1] = halfPriceBalance - halfPriceCount;
         result[2] = halfPriceCount;
         result[3] = fullPriceCount;
@@ -194,7 +206,7 @@ public class AccountController {
     }
 
     public boolean callCanBeDone(Account account, long count) {
-        if(account!=null){
+        if (account != null) {
             final Call callBalance = getCallBalance(account.getLogin());
             final Long[] calcResult = calcPrice(callBalance.getCall_balance(), count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
             return account.getBalance() >= calcResult[0];
@@ -203,7 +215,7 @@ public class AccountController {
     }
 
     public boolean chargeCall(Account account, long count) {
-        if(account!=null){
+        if (account != null) {
             final Call callBalance = getCallBalance(account.getLogin());
             final Long[] calcResult = calcPrice(callBalance.getCall_balance(), count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
 
@@ -211,13 +223,13 @@ public class AccountController {
             callBalance.setCall_balance(calcResult[1]);
 
             try {
-                if(calcResult[2]>0){
+                if (calcResult[2] > 0) {
                     rabbitMQSender.send(callBalance, RabbitMQMessageType.CALL_ONE_SECOND);
                 }
-                if(calcResult[0]>0){
+                if (calcResult[0] > 0) {
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                 }
-            } catch (JsonProcessingException e){
+            } catch (JsonProcessingException e) {
                 LOG.error("chargeCall failed", e);
             }
             return account.getBalance() > 0;
@@ -227,7 +239,7 @@ public class AccountController {
 
 
     public boolean smsCanBeSend(Account account, long count) {
-        if(account!=null){
+        if (account != null) {
             final Sms balance = getSmsBalance(account.getLogin());
             final Long[] calcResult = calcPrice(balance.getSms_balance(), count, balance.getSms_cost(), balance.getDefault_sms_cost());
             return account.getBalance() >= calcResult[0];
@@ -236,7 +248,7 @@ public class AccountController {
     }
 
     public boolean chargeSms(Account account, long count) {
-        if(account!=null){
+        if (account != null) {
             final Sms balance = getSmsBalance(account.getLogin());
             final Long[] calcResult = calcPrice(balance.getSms_balance(), count, balance.getSms_cost(), balance.getDefault_sms_cost());
 
@@ -244,13 +256,13 @@ public class AccountController {
             balance.setSms_balance(calcResult[1]);
 
             try {
-                if(calcResult[2]>0){
+                if (calcResult[2] > 0) {
                     rabbitMQSender.send(balance, RabbitMQMessageType.REQUEST_SMS);
                 }
-                if(calcResult[0]>0){
+                if (calcResult[0] > 0) {
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                 }
-            } catch (JsonProcessingException e){
+            } catch (JsonProcessingException e) {
                 LOG.error("chargeCall failed", e);
             }
             return account.getBalance() > 0;
@@ -259,7 +271,7 @@ public class AccountController {
     }
 
     public boolean internetCanBeUsed(Account account, long count) {
-        if(account!=null){
+        if (account != null) {
             final Internet balance = getInternetBalance(account.getLogin());
             final Long[] calcResult = calcPrice(balance.getInternet_balance(), count, balance.getInternet_cost(), balance.getDefault_internet_cost());
             return account.getBalance() >= calcResult[0];
@@ -268,7 +280,7 @@ public class AccountController {
     }
 
     public boolean chargeInternet(Account account, long count) {
-        if(account!=null){
+        if (account != null) {
             final Internet balance = getInternetBalance(account.getLogin());
             final Long[] calcResult = calcPrice(balance.getInternet_balance(), count, balance.getInternet_cost(), balance.getDefault_internet_cost());
 
@@ -276,13 +288,13 @@ public class AccountController {
             balance.setInternet_balance(calcResult[1]);
 
             try {
-                if(calcResult[2]>0){
+                if (calcResult[2] > 0) {
                     rabbitMQSender.send(balance, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
                 }
-                if(calcResult[0]>0){
+                if (calcResult[0] > 0) {
                     rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
                 }
-            } catch (JsonProcessingException e){
+            } catch (JsonProcessingException e) {
                 LOG.error("chargeCall failed", e);
             }
             return account.getBalance() > 0;

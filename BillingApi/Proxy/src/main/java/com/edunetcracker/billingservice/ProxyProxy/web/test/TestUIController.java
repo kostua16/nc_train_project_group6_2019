@@ -28,14 +28,6 @@ public class TestUIController {
     @Autowired
     AccountController accountController;
 
-    @Autowired
-    CallController callController;
-
-    @Autowired
-    SmsController smsController;
-
-    @Autowired
-    InternetController internetController;
 
     @Autowired
     TariffController tariffController;
@@ -57,9 +49,9 @@ public class TestUIController {
             for (Account account : allAccounts) {
                 BalanceInfo balanceInfo = new BalanceInfo();
                 balanceInfo.setAccount(account);
-                balanceInfo.setCallBalance(callController.getCallByLogin(account.getLogin()).getBody());
-                balanceInfo.setSmsBalance(smsController.getSmsByLogin(account.getLogin()).getBody());
-                balanceInfo.setInternetBalance(internetController.getInternetByLogin(account.getLogin()).getBody());
+                balanceInfo.setCallBalance(accountController.getCallBalance(account.getLogin()));
+                balanceInfo.setSmsBalance(accountController.getSmsBalance(account.getLogin()));
+                balanceInfo.setInternetBalance(accountController.getInternetBalance(account.getLogin()));
                 balances.add(balanceInfo);
             }
         }

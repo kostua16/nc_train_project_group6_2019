@@ -1,8 +1,6 @@
 package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.entity.*;
-import com.edunetcracker.billingservice.ProxyProxy.web.NewMonth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,27 +18,13 @@ public class BillingController {
     AccountController accountController;
 
     @Autowired
-    BalanceController balanceController;
-
-    @Autowired
-    CallController callController;
-
-    @Autowired
-    InternetController internetController;
-
-    @Autowired
-    SmsController smsController;
-
-    @Autowired
     TariffController tariffController;
 
-    @Autowired
-    Checks checks;
 
     Logger LOG = LoggerFactory.getLogger(BillingController.class);
 
     @Scheduled(cron = "0 0 0 */1 * *")
-    public boolean newMonth(){
+    public boolean newMonth() {
         LOG.info("newMonth started {}", Date.from(Instant.now()));
 
         List<Account> accounts = accountController.getAllAccount();   // получим имена тарифов
@@ -49,7 +33,7 @@ public class BillingController {
         for (Account account : accounts) {
             String tariffName = account.getTariff();
             for (CollectedTariff collectedTariff : collectedTariffs) {
-                if(tariffName.equals(collectedTariff.getName())){
+                if (tariffName.equals(collectedTariff.getName())) {
 
                     TariffCall tariffCall = collectedTariff.getTariffCall();
                     TariffInternet tariffInternet = collectedTariff.getTariffInternet();
@@ -75,12 +59,12 @@ public class BillingController {
                     sms.setDefault_sms_cost(tariffSms.getDefault_sms_cost());
 
                     try {
-                        callController.updateCall(call);
-                        internetController.updateInternet(internet);
-                        smsController.updateSms(sms);
+                        accountController.updateCallBalance(call);
+                        accountController.updateInternetBalance(internet);
+                        accountController.updateSmsBalance(sms);
                         LOG.info("Updated account - {} [sms:{}, calls:{}, internet:{}]", account, sms, call, internet);
                         break;
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         LOG.info("Failed to update account - {} [sms:{}, calls:{}, internet:{}]", account, sms, call, internet);
                         break;
                     }

@@ -1,16 +1,10 @@
 package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
-import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
 import com.edunetcracker.billingservice.ProxyProxy.entity.*;
-import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
-import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class ImitatorService {
-    @Autowired
-    private RabbitMQSender rabbitMQSender;
-
-    @Autowired
-    private Helpers helpers;
-
-    @Autowired
-    private Checks checks;
 
     @Autowired
     TariffController tariffController;
@@ -35,14 +21,7 @@ public class ImitatorService {
     @Autowired
     AccountController accountController;
 
-    @Autowired
-    CallController callController;
 
-    @Autowired
-    InternetController internetController;
-
-    @Autowired
-    SmsController smsController;
 
     Logger LOG = LoggerFactory.getLogger(ImitatorService.class);
 
@@ -54,10 +33,11 @@ public class ImitatorService {
         return started;
     }
 
-    public void start(){
+    public void start() {
         started = true;
     }
-    public void stop(){
+
+    public void stop() {
         started = false;
     }
 
@@ -70,7 +50,7 @@ public class ImitatorService {
             final int accUid = (prefix + i);
             final String phoneNum = "8801555" + accUid;
             final String login = "user" + accUid + "@mail.ru";
-            if (!checks.isAccountExistsByPhone(phoneNum) && !checks.isAccountExists(login)) {
+            if (!accountController.isAccountExistsByPhone(phoneNum) && !accountController.isAccountExists(login)) {
                 final List<Tariff> tariffs = tariffController.getAllBaseTariffs();
                 if (tariffs != null && !tariffs.isEmpty()) {
                     final Tariff currentTariff = tariffs.get(currentRandom.nextInt(0, tariffs.size() + 1));
@@ -112,17 +92,16 @@ public class ImitatorService {
                 int accUid = (prefix + j);
                 String phoneNum = "8801555" + accUid;
                 final Account accountFrom = accountController.getAccountByTelephone(phoneNum);
-                if(accountFrom!=null){
-                    final String login = accountFrom.getLogin();
+                if (accountFrom != null) {
                     switch (ThreadLocalRandom.current().nextInt(1, 4)) {
                         case 1:
-                            callController.callToMinutes(login, ThreadLocalRandom.current().nextInt(1, 3));
+                            accountController.chargeCall(accountFrom, ThreadLocalRandom.current().nextInt(1, 3));
                             break;
                         case 2:
-                            smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3));
+                            accountController.chargeSms(accountFrom, ThreadLocalRandom.current().nextLong(1, 3));
                             break;
                         case 3:
-                            internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000));
+                            accountController.chargeInternet(accountFrom, ThreadLocalRandom.current().nextLong(100, 30000));
                             break;
                     }
                 }
@@ -150,7 +129,7 @@ public class ImitatorService {
                         ));
             }
 
-            if(!accountController.isAccountExists("admin@mail.ru")){
+            if (!accountController.isAccountExists("admin@mail.ru")) {
                 accountController.createAccount(
                         new Account(
                                 "admin@mail.ru", "123456", "admin",
@@ -159,7 +138,7 @@ public class ImitatorService {
                 );
             }
 
-            if(!accountController.isAccountExists("user@mail.ru")){
+            if (!accountController.isAccountExists("user@mail.ru")) {
                 accountController.createAccount(
                         new Account(
                                 "user@mail.ru", "123456", "user",
@@ -168,7 +147,7 @@ public class ImitatorService {
                 );
             }
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
@@ -176,7 +155,7 @@ public class ImitatorService {
     @Scheduled(cron = "*/10 * * * * *")
     @PostConstruct
     public void initSystem() {
-        if(!systemInit){
+        if (!systemInit) {
             systemInit = initBaseUsers();
         }
 
