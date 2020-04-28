@@ -84,6 +84,31 @@ public class SSP {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
     }
+    @GetMapping("topUpByTelephone")
+    public ResponseEntity<Boolean> topUpByTelephone (@RequestParam("token") @NotNull String token,
+                                                     @RequestParam("telephone") @NotNull Long telephone,
+                                                     @RequestParam("amount") @NotNull Long amount ) {
+        String login = checks.getLoginByTokenAndCheck(token);
+        if(login == null) {
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        }
+        String rang = helpers.getAccount(login).getRang();
+        if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
+            String url = helpers.getUrlProxy() + "/topUpByTelephone/?telephone=" + telephone + "&amount=" + amount;
+            Boolean response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
+            if(response!=null){
+                if(response){
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+                }
+            }
+
+
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+    }
     /**
      * Показ всех доступных тарифов вместе с текущим для пользователя
      */

@@ -63,6 +63,12 @@ public class SSP {
                          @RequestParam("amount") Long amount) {
         return accountController.addBalance(login, amount);
     }
+    @GetMapping("topUpByTelephone")
+    public Boolean topUpByTelephone(@RequestParam("telephone") String telephone,
+                                    @RequestParam("amount") Long amount) {
+        final Account account = accountController.getAccountByTelephone(telephone);
+        return accountController.addBalance(account.getLogin(), amount);
+    }
 
     //  http://localhost:8102/showtariff/?login=tester@mail.ru
     @GetMapping("showtariff")
