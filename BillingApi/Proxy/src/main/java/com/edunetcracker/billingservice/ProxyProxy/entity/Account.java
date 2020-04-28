@@ -87,4 +87,17 @@ public class Account {
                 ", rang='" + rang + '\'' +
                 '}';
     }
+
+    public Account() {
+    }
+
+    public Account(String login, String password, String name, Long balance, String tariff, String telephone, String rang) {
+        this.login = login;
+        this.password = password;
+        this.name = name;
+        this.balance = balance;
+        this.tariff = tariff;
+        this.telephone = telephone;
+        this.rang = rang;
+    }
 }

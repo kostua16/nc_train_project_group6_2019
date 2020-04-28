@@ -27,6 +27,9 @@ public class BalanceController {
     @Autowired
     private Checks checks;
 
+    @Autowired
+    private AccountController accountController;
+
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     /*@GetMapping("getBalance")*/
@@ -39,21 +42,6 @@ public class BalanceController {
             e.printStackTrace();
             return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
         }
-    }
-
-    /*@GetMapping("getAnotherBalance")*/
-    public ResponseEntity<Long> getAnotherBalance(/*@RequestParam("token") String token,
-                                                  @RequestParam("login") */String login) {
-        try {
-            String url = helpers.getUrlBilling() + "/getBalanceByLogin/?login=" + login;
-            ResponseEntity responseBalance = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Long.class);
-            return new ResponseEntity<>((Long) responseBalance.getBody(), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>((Long) null, HttpStatus.NOT_FOUND);
-        }
-
-
     }
 
     // add +/- amount

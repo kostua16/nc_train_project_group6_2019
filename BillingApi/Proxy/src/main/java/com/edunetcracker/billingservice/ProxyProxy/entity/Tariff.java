@@ -12,4 +12,11 @@ public class Tariff {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Tariff(String name) {
+        this.name = name;
+    }
+
+    public Tariff() {
+    }
 }

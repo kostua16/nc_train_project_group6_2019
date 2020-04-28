@@ -40,17 +40,18 @@ public class TestUIController {
     @Autowired
     TariffController tariffController;
 
-    @Autowired
-    Helpers helpers;
 
     @Autowired
     ImitatorService imitatorService;
+
+    @Autowired
+    HistoryController historyController;
 
 
     @GetMapping("users")
     public String users(Model model){
         ;
-        List<Account> allAccounts = accountController.getAllAccount().getBody();
+        List<Account> allAccounts = accountController.getAllAccount();
         List<BalanceInfo> balances = new ArrayList<>();
         if(allAccounts!=null){
             for (Account account : allAccounts) {
@@ -68,10 +69,10 @@ public class TestUIController {
 
     @GetMapping("plans")
     public String tariffs(Model model){
-        List<Tariff> allTariffs = tariffController.getAllTariff().getBody();
+        List<Tariff> allTariffs = tariffController.getAllBaseTariffs();
         List<CollectedTariff> plans = new ArrayList<>();
         for (Tariff tariff : allTariffs) {
-            final CollectedTariff collectedTariff = tariffController.getCollectedTariffByName(tariff.getName()).getBody();
+            final CollectedTariff collectedTariff = tariffController.getTariff(tariff.getName());
             plans.add(collectedTariff);
         }
         model.addAttribute("plans", plans);
@@ -80,9 +81,7 @@ public class TestUIController {
 
     @GetMapping("history")
     public String history(Model model, @RequestParam(value = "page", defaultValue = "0") Integer page){
-        String url = helpers.getUrlBilling() + "/getHistory?page=" + page;
-        final List<History> historyList =  (List<History>) new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
-        model.addAttribute("history", historyList);
+        model.addAttribute("history", historyController.showHistory(page));
         return "ui/test/history";
     }
 

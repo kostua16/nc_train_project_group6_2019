@@ -47,4 +47,13 @@ public class TariffSms {
         this.default_sms_cost = default_sms_cost;
     }
 
+    public TariffSms(String name, Float sms_cost, Long sms_balance, Float default_sms_cost) {
+        this.name = name;
+        this.sms_cost = sms_cost;
+        this.sms_balance = sms_balance;
+        this.default_sms_cost = default_sms_cost;
+    }
+
+    public TariffSms() {
+    }
 }

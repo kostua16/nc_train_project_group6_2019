@@ -445,6 +445,12 @@ export default new Vuex.Store({
     },
 
     DO_CALL: async (context, info) => {
+      let result = {
+        count: 1,
+        stopped: false,
+        balance: 0,
+        package: 0
+      };
       if (context.state.STUB_MODE) {
         const user = context.state.STUB_USERS.find(user => user.telephone === info.telephoneFrom);
         if (user != null) {
@@ -456,6 +462,7 @@ export default new Vuex.Store({
             } else {
               user.balance = user.balance - tariff.tariffCall.Default_call_cost * 1;
             }
+            result.balance = user.balance;
           } else {
             throw new Error("Tariff not found:" + user.tariff);
           }
@@ -464,15 +471,27 @@ export default new Vuex.Store({
         }
       } else {
         const response = await Vue.axios.get(`${context.state.PROXY_URL}/callFromTo/?telephoneFrom=${info.telephoneFrom}&minutes=1&telephoneTo=${info.telephoneTo}`);
-        if("true" !== response.data){
+        if(response.data == null){
           throw new Error("User unable to make call");
         }
+        result.stopped = response.data.stopped;
+        result.count = response.data.count;
+        result.balance = response.balance;
+        result.package = response.package;
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
       }
+
+      return result;
     },
     DO_SMS: async (context, info) => {
+      let result = {
+        count: 1,
+        stopped: false,
+        balance: 0,
+        package: 0
+      };
       if (context.state.STUB_MODE) {
         const user = context.state.STUB_USERS.find(user => user.telephone === info.telephoneFrom);
         if (user != null) {
@@ -484,6 +503,7 @@ export default new Vuex.Store({
             } else {
               user.balance = user.balance - tariff.tariffSms.Default_sms_cost * 1;
             }
+            result.balance = user.balance;
           } else {
             throw new Error("Tariff not found:" + user.tariff);
           }
@@ -492,15 +512,26 @@ export default new Vuex.Store({
         }
       } else {
         const response = await Vue.axios.get(`${context.state.PROXY_URL}/smsFromTo/?telephoneFrom=${info.telephoneFrom}&sms=1&telephoneTo=${info.telephoneTo}`);
-        if("true" !== response.data){
+        if(response.data == null){
           throw new Error("User unable to send sms");
         }
+        result.stopped = response.data.stopped;
+        result.count = response.data.count;
+        result.balance = response.balance;
+        result.package = response.package;
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
       }
+      return result;
     },
     DO_INTERNET: async (context, info) => {
+      let result = {
+        count: 1024,
+        stopped: false,
+        balance: 0,
+        package: 0
+      };
       if (context.state.STUB_MODE) {
         const user = context.state.STUB_USERS.find(user => user.telephone === info.telephoneFrom);
         if (user != null) {
@@ -512,6 +543,7 @@ export default new Vuex.Store({
             } else {
               user.balance = user.balance - tariff.tariffInternet.Default_internet_cost * 1;
             }
+            result.balance = user.balance;
           } else {
             throw new Error("Tariff not found:" + user.tariff);
           }
@@ -519,14 +551,19 @@ export default new Vuex.Store({
           throw new Error("User not found:" + info.telephoneFrom);
         }
       } else {
-        const response = await Vue.axios.get(`${context.state.PROXY_URL}/useInternet/?telephoneFrom=${info.telephoneFrom}&kilobytes=1000&telephoneTo=${info.telephoneTo}`);
-        if("true" !== response.data){
+        const response = await Vue.axios.get(`${context.state.PROXY_URL}/useInternet/?telephoneFrom=${info.telephoneFrom}&kilobytes=1024&telephoneTo=${info.telephoneTo}`);
+        if(response.data == null){
           throw new Error("User unable to establish internet connection");
         }
+        result.stopped = response.data.stopped;
+        result.count = response.data.count;
+        result.balance = response.balance;
+        result.package = response.package;
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
       }
+      return result;
     },
   },
   modules: {}

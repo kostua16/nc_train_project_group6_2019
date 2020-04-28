@@ -16,6 +16,7 @@ public class CollectedTariff {
         this.tariffSms = tariffSms;
     }
 
+
     public String getName() {
         return name;
     }

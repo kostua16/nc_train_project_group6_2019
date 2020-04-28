@@ -46,4 +46,14 @@ public class TariffCall {
     public void setDefault_call_cost(Float default_call_cost) {
         this.default_call_cost = default_call_cost;
     }
+
+    public TariffCall() {
+    }
+
+    public TariffCall(String name, Float call_cost, Long call_balance, Float default_call_cost) {
+        this.name = name;
+        this.call_cost = call_cost;
+        this.call_balance = call_balance;
+        this.default_call_cost = default_call_cost;
+    }
 }

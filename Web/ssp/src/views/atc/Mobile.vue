@@ -87,6 +87,8 @@
       telephoneTo: '',
       showModal: false,
       actionDuration: 0,
+      actionBalance: 0,
+      actionPackageCount: 0,
       actionState:0,
       typeModal: 'call',
       imitatorCalled: false
@@ -106,23 +108,23 @@
             }
           case actionStarted:
             switch (this.typeModal) {
-              case "call": return `Абонент производит звонок. Длительность - ${this.actionDuration}`;
-              case "sms": return `Абонент отправляет смс. Количество - ${this.actionDuration}`;
-              case "internet": return `Абонент использует интернет. Объем - ${this.actionDuration}`;
+              case "call": return `Абонент производит звонок. Длительность - ${this.actionDuration} мин. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} мин. `;
+              case "sms": return `Абонент отправляет смс. Количество - ${this.actionDuration} шт. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} шт. `;
+              case "internet": return `Абонент использует интернет. Объем - ${this.actionDuration} кб. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} кб. `;
               default: return ""
             }
           case actionStoppedByUser:
             switch (this.typeModal) {
-              case "call": return `Звонок завершен абонентом. Длительность - ${this.actionDuration}`;
-              case "sms": return `Отправка смс завершена абонентом. Количество - ${this.actionDuration}`;
-              case "internet": return `Пользование интернетом завершено абонентом. Объем - ${this.actionDuration}`;
+              case "call": return `Звонок завершен абонентом. Длительность - ${this.actionDuration} мин. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} мин. `;
+              case "sms": return `Отправка смс завершена абонентом. Количество - ${this.actionDuration} шт. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} шт. `;
+              case "internet": return `Пользование интернетом завершено абонентом. Объем - ${this.actionDuration} кб. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} кб. `;
               default: return ""
             }
           case actionStoppedBySystem:
             switch (this.typeModal) {
-              case "call": return `Звонок прерван системой. Длительность - ${this.actionDuration}`;
-              case "sms": return `Отправка смс прервана системой. Количество - ${this.actionDuration}`;
-              case "internet": return `Пользование интернетом прервано системой. Объем - ${this.actionDuration}`;
+              case "call": return `Звонок прерван системой. Длительность - ${this.actionDuration} мин. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} мин. `;
+              case "sms": return `Отправка смс прервана системой. Количество - ${this.actionDuration} шт. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} шт. `;
+              case "internet": return `Пользование интернетом прервано системой. Объем - ${this.actionDuration} кб. Баланс - ${this.actionBalance} р. Остаток пакета - ${this.actionPackageCount} кб. `;
               default: return ""
             }
           default: return ""
@@ -155,6 +157,8 @@
       startModal(type) {
         this.typeModal=type;
         this.actionDuration = 0;
+        this.actionBalance = 0;
+        this.actionPackageCount = 0;
         this.actionState = actionNotStarted;
         this.showModal = true;
       },
@@ -186,10 +190,17 @@
                   operation = "DO_INTERNET";
                   break;
               }
-              await this.$store.dispatch(operation, {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo});
-              this.actionDuration += 1;
-              const that = this;
-              setTimeout(() => that.spend(), 1000);
+              let result = await this.$store.dispatch(operation, {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo});
+              this.actionDuration += result.count;
+              this.actionBalance = result.balance;
+              this.actionPackageCount = result.package;
+              if(result.stopped === true){
+                this.actionState = actionStoppedBySystem;
+              } else {
+                const that = this;
+                setTimeout(() => that.spend(), 1000);
+              }
+
             } catch (e) {
               this.actionState = actionStoppedBySystem;
             }

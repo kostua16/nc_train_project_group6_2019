@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 //АТС
 @RestController
 public class TelephoneExchange {
@@ -40,40 +43,72 @@ public class TelephoneExchange {
 
     Logger LOG = LoggerFactory.getLogger(TelephoneExchange.class);
 
-    /*************************************************************************/
-    //  http://localhost:8102/addBalance/?telephoneFrom=897654321&amount=1
-    @GetMapping("addBalance")
-    public Boolean topup (@RequestParam("telephoneFrom") String telephoneFrom,
-                          @RequestParam("amount") Long amount ) {
-        Account accountFrom = accountController.getAccountByTelephone(telephoneFrom).getBody();
-        if (amount > 0L && balanceController.addToBalance(accountFrom.getLogin(), amount).getBody())
-            return true;
-        return false;
-    }
     //  http://localhost:8102/callFromTo/?telephoneFrom=897654321&minutes=1&telephoneTo=999
     @GetMapping("callFromTo")
-    public Boolean choicetariff(@RequestParam("telephoneFrom") String telephoneFrom,
+    public Map<String, String> callFromTo(@RequestParam("telephoneFrom") String telephoneFrom,
                                 @RequestParam("minutes") Long minutes,
                                 @RequestParam("telephoneTo") String telephoneTo){
-        Account accountFrom = accountController.getAccountByTelephone(telephoneFrom).getBody();
-        //return callController.callToMinutes(accountFrom.getLogin(), Long.parseLong(minutes));
-        return callController.callToMinutes(accountFrom.getLogin(), minutes);
+        Map<String, String> result= new HashMap<>();
+        result.put("stopped", "true");
+        Account accountFrom = accountController.getAccountByTelephone(telephoneFrom);
+        if(accountController.callCanBeDone(accountFrom, 1)){
+            int countDone = 0;
+            boolean running = true;
+
+            while (countDone<=minutes && running){
+                running = accountController.chargeCall(accountFrom, 60);
+                countDone +=1;
+            }
+            result.put("count", String.valueOf(countDone));
+            result.put("stopped", String.valueOf(!running));
+            result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
+            result.put("package", String.valueOf(accountController.getCallBalance(accountFrom.getLogin()).getCall_balance()));
+        };
+        return result;
     }
     //  http://localhost:8102/useInternet/?telephoneFrom=897654321&kilobytes=4
     @GetMapping("useInternet")
-    public Boolean useInternet(@RequestParam("telephoneFrom") String telephoneFrom,
+    public Map<String, String> useInternet(@RequestParam("telephoneFrom") String telephoneFrom,
                                @RequestParam("kilobytes") Long kilobytes){
-        LOG.info("i");
-        Account accountFrom = accountController.getAccountByTelephone(telephoneFrom).getBody();
-        LOG.info("ii");
-        return internetController.useInternetKilobytes(accountFrom.getLogin(), kilobytes);
+        Map<String, String> result= new HashMap<>();
+        result.put("stopped", "true");
+        Account accountFrom = accountController.getAccountByTelephone(telephoneFrom);
+        if(accountController.internetCanBeUsed(accountFrom, 1)){
+            int countDone = 0;
+            boolean running = true;
+
+            while (countDone<=kilobytes && running){
+                running = accountController.chargeInternet(accountFrom, 1024);
+                countDone +=1024;
+            }
+            result.put("count", String.valueOf(countDone));
+            result.put("stopped", String.valueOf(!running));
+            result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
+            result.put("package", String.valueOf(accountController.getInternetBalance(accountFrom.getLogin()).getInternet_balance()));
+        };
+        return result;
     }
     //  http://localhost:8102/smsFromTo/?telephoneFrom=897654321&sms=4&telephoneTo=999
     @GetMapping("smsFromTo")
-    public Boolean smsFromTo(@RequestParam("telephoneFrom") String telephoneFrom,
+    public Map<String, String> smsFromTo(@RequestParam("telephoneFrom") String telephoneFrom,
                              @RequestParam("sms") Long sms,
                              @RequestParam("telephoneTo") String telephoneTo){
-        Account accountFrom = accountController.getAccountByTelephone(telephoneFrom).getBody();
-        return smsController.requestSms(accountFrom.getLogin(),sms);
+        Map<String, String> result= new HashMap<>();
+        result.put("stopped", "true");
+        Account accountFrom = accountController.getAccountByTelephone(telephoneFrom);
+        if(accountController.smsCanBeSend(accountFrom, 1)){
+            int countDone = 0;
+            boolean running = true;
+
+            while (countDone<=sms && running){
+                running = accountController.chargeCall(accountFrom, 1);
+                countDone +=1;
+            }
+            result.put("count", String.valueOf(countDone));
+            result.put("stopped", String.valueOf(!running));
+            result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
+            result.put("package", String.valueOf(accountController.getSmsBalance(accountFrom.getLogin()).getSms_balance()));
+        };
+        return result;
     }
 }

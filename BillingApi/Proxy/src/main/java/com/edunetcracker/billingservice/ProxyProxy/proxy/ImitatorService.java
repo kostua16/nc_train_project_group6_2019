@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -47,6 +48,8 @@ public class ImitatorService {
 
     private boolean started = false;
 
+    private boolean systemInit = false;
+
     public boolean isStarted() {
         return started;
     }
@@ -68,18 +71,14 @@ public class ImitatorService {
             final String phoneNum = "8801555" + accUid;
             final String login = "user" + accUid + "@mail.ru";
             if (!checks.isAccountExistsByPhone(phoneNum) && !checks.isAccountExists(login)) {
-                final List<Tariff> tariffs = tariffController.getAllTariff().getBody();
+                final List<Tariff> tariffs = tariffController.getAllBaseTariffs();
                 if (tariffs != null && !tariffs.isEmpty()) {
                     final Tariff currentTariff = tariffs.get(currentRandom.nextInt(0, tariffs.size() + 1));
                     if (currentTariff != null) {
-                        final CollectedTariff collectedTariff = tariffController.getCollectedTariffByName(currentTariff.getName()).getBody();
+                        final CollectedTariff collectedTariff = tariffController.getTariff(currentTariff.getName());
 
 
                         if (collectedTariff != null) {
-
-                            final TariffCall tariffCall = collectedTariff.getTariffCall();
-                            final TariffSms tariffSms = collectedTariff.getTariffSms();
-                            final TariffInternet tariffInternet = collectedTariff.getTariffInternet();
 
                             Account account = new Account();
 
@@ -93,31 +92,9 @@ public class ImitatorService {
 
                             account.setTariff(currentTariff.getName());
 
-                            // взять тариф и присвоить его
-                            Call call = new Call();
-                            call.setLogin(account.getLogin());
-                            call.setCall_cost(tariffCall.getCall_cost());
-                            call.setCall_balance(currentRandom.nextLong(0, 100));
-                            call.setDefault_call_cost(tariffCall.getDefault_call_cost());
+                            accountController.createAccount(account);
 
-                            Internet internet = new Internet();
-                            internet.setLogin(account.getLogin());
-                            internet.setInternet_cost(tariffInternet.getInternet_cost());
-                            internet.setInternet_balance(currentRandom.nextLong(0, 50));
-                            internet.setDefault_internet_cost(tariffInternet.getDefault_internet_cost());
-
-                            Sms sms = new Sms();
-                            sms.setLogin(account.getLogin());
-                            sms.setSms_cost(tariffSms.getSms_cost());
-                            sms.setSms_balance(currentRandom.nextLong(0, 50000));
-                            sms.setDefault_sms_cost(tariffSms.getDefault_sms_cost());
-
-                            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
-                            rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
-                            rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
-                            rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
-
-                            LOG.info("Generated account - {} [sms:{}, calls:{}, internet:{}]", account, sms, call, internet);
+                            LOG.info("Generated account - {}", account);
                         }
 
                     }
@@ -134,29 +111,76 @@ public class ImitatorService {
             for (int j = 0; j < maxToIterate; j++) {
                 int accUid = (prefix + j);
                 String phoneNum = "8801555" + accUid;
-                final ResponseEntity<Account> accountByTelephone = accountController.getAccountByTelephone(phoneNum);
-                if (HttpStatus.OK.equals(accountByTelephone.getStatusCode())) {
-                    Account accountFrom = accountByTelephone.getBody();
-                    if(accountFrom!=null){
-                        final String login = accountFrom.getLogin();
-                        switch (ThreadLocalRandom.current().nextInt(1, 4)) {
-                            case 1:
-                                callController.callToMinutes(login, ThreadLocalRandom.current().nextInt(1, 3));
-                                break;
-                            case 2:
-                                smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3));
-                                break;
-                            case 3:
-                                internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000));
-                                break;
-                        }
+                final Account accountFrom = accountController.getAccountByTelephone(phoneNum);
+                if(accountFrom!=null){
+                    final String login = accountFrom.getLogin();
+                    switch (ThreadLocalRandom.current().nextInt(1, 4)) {
+                        case 1:
+                            callController.callToMinutes(login, ThreadLocalRandom.current().nextInt(1, 3));
+                            break;
+                        case 2:
+                            smsController.requestSms(login, ThreadLocalRandom.current().nextLong(1, 3));
+                            break;
+                        case 3:
+                            internetController.useInternetKilobytes(login, ThreadLocalRandom.current().nextLong(100, 30000));
+                            break;
                     }
-
                 }
             }
         }
     }
 
+    public Boolean initBaseUsers() {
+
+        try {
+            if (!tariffController.isTariffExists("DEFAULT")) {
+                tariffController.createTariff(
+                        new CollectedTariff("DEFAULT",
+                                new TariffCall("DEFAULT", 0F, 1800L, 0.0834F),
+                                new TariffInternet("DEFAULT", 0F, 1000000L, 0.001F),
+                                new TariffSms("DEFAULT", 0F, 30L, 2F)
+                        ));
+            }
+            if (!tariffController.isTariffExists("ADMINISTRATOR")) {
+                tariffController.createTariff(
+                        new CollectedTariff("ADMINISTRATOR",
+                                new TariffCall("ADMINISTRATOR", 0F, 0L, 0F),
+                                new TariffInternet("ADMINISTRATOR", 0F, 0L, 0F),
+                                new TariffSms("ADMINISTRATOR", 0F, 0L, 0F)
+                        ));
+            }
+
+            if(!accountController.isAccountExists("admin@mail.ru")){
+                accountController.createAccount(
+                        new Account(
+                                "admin@mail.ru", "123456", "admin",
+                                0L, "ADMINISTRATOR", "88005553535", "ADMINISTRATOR"
+                        )
+                );
+            }
+
+            if(!accountController.isAccountExists("user@mail.ru")){
+                accountController.createAccount(
+                        new Account(
+                                "user@mail.ru", "123456", "user",
+                                0L, "DEFAULT", "88005553536", "USER"
+                        )
+                );
+            }
+            return true;
+        } catch (Exception e){
+            return false;
+        }
+    }
+
+    @Scheduled(cron = "*/10 * * * * *")
+    @PostConstruct
+    public void initSystem() {
+        if(!systemInit){
+            systemInit = initBaseUsers();
+        }
+
+    }
 
     @Scheduled(cron = "* */1 * * * *")
     public void generateUsers() throws JsonProcessingException {

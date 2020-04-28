@@ -43,8 +43,8 @@ public class BillingController {
     public boolean newMonth(){
         LOG.info("newMonth started {}", Date.from(Instant.now()));
 
-        List<Account> accounts = accountController.getAllAccount().getBody();   // получим имена тарифов
-        List<CollectedTariff> collectedTariffs = tariffController.getAllCollectedTariff().getBody();    // получим деф значения
+        List<Account> accounts = accountController.getAllAccount();   // получим имена тарифов
+        List<CollectedTariff> collectedTariffs = tariffController.getAllCollectedTariff();    // получим деф значения
 
         for (Account account : accounts) {
             String tariffName = account.getTariff();

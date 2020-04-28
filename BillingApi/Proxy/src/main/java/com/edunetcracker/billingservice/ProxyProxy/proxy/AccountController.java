@@ -2,10 +2,10 @@ package com.edunetcracker.billingservice.ProxyProxy.proxy;
 
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Checks;
 import com.edunetcracker.billingservice.ProxyProxy.checks_and_helpers.Helpers;
-import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
-import com.edunetcracker.billingservice.ProxyProxy.entity.Call;
+import com.edunetcracker.billingservice.ProxyProxy.entity.*;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQMessageType;
 import com.edunetcracker.billingservice.ProxyProxy.rabbit.RabbitMQSender;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,117 +24,271 @@ public class AccountController {
     @Autowired
     private RabbitMQSender rabbitMQSender;
 
-    @Autowired
-    private Helpers helpers;
+
+    Logger LOG = LoggerFactory.getLogger(AccountController.class);
 
     @Autowired
-    private Checks checks;
-    Logger LOG = LoggerFactory.getLogger(AccountController.class);
+    OperationsService operationsService;
+
+    @Autowired
+    TariffController tariffController;
+
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*@GetMapping("getAccount")*/
-    public ResponseEntity<Account> getAccount(/*@RequestParam("token") String token*/ String login) {
-        try {
-            String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + login;
-            ResponseEntity responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
-            return responseAccount;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
-        }
-    }
-    /*@GetMapping("getAccountByLogin")*/
-    public ResponseEntity<Account> getAccountForName(/*@RequestParam("token") String token,*/
-                                                     /*@RequestParam("login")*/ String login ) {
-        try {
-            String url = helpers.getUrlBilling() + "/getAccountByLogin/?login=" + login;
-            ResponseEntity<Account> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
-            return responseAccount;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
-        }
-    }
-    public ResponseEntity<List<Account>> searchAccounts(String query ) {
-        try {
-            String url = helpers.getUrlBilling() + "/searchAccounts/?query=" + query;
-            final List<Account> accounts = (List<Account>) new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
-            return new ResponseEntity<>( accounts, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
-        }
-    }
-    public ResponseEntity<Account> getAccountByTelephone(String telephone) {
-        try {
-            LOG.info("getAccountByTelephone");
-            String url = helpers.getUrlBilling() + "/getAccountByTelephone/?telephone=" + telephone;
-            ResponseEntity<Account> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Account.class);
-            return responseAccount;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
-        }
-    }
-    /*@GetMapping("getAllAccount")*/
-    public ResponseEntity<List<Account>> getAllAccount(/*@RequestParam("token") String token*/) {
-        try {
-            String url = helpers.getUrlBilling() + "/getAllAccount";
-            ResponseEntity <List<Account>> responseAccount = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), new ParameterizedTypeReference<List<Account>>() {});
-            return responseAccount;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
-        }
+    /*************checks**************/
+    public Boolean isAccountExists(String accountLogin) {
+        return operationsService.request("/getAccountByLogin/?login=" + accountLogin, HttpMethod.GET, Account.class) != null;
     }
 
-    /*@PostMapping("createAccount")*/
-    public Boolean createAccount(/*@RequestParam("token") String token,
-                                 @RequestBody*/ Account account) {
+    public Boolean isAccountExistsByPhone(String phoneNum) {
+        return operationsService.request("/getAccountByTelephone/?telephone=" + phoneNum, HttpMethod.GET, Account.class) != null;
+    }
+
+    public Boolean createAccount(Account account) throws JsonProcessingException {
+        if(account!=null && !isAccountExists(account.getLogin()) && !isAccountExistsByPhone(account.getTelephone()) && tariffController.isTariffExists(account.getTariff())){
+
+            final CollectedTariff currentTarrif = tariffController.getTariff(account.getTariff());
+            if(currentTarrif!=null){
+                final TariffInternet tariffInternet = currentTarrif.getTariffInternet();
+                final TariffSms tariffSms = currentTarrif.getTariffSms();
+                final TariffCall tariffCall = currentTarrif.getTariffCall();
+                // взять тариф и присвоить его
+                Call call = new Call();
+                call.setLogin(account.getLogin());
+                call.setCall_cost(tariffCall.getCall_cost());
+                call.setCall_balance(tariffCall.getCall_balance());
+                call.setDefault_call_cost(tariffCall.getDefault_call_cost());
+
+                Internet internet = new Internet();
+                internet.setLogin(account.getLogin());
+                internet.setInternet_cost(tariffInternet.getInternet_cost());
+                internet.setInternet_balance(tariffInternet.getInternet_balance());
+                internet.setDefault_internet_cost(tariffInternet.getDefault_internet_cost());
+
+                Sms sms = new Sms();
+                sms.setLogin(account.getLogin());
+                sms.setSms_cost(tariffSms.getSms_cost());
+                sms.setSms_balance(tariffSms.getSms_balance());
+                sms.setDefault_sms_cost(tariffSms.getDefault_sms_cost());
+
+                rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
+                rabbitMQSender.send(call, RabbitMQMessageType.CREATE_CALL);
+                rabbitMQSender.send(internet, RabbitMQMessageType.CREATE_INTERNET);
+                rabbitMQSender.send(sms, RabbitMQMessageType.CREATE_SMS);
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    public Account getAccount(String login) {
+        return operationsService.request("/getAccountByLogin/?login=" + login, HttpMethod.GET, Account.class);
+    }
+    public List<Account> searchAccounts(String query ) {
+        return operationsService.requestList("/searchAccounts/?query=" + query, HttpMethod.GET, Account.class);
+    }
+    public Account getAccountByTelephone(String telephone) {
+        return operationsService.request("/getAccountByTelephone/?telephone=" + telephone, HttpMethod.GET, Account.class);
+    }
+    public List<Account> getAllAccount() {
+        return operationsService.requestList("/getAllAccount", HttpMethod.GET, Account.class);
+    }
+
+    public Boolean migrateToTariff(String oldTariff, String newTariff) {
+        if(tariffController.isTariffExists(oldTariff) && tariffController.isTariffExists(newTariff)){
+            for (Account account : getAllAccount()) {
+                if(oldTariff.equals(account.getTariff())) {
+                    account.setTariff(newTariff);
+                    if(!updateAccount(account)){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    public Boolean updateAccount(Account newAccountData) {
+        if(isAccountExists(newAccountData.getLogin())){
+            try {
+                rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
+                return true;
+            } catch (JsonProcessingException e){
+                LOG.error("updateAccount failed", e);
+            }
+
+        }
+        return false;
+    }
+
+    public Boolean deleteAccountByLogin(String login) {
+        if(isAccountExists(login)){
+            try {
+                rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
+                return true;
+            } catch (Exception e) {
+                LOG.error("deleteAccountByLogin failed", e);
+
+            }
+        }
+        return false;
+    }
+
+    public Long getBalance(/*@RequestParam("token")*/ String login) {
+        return operationsService.request("/getBalanceByLogin/?login=" + login, HttpMethod.GET, Long.class);
+    }
+
+    public Boolean updateBalance(String login, Long amount) {
         try {
-            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
+            final Account acc = getAccount(login);
+            acc.setBalance(amount);
+            rabbitMQSender.send(acc, RabbitMQMessageType.ADD_BALANCE);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            LOG.error("updateBalance failed", e);
         }
+        return false;
     }
 
-    /*@PostMapping("createAccountWithoutToken")*/
-    public Boolean createAccountWithoutToken(/*@RequestBody */Account account) {
+    public Boolean addBalance(String login, Long amount) {
         try {
-            rabbitMQSender.send(account, RabbitMQMessageType.CREATE_ACCOUNT);
-            return true;
+            final Account acc = getAccount(login);
+            if ((acc.getBalance() + amount >= 0L)) {
+                acc.setBalance(amount);
+                rabbitMQSender.send(acc, RabbitMQMessageType.ADD_BALANCE);
+                return true;
+            }
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            LOG.error("addBalance failed", e);
         }
+        return false;
     }
 
-    /*@PutMapping("updateAccount")*/
-    public Boolean updateAccount(/*@RequestParam("token") String token,
-                                 @RequestBody */Account newAccountData) {
-        try {
-            rabbitMQSender.send(newAccountData, RabbitMQMessageType.UPDATE_ACCOUNT);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
+    public Internet getInternetBalance(String login) {
+        return operationsService.request("/getInternetByLogin/?login=" + login, HttpMethod.GET, Internet.class);
+    }
+    public Call getCallBalance(String login) {
+        return operationsService.request("/getCallByLogin/?login=" + login, HttpMethod.GET, Call.class);
+    }
+    public Sms getSmsBalance(String login) {
+        return operationsService.request("/getSmsByLogin/?login=" + login, HttpMethod.GET, Sms.class);
     }
 
-    /*@DeleteMapping("deleteAccountByLogin")*/
-    public Boolean deleteAccountByLogin(/*@RequestParam("token") String token,
-                                        @RequestParam("login")*/ String login) {
+    private Long[] calcPrice(long halfPriceBalance, long chargeCount, float halfPriceCost, float fullPriceCost) {
+        Long[] result = new Long[4];
+        final long halfPriceCount = halfPriceBalance >= chargeCount ? chargeCount : chargeCount - halfPriceBalance;
+        final long fullPriceCount = chargeCount - halfPriceCount;
 
-        try {
-            rabbitMQSender.send(login, RabbitMQMessageType.DELETE_ACCOUNT);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        result[0] = (long)(halfPriceCount * halfPriceCost + fullPriceCount * fullPriceCost);
+        result[1] = halfPriceBalance - halfPriceCount;
+        result[2] = halfPriceCount;
+        result[3] = fullPriceCount;
+
+        return result;
     }
+
+    public boolean callCanBeDone(Account account, long count) {
+        if(account!=null){
+            final Call callBalance = getCallBalance(account.getLogin());
+            final Long[] calcResult = calcPrice(callBalance.getCall_balance(), count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
+            return account.getBalance() >= calcResult[0];
+        }
+        return false;
+    }
+
+    public boolean chargeCall(Account account, long count) {
+        if(account!=null){
+            final Call callBalance = getCallBalance(account.getLogin());
+            final Long[] calcResult = calcPrice(callBalance.getCall_balance(), count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
+
+            account.setBalance(account.getBalance() - calcResult[0]);
+            callBalance.setCall_balance(calcResult[1]);
+
+            try {
+                if(calcResult[2]>0){
+                    rabbitMQSender.send(callBalance, RabbitMQMessageType.CALL_ONE_SECOND);
+                }
+                if(calcResult[0]>0){
+                    rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                }
+            } catch (JsonProcessingException e){
+                LOG.error("chargeCall failed", e);
+            }
+            return account.getBalance() > 0;
+        }
+        return false;
+    }
+
+
+    public boolean smsCanBeSend(Account account, long count) {
+        if(account!=null){
+            final Sms balance = getSmsBalance(account.getLogin());
+            final Long[] calcResult = calcPrice(balance.getSms_balance(), count, balance.getSms_cost(), balance.getDefault_sms_cost());
+            return account.getBalance() >= calcResult[0];
+        }
+        return false;
+    }
+
+    public boolean chargeSms(Account account, long count) {
+        if(account!=null){
+            final Sms balance = getSmsBalance(account.getLogin());
+            final Long[] calcResult = calcPrice(balance.getSms_balance(), count, balance.getSms_cost(), balance.getDefault_sms_cost());
+
+            account.setBalance(account.getBalance() - calcResult[0]);
+            balance.setSms_balance(calcResult[1]);
+
+            try {
+                if(calcResult[2]>0){
+                    rabbitMQSender.send(balance, RabbitMQMessageType.REQUEST_SMS);
+                }
+                if(calcResult[0]>0){
+                    rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                }
+            } catch (JsonProcessingException e){
+                LOG.error("chargeCall failed", e);
+            }
+            return account.getBalance() > 0;
+        }
+        return false;
+    }
+
+    public boolean internetCanBeUsed(Account account, long count) {
+        if(account!=null){
+            final Internet balance = getInternetBalance(account.getLogin());
+            final Long[] calcResult = calcPrice(balance.getInternet_balance(), count, balance.getInternet_cost(), balance.getDefault_internet_cost());
+            return account.getBalance() >= calcResult[0];
+        }
+        return false;
+    }
+
+    public boolean chargeInternet(Account account, long count) {
+        if(account!=null){
+            final Internet balance = getInternetBalance(account.getLogin());
+            final Long[] calcResult = calcPrice(balance.getInternet_balance(), count, balance.getInternet_cost(), balance.getDefault_internet_cost());
+
+            account.setBalance(account.getBalance() - calcResult[0]);
+            balance.setInternet_balance(calcResult[1]);
+
+            try {
+                if(calcResult[2]>0){
+                    rabbitMQSender.send(balance, RabbitMQMessageType.INTERNET_USE_KILOBYTE);
+                }
+                if(calcResult[0]>0){
+                    rabbitMQSender.send(account, RabbitMQMessageType.ADD_BALANCE);
+                }
+            } catch (JsonProcessingException e){
+                LOG.error("chargeCall failed", e);
+            }
+            return account.getBalance() > 0;
+        }
+        return false;
+    }
+
+
 }
