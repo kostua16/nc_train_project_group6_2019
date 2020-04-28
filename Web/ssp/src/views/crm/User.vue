@@ -4,7 +4,7 @@
     <div class="row">
       <form class="col s12" @submit.prevent="search">
         <div class="input-field col s10">
-          <input id="query" type="text" v-model.trim="searchQuery" class="validate" :disabled="searchCalled">
+          <input id="query" type="text" v-model.trim="searchQuery" :disabled="searchCalled">
           <label for="query">Поиск</label>
         </div>
         <div class="input-field col s2">
@@ -17,25 +17,25 @@
     <div class="row">
       <table class="col s12">
         <tr class="row">
-          <th class="col s2">Login</th>
-          <th class="col s2">ФИО</th>
-          <th class="col s2">Баланс</th>
-          <th class="col s2">Тарифный план</th>
-          <th class="col s2">Номер телефона</th>
-          <th class="col s1">Пополнение</th>
-          <th class="col s1">Удаление</th>
+          <th class="col s1">Login</th>
+          <th class="col s1">ФИО</th>
+          <th class="col s1">Баланс</th>
+          <th class="col s1">Тарифный план</th>
+          <th class="col s1">Номер телефона</th>
+          <th class="col s4">Пополнение</th>
+          <th class="col s3">Удаление</th>
         </tr> <!--ряд с ячейками заголовков-->
         <tr class="row" v-for="(result) in searchResults">
-          <td class="col s2">{{result.login}}</td>
-          <td class="col s2">{{result.name}}</td>
-          <td class="col s2">{{result.balance}}</td>
-          <td class="col s2">{{result.tariff}}</td>
-          <td class="col s2">{{result.telephone}}</td>
-          <td class="col s1">
+          <td class="col s1">{{result.login}}</td>
+          <td class="col s1">{{result.name}}</td>
+          <td class="col s1">{{result.balance}}</td>
+          <td class="col s1">{{result.tariff}}</td>
+          <td class="col s1">{{result.telephone}}</td>
+          <td class="col s4">
             <editable-number-field v-bind:label="'Сумма пополнения'" v-bind:init-value="0"
                                    v-bind:callback="(amt) => {updateBalance(result.telephone, amt)}"/>
           </td>
-          <td class="col s1">
+          <td class="col s3">
             <button class="btn waves-effect waves-light" type="submit" @click.prevent="deleteAk(result.login)"
                     name="deleteAction">Удалить
               <i class="material-icons right">send</i>
