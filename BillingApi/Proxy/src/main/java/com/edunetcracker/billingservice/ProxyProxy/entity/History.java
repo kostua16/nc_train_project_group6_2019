@@ -12,6 +12,9 @@ public class History {
 
     private String body;
 
+    public History() {
+    }
+
     public History(String date, String type, String body) {
         this.date = date;
         this.type = type;
