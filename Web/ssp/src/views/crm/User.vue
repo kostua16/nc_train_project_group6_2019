@@ -72,13 +72,13 @@
           </div>
 
           <div class="input-field col s12">
-            <select id="tariff" class="validate" v-model="newUser.tariff" :disabled="creationCalled">
+            <select id="tariff" class="validate" v-model="newUser.tariff">
               <option v-for="tariff in tariffs" v-bind:value="tariff.name">{{ tariff.name }}</option>
             </select>
             <label for="tariff">Тарифный план</label>
           </div>
           <div class="input-field col s12">
-            <select id="rang" v-model="newUser.rang" class="validate" :disabled="creationCalled">
+            <select id="rang" class="validate" v-model="newUser.rang">
               <option value="USER">User</option>
               <option value="ADMINISTRATOR">Administrator</option>
             </select>
@@ -135,6 +135,14 @@
       searchResults: state => state.LIST_ACCOUNTS,
       tariffs: state => state.CURRENT_USER!=null ? state.CURRENT_USER.availableTariffs : [],
     }),
+    mounted() {
+      this.dropdown = M.FormSelect.init(this.$refs.tariff, {
+        constrainWidth: true
+      });
+      this.dropdown = M.FormSelect.init(this.$refs.rang, {
+        constrainWidth: true
+      });
+    },
     methods: {//deleteA
       async search() {
         this.searchCalled = true;
