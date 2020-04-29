@@ -19,7 +19,7 @@
         this.$store.dispatch("WAIT_INITIALIZATION").then(() => { then() });
       },
       goToLastPage() {
-        if(this.currentPage!==this.lastPage){
+        if(this.currentPage!==this.lastPage && this.haveLastPage){
           this.goTo(this.lastPage);
         } else {
           this.goTo(this.defaultPage);

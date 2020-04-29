@@ -1,8 +1,8 @@
 <script>
-  import LoginBase from '../base/LoginView'
+  import LoginView from '../base/LoginView'
 
   export default {
-    extends: LoginBase,
+    extends: LoginView,
     data: () => ({
       defaultPage: '/crm',
       title: 'Личный кабинет',
