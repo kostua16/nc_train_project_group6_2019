@@ -26,7 +26,7 @@
           <th class="col s2">Type</th>
           <th class="col s8">Body</th>
         </tr> <!--ряд с ячейками заголовков-->
-        <tr class="row" v-for = "(history) in histories">
+        <tr class="row" v-for = "(history) in histories"  :key="history.id">
             <td class="col s2">{{history.date}}</td>
             <td class="col s2">{{history.type}}</td>
             <td class="col s8">{{history.body}}</td>

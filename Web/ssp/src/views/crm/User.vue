@@ -25,7 +25,7 @@
           <th class="col s2">Пополнение</th>
           <th class="col s2">Удаление</th>
         </tr> <!--ряд с ячейками заголовков-->
-        <tr class="row" v-for="(result) in searchResults">
+        <tr class="row" v-for="(result) in searchResults" :key="result.telephone">
           <td class="col s2">{{result.login}}</td>
           <td class="col s2">{{result.name}}</td>
           <td class="col s1">{{result.balance}}</td>
