@@ -119,9 +119,9 @@ public class RabbitMQListener {
                 }
                 case CALL_ONE_MINUTE: { //message = Call
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
-                    LOG.info("CALL_ONE_SECOND {}", call);
+                    LOG.info("CALL_ONE_MINUTE {}", call);
                     Call realCall = CallRepository.findCallByLogin(call.getLogin());
-                    realCall.setCall_balance(realCall.getCall_balance() - call.getCall_balance());
+                    realCall.setCall_balance(call.getCall_balance());
                     CallRepository.updateCall(realCall);
                     addToHistory(CALL_ONE_MINUTE, objectMapper.writeValueAsString(call));
                     break;
@@ -130,7 +130,7 @@ public class RabbitMQListener {
                     Call call = objectMapper.readValue(message.getBody(), Call.class);
                     LOG.info("CALL_ONE_SECOND {}", call);
                     Call realCall = CallRepository.findCallByLogin(call.getLogin());
-                    realCall.setCall_balance(realCall.getCall_balance() - call.getCall_balance());
+                    realCall.setCall_balance(call.getCall_balance());
                     CallRepository.updateCall(realCall);
                     addToHistory(CALL_ONE_SECOND, objectMapper.writeValueAsString(call));
                     break;
@@ -168,7 +168,7 @@ public class RabbitMQListener {
                     Internet internet = objectMapper.readValue(message.getBody(), Internet.class);
                     LOG.info("INTERNET_USE_KILOBYTE {}", internet);
                     Internet realInternet = InternetRepository.findInternetByLogin(internet.getLogin());
-                    realInternet.setInternet_balance(realInternet.getInternet_balance() - internet.getInternet_balance());
+                    realInternet.setInternet_balance(internet.getInternet_balance());
                     InternetRepository.updateInternet(realInternet);
                     addToHistory(INTERNET_USE_KILOBYTE, objectMapper.writeValueAsString(internet));
                     break;
@@ -201,7 +201,7 @@ public class RabbitMQListener {
                     Sms sms = objectMapper.readValue(message.getBody(), Sms.class);
                     LOG.info("REQUEST_SMS {}", sms);
                     Sms realSms = SmsRepository.findSmsByLogin(sms.getLogin());
-                    realSms.setSms_balance(realSms.getSms_balance() - sms.getSms_balance());
+                    realSms.setSms_balance(sms.getSms_balance());
                     SmsRepository.updateSms(realSms);
                     addToHistory(REQUEST_SMS, objectMapper.writeValueAsString(sms));
                     break;

@@ -191,7 +191,8 @@
                   break;
               }
               let result = await this.$store.dispatch(operation, {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo});
-              this.actionDuration += result.count;
+
+              this.actionDuration =parseInt(result.count) + parseInt(this.actionDuration);
               this.actionBalance = result.balance;
               this.actionPackageCount = result.package;
               if(result.stopped === true){
