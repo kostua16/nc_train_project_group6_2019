@@ -31,8 +31,11 @@ public class TelephoneExchange {
                                           @RequestParam("telephoneTo") String telephoneTo) {
         Map<String, String> result = new HashMap<>();
         result.put("stopped", "true");
+        result.put("count", "0");
+        result.put("balance", "0");
+        result.put("package", "0");
         Account accountFrom = accountController.getAccountByTelephone(telephoneFrom);
-        if (accountController.callCanBeDone(accountFrom, 1)) {
+        if (accountFrom!=null && accountController.callCanBeDone(accountFrom, 1)) {
             int countDone = 0;
             boolean running = true;
 
@@ -42,9 +45,9 @@ public class TelephoneExchange {
             }
             result.put("count", String.valueOf(countDone));
             result.put("stopped", String.valueOf(!running));
-            result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
-            result.put("package", String.valueOf(accountController.getCallBalance(accountFrom.getLogin()).getCall_balance()));
         }
+        result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
+        result.put("package", String.valueOf(accountController.getCallBalance(accountFrom.getLogin()).getCall_balance()));
         LOG.info("callFromTo({}, {}, {}) result => {}", telephoneFrom, minutes, telephoneTo, result);
         return result;
     }
@@ -55,8 +58,11 @@ public class TelephoneExchange {
                                            @RequestParam("kilobytes") Long kilobytes) {
         Map<String, String> result = new HashMap<>();
         result.put("stopped", "true");
+        result.put("count", "0");
+        result.put("balance", "0");
+        result.put("package", "0");
         Account accountFrom = accountController.getAccountByTelephone(telephoneFrom);
-        if (accountController.internetCanBeUsed(accountFrom, 1)) {
+        if (accountFrom!=null && accountController.internetCanBeUsed(accountFrom, 1)) {
             int countDone = 0;
             boolean running = true;
 
@@ -66,9 +72,9 @@ public class TelephoneExchange {
             }
             result.put("count", String.valueOf(countDone));
             result.put("stopped", String.valueOf(!running));
-            result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
-            result.put("package", String.valueOf(accountController.getInternetBalance(accountFrom.getLogin()).getInternet_balance()));
         }
+        result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
+        result.put("package", String.valueOf(accountController.getInternetBalance(accountFrom.getLogin()).getInternet_balance()));
         LOG.info("useInternet({}, {}) result => {}", telephoneFrom, kilobytes, result);
         return result;
     }
@@ -80,8 +86,11 @@ public class TelephoneExchange {
                                          @RequestParam("telephoneTo") String telephoneTo) {
         Map<String, String> result = new HashMap<>();
         result.put("stopped", "true");
+        result.put("count", "0");
+        result.put("balance", "0");
+        result.put("package", "0");
         Account accountFrom = accountController.getAccountByTelephone(telephoneFrom);
-        if (accountController.smsCanBeSend(accountFrom, 1)) {
+        if (accountFrom!=null && accountController.smsCanBeSend(accountFrom, 1)) {
             int countDone = 0;
             boolean running = true;
 

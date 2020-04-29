@@ -208,7 +208,7 @@ public class AccountController {
     public boolean callCanBeDone(Account account, long count) {
         if (account != null) {
             final Call callBalance = getCallBalance(account.getLogin());
-            final Long[] calcResult = calcPrice(callBalance.getCall_balance(), count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
+            final Long[] calcResult = calcPrice(callBalance.getCall_balance() * 60, count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
             return account.getBalance() >= calcResult[0];
         }
         return false;
@@ -217,10 +217,11 @@ public class AccountController {
     public boolean chargeCall(Account account, long count) {
         if (account != null) {
             final Call callBalance = getCallBalance(account.getLogin());
-            final Long[] calcResult = calcPrice(callBalance.getCall_balance(), count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
+            final Long[] calcResult = calcPrice(callBalance.getCall_balance() * 60, count, callBalance.getCall_cost(), callBalance.getDefault_call_cost());
 
             account.setBalance(account.getBalance() - calcResult[0]);
-            callBalance.setCall_balance(calcResult[1]);
+            final Long newCountBalance = calcResult[1];
+            callBalance.setCall_balance(newCountBalance >0 ? newCountBalance / 60 : 0);
 
             try {
                 if (calcResult[2] > 0) {
@@ -273,7 +274,7 @@ public class AccountController {
     public boolean internetCanBeUsed(Account account, long count) {
         if (account != null) {
             final Internet balance = getInternetBalance(account.getLogin());
-            final Long[] calcResult = calcPrice(balance.getInternet_balance(), count, balance.getInternet_cost(), balance.getDefault_internet_cost());
+            final Long[] calcResult = calcPrice(balance.getInternet_balance() * 1024, count, balance.getInternet_cost(), balance.getDefault_internet_cost());
             return account.getBalance() >= calcResult[0];
         }
         return false;
@@ -282,10 +283,11 @@ public class AccountController {
     public boolean chargeInternet(Account account, long count) {
         if (account != null) {
             final Internet balance = getInternetBalance(account.getLogin());
-            final Long[] calcResult = calcPrice(balance.getInternet_balance(), count, balance.getInternet_cost(), balance.getDefault_internet_cost());
+            final Long[] calcResult = calcPrice(balance.getInternet_balance() * 1024, count, balance.getInternet_cost(), balance.getDefault_internet_cost());
 
             account.setBalance(account.getBalance() - calcResult[0]);
-            balance.setInternet_balance(calcResult[1]);
+            final Long newCountBalance = calcResult[1];
+            balance.setInternet_balance(newCountBalance >0 ? newCountBalance / 1024 : 0);
 
             try {
                 if (calcResult[2] > 0) {
