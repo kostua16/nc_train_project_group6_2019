@@ -157,7 +157,7 @@ public class AccountController {
         try {
             final Account acc = getAccount(login);
             if ((acc.getBalance() + amount >= 0L)) {
-                acc.setBalance(amount);
+                acc.setBalance(acc.getBalance() + amount);
                 rabbitMQSender.send(acc, RabbitMQMessageType.ADD_BALANCE);
                 return true;
             }
@@ -194,13 +194,13 @@ public class AccountController {
 
     private Long[] calcPrice(long halfPriceBalance, long chargeCount, float halfPriceCost, float fullPriceCost) {
         Long[] result = new Long[4];
-        final long halfPriceCount = halfPriceBalance >= chargeCount ? chargeCount : chargeCount - halfPriceBalance;
+        final long halfPriceCount = halfPriceBalance >= chargeCount && halfPriceBalance>0 ? chargeCount : chargeCount - halfPriceBalance;
         final long fullPriceCount = chargeCount - halfPriceCount;
 
-        result[0] = (long) (halfPriceCount * halfPriceCost + fullPriceCount * fullPriceCost);
-        result[1] = halfPriceBalance - halfPriceCount;
-        result[2] = halfPriceCount;
-        result[3] = fullPriceCount;
+        result[0] = Math.abs((long) (halfPriceCount * halfPriceCost + fullPriceCount * fullPriceCost)); //price
+        result[1] = halfPriceBalance - halfPriceCount;                                        // how we will have mountly_balance
+        result[2] = halfPriceCount;                                                           // to charge from mountly balance
+        result[3] = fullPriceCount;                                                           // real minutes spend
 
         return result;
     }

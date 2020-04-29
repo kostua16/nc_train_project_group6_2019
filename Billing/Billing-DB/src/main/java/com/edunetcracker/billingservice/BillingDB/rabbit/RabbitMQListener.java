@@ -89,8 +89,8 @@ public class RabbitMQListener {
                     Account account = objectMapper.readValue(message.getBody(), Account.class);
                     LOG.info("ADD_BALANCE {}", account);
                     Account realAccount = AccountRepository.findAccountByLogin(account.getLogin());
-                    account.setBalance(account.getBalance() + realAccount.getBalance());
-                    AccountRepository.addAccountBalance(account);
+                    realAccount.setBalance(account.getBalance());
+                    AccountRepository.addAccountBalance(realAccount);
                     addToHistory(ADD_BALANCE, objectMapper.writeValueAsString(account));
                     break;
                 }

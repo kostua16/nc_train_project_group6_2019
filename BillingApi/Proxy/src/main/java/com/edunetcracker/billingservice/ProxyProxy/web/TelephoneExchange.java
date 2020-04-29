@@ -2,6 +2,8 @@ package com.edunetcracker.billingservice.ProxyProxy.web;
 
 import com.edunetcracker.billingservice.ProxyProxy.entity.Account;
 import com.edunetcracker.billingservice.ProxyProxy.proxy.AccountController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +22,7 @@ public class TelephoneExchange {
     @Autowired
     AccountController accountController;
 
+    Logger LOG = LoggerFactory.getLogger(TelephoneExchange.class);
 
     //  http://localhost:8102/callFromTo/?telephoneFrom=897654321&minutes=1&telephoneTo=999
     @GetMapping("callFromTo")
@@ -42,7 +45,7 @@ public class TelephoneExchange {
             result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
             result.put("package", String.valueOf(accountController.getCallBalance(accountFrom.getLogin()).getCall_balance()));
         }
-        ;
+        LOG.info("callFromTo({}, {}, {}) result => {}", telephoneFrom, minutes, telephoneTo, result);
         return result;
     }
 
@@ -66,7 +69,7 @@ public class TelephoneExchange {
             result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
             result.put("package", String.valueOf(accountController.getInternetBalance(accountFrom.getLogin()).getInternet_balance()));
         }
-        ;
+        LOG.info("useInternet({}, {}) result => {}", telephoneFrom, kilobytes, result);
         return result;
     }
 
@@ -91,7 +94,7 @@ public class TelephoneExchange {
             result.put("balance", String.valueOf(accountController.getAccountByTelephone(telephoneFrom).getBalance()));
             result.put("package", String.valueOf(accountController.getSmsBalance(accountFrom.getLogin()).getSms_balance()));
         }
-        ;
+        LOG.info("smsFromTo({}, {}, {}) result => {}", telephoneFrom, sms, telephoneTo, result);
         return result;
     }
 }
