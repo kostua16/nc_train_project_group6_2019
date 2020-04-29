@@ -166,6 +166,7 @@
         this.creationCalled = true;
         try {
           await this.$store.dispatch("CREATE_USER", this.newUser);
+          this.searchQuery = this.newUser.login;
           this.newUser = this.nullUser;
           await this.search();
           this.creationFailed = false;

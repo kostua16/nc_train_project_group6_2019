@@ -1,6 +1,5 @@
 <script>
   import LoginView from '../base/LoginView'
-
   export default {
     extends: LoginView,
     data: () => ({
