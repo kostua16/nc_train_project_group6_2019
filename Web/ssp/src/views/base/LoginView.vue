@@ -54,9 +54,7 @@
       this.$store.dispatch("WAIT_INITIALIZATION").then(() => {
         this.email = this.$store.state.DEFAULT_USER_NAME;
         this.password = this.$store.state.DEFAULT_USER_PASS;
-        if(this.login_done){
-          this.goToLastPage();
-        }
+        this.loginCheck();
       })
 
     },
@@ -65,6 +63,14 @@
       password: {required, minLength: minLength(6)}
     },
     methods: {
+      loginCheck() {
+        if(this.login_done){
+          this.goToLastPage();
+        } else {
+          const that = this;
+          setTimeout(() => that.loginCheck(), 1000);
+        }
+      },
       loginClick() {
         if (this.$v.$invalid) {
           this.$v.$touch()
