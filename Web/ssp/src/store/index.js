@@ -476,8 +476,8 @@ export default new Vuex.Store({
         }
         result.stopped = response.data.stopped;
         result.count = response.data.count;
-        result.balance = response.balance;
-        result.package = response.package;
+        result.balance = response.data.balance;
+        result.package = response.data.package;
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
@@ -557,8 +557,8 @@ export default new Vuex.Store({
         }
         result.stopped = response.data.stopped;
         result.count = response.data.count;
-        result.balance = response.balance;
-        result.package = response.package;
+        result.balance = response.data.balance;
+        result.package = response.data.package;
       }
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
