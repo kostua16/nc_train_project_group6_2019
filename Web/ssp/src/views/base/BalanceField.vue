@@ -1,11 +1,15 @@
 <template>
-  <form class="input-field" @submit.prevent="updateBalance">
-    <label for="inputField">{{label}}</label><input id="inputField" type="number" v-model.trim="value" class="validate" :class="{s1: smallWindow}" >
+  <form class="input-field col s12" @submit.prevent="updateBalance">
+    <for class="col s6">
+    <label for="inputField">{{label}}</label><input id="inputField" type="number" v-model.trim="value" class="validate"  >
+    </for>
     <div class="error" v-if="!$v.value.required">Введите сумму</div>
     <div class="error" v-if="!$v.value.isNumber">Введите числовое значение</div>
-    <button class="btn waves-effect waves-light" :class="{s1: smallWindow}" type="submit" @click.prevent="updateBalance" name="up">
+    <for>
+    <button class="btn waves-effect waves-light" type="submit" @click.prevent="updateBalance" name="up">
       <i class="material-icons right">send</i>
     </button>
+    </for>
   </form>
 </template>
 <script>

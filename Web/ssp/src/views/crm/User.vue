@@ -36,7 +36,7 @@
               v-bind:label="'Сумма пополнения'"
               v-bind:init-value="0"
               v-bind:phone-number="result.telephone"
-              v-bind:small-Window='true'
+              v-bind:small-window="true"
               @changed="search" />
           </td>
           <td class="col s2">
