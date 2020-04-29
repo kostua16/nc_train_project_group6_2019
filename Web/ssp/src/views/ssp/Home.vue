@@ -65,9 +65,9 @@ export default {
   data: () => ({ loginRoute: '/ssp/login' }),
   computed: mapState({
     balance: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.balance)).toFixed(0) : 0,
-    minutes: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.minutes)/60).toFixed(0) : 0,
+    minutes: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.minutes)).toFixed(0) : 0,
     sms: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.sms)).toFixed(0) : 0,
-    internet: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.internet)/1000).toFixed(1) : 0,
+    internet: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.internet)).toFixed(1) : 0,
     userPhone: state => state.CURRENT_USER!=null ? state.CURRENT_USER.telephone : ''
   }),
   mounted() {
