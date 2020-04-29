@@ -20,7 +20,7 @@ const routes = [
   {
     path: '/crm/login', //для адресной строки //при этом имени <router-view/> на главной странице App.vue будет менять контент
     name: 'crmLogin', //для себя имя
-    meta: {layout: 'Empty'}, //задаём лаяуты //свойства имя, имя
+    meta: {layout: 'Main'}, //задаём лаяуты //свойства имя, имя
     component: () => import('../views/crm/CrmLogin') //импортируем контент
   },
   {
