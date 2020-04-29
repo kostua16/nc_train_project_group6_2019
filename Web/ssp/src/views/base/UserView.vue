@@ -11,9 +11,7 @@
       login_done: state => state.CURRENT_USER != null,
     }),
     mounted() {
-      if(!this.login_done){
-        this.goTo(this.loginRoute);
-      }
+      this.loginCheck();
     },
     methods: {
       loginCheck() {
