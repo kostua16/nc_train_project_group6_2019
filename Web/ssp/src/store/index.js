@@ -482,7 +482,7 @@ export default new Vuex.Store({
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
       }
-
+      console.log("DO_CALL result = " + JSON.stringify(result));
       return result;
     },
     DO_SMS: async (context, info) => {
@@ -523,6 +523,7 @@ export default new Vuex.Store({
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
       }
+      console.log("DO_SMS result = " + JSON.stringify(result));
       return result;
     },
     DO_INTERNET: async (context, info) => {
@@ -563,6 +564,7 @@ export default new Vuex.Store({
       if(info.telephoneFrom === context.state.CURRENT_USER.telephone){
         await context.dispatch("SYNC_CURRENT_USER");
       }
+      console.log("DO_INTERNET result = " + JSON.stringify(result));
       return result;
     },
   },
