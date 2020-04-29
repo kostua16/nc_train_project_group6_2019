@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +217,26 @@ public class CRM {
         String rang = helpers.getAccount(Mylogin).getRang();
         if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             List<Account> accounts = helpers.searchAccounts(query);
+            if(accounts!=null){
+                accounts.sort(new Comparator<Account>() {
+                    @Override
+                    public int compare(Account o1, Account o2) {
+                        if(o1!=null){
+                            if(o2!=null){
+                                return o1.getLogin().compareToIgnoreCase(o2.getLogin());
+                            } else {
+                                return  1;
+                            }
+                        } else {
+                            if(o2!=null){
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                });
+            }
             return new ResponseEntity<>(accounts, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -245,6 +266,34 @@ public class CRM {
         if(checks.isAvailableInRanges(rang) && rang.equals(Checks.ADMINISTRATOR)) {
             String url = helpers.getUrlProxy() + "/showHistory?page=" + page;
             List<History> response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), List.class).getBody();
+            if(response!=null){
+                response.sort(new Comparator<History>() {
+                    @Override
+                    public int compare(History o1, History o2) {
+                        if(o1!=null){
+                            if(o2!=null){
+                                if(o1.getId().equals(o2.getId())){
+                                    return 0;
+                                } else {
+                                    if(o1.getId()> o2.getId()){
+                                        return 1;
+                                    } else {
+                                        return -1;
+                                    }
+                                }
+                            } else {
+                                return  1;
+                            }
+                        } else {
+                            if(o2!=null){
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                });
+            }
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
