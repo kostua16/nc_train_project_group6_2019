@@ -76,13 +76,13 @@
           </div>
 
           <div class="input-field col s12">
-            <select id="tariff" class="validate" v-model="newUser.tariff">
+            <select id="tariff" ref="tariff" class="validate" v-model="newUser.tariff">
               <option v-for="tariff in tariffs" v-bind:value="tariff.name">{{ tariff.name }}</option>
             </select>
             <label for="tariff">Тарифный план</label>
           </div>
           <div class="input-field col s12">
-            <select id="rang" class="validate" v-model="newUser.rang">
+            <select id="rang" ref="rang" class="validate" v-model="newUser.rang">
               <option value="USER">User</option>
               <option value="ADMINISTRATOR">Administrator</option>
             </select>
