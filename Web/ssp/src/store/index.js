@@ -146,10 +146,10 @@ export default new Vuex.Store({
     },
     SEARCH_ACCOUNTS: async (context, query) => {
       let compare = function(a, b) {
-        if (a.id<b.id) {
+        if (a.login<b.login) {
           return -1;
         }
-        if (a.id>b.id) {
+        if (a.login>b.login) {
           return 1;
         }
         // a должно быть равным b
