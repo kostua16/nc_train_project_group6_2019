@@ -197,11 +197,11 @@ public class AccountController {
         final long halfPriceCount = halfPriceBalance >= chargeCount && halfPriceBalance>0 ? chargeCount : chargeCount - halfPriceBalance;
         final long fullPriceCount = chargeCount - halfPriceCount;
 
-        result[0] = Math.abs((long) (halfPriceCount * halfPriceCost + fullPriceCount * fullPriceCost)); //price
+        result[0] = Math.abs((long) ((halfPriceCount * halfPriceCost) + (fullPriceCount * fullPriceCost))); //price
         result[1] = halfPriceBalance - halfPriceCount;                                        // how we will have mountly_balance
         result[2] = halfPriceCount;                                                           // to charge from mountly balance
         result[3] = fullPriceCount;                                                           // real minutes spend
-
+        LOG.info("calcPrice (halfPriceBalance:{}, chargeCount:{}, halfPriceCost:{}, fullPriceCost:{}) = [price: {}, mountly_balance:{}, halfPriceCharged:{}, fullPriceCharged:{}]", halfPriceBalance, chargeCount, halfPriceCost, fullPriceCost, result[0], result[1], result[2], result[3]);
         return result;
     }
 

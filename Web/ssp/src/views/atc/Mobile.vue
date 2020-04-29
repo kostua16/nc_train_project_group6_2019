@@ -60,7 +60,7 @@
         <modal
           v-if="showModal"
           v-bind:text="modalMessage"
-          v-bind:active="actionState === actionStarted"
+          v-bind:active="actionIsActive"
           @close="stopModal"
           @deactivate="stopOperation"
           @activate="spend"
@@ -96,6 +96,12 @@
     computed: {
       imitationState() {
         return this.$store.state.IMITATOR_STATE;
+      },
+      actionIsActive() {
+        return this.actionState === actionStarted;
+      },
+      actionIsStopped() {
+        return this.actionState === actionStoppedByUser || this.actionState === actionStoppedBySystem;
       },
       modalMessage() {
         switch (this.actionState) {
@@ -192,10 +198,10 @@
               }
               let result = await this.$store.dispatch(operation, {telephoneFrom: this.telephoneFrom, telephoneTo: this.telephoneTo});
 
-              this.actionDuration =parseInt(result.count) + parseInt(this.actionDuration);
-              this.actionBalance = result.balance;
-              this.actionPackageCount = result.package;
-              if(result.stopped === true){
+              this.actionDuration =parseFloat(result.count) + parseFloat(this.actionDuration);
+              this.actionBalance =  parseFloat(result.balance);
+              this.actionPackageCount = parseFloat(result.package);
+              if(result.stopped === "true" || result.stopped === true){
                 this.actionState = actionStoppedBySystem;
               } else {
                 const that = this;
