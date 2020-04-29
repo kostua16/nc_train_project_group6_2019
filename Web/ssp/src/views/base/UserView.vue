@@ -15,6 +15,16 @@
         this.goTo(this.loginRoute);
       }
     },
+    methods: {
+      loginCheck() {
+        if(!this.login_done && this.currentPage !== this.loginRoute){
+          this.goTo(this.loginRoute);
+        } else {
+          const that = this;
+          setTimeout(() => that.loginCheck(), 1000);
+        }
+      }
+    }
 
 
   }
