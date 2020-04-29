@@ -86,7 +86,7 @@ public class TelephoneExchange {
             boolean running = true;
 
             while (countDone <= sms && running) {
-                running = accountController.chargeCall(accountFrom, 1);
+                running = accountController.chargeSms(accountFrom, 1);
                 countDone += 1;
             }
             result.put("count", String.valueOf(countDone));
