@@ -14,7 +14,7 @@
         </div>
       </form>
     </div>
-    <div class="row">
+    <div class="row" v-if="haveSearchResults">
       <table class="col s12">
         <tr class="row">
           <th class="col s2">Login</th>
@@ -139,6 +139,7 @@
     }),
     computed: mapState({
       searchResults: state => state.LIST_ACCOUNTS,
+      haveSearchResults: state => state.LIST_ACCOUNTS!=null && state.LIST_ACCOUNTS.length>0,
       tariffs: state => state.CURRENT_USER!=null ? state.CURRENT_USER.availableTariffs : [],
     }),
     mounted() {
