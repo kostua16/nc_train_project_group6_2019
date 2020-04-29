@@ -44,8 +44,8 @@
 
             <tbody>
             <tr>
-              <td>{{parseFloat(internet/1000).toFixed(1)}} Мб</td>
-              <td>{{parseFloat(minutes/60).toFixed(0)}} мин</td>
+              <td>{{internet}} Мб</td>
+              <td>{{minutes}} мин</td>
               <td>{{sms}} шт</td>
             </tr>
             </tbody>
@@ -64,10 +64,10 @@ export default {
   extends: UserPage,
   data: () => ({ loginRoute: '/ssp/login' }),
   computed: mapState({
-    balance: state => state.CURRENT_USER!=null ? state.CURRENT_USER.balance : null,
-    minutes: state => state.CURRENT_USER!=null ? state.CURRENT_USER.minutes : null,
-    sms: state => state.CURRENT_USER!=null ? state.CURRENT_USER.sms : null,
-    internet: state => state.CURRENT_USER!=null ? state.CURRENT_USER.internet : null,
+    balance: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.balance)).toFixed(0) : 0,
+    minutes: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.minutes)/60).toFixed(0) : 0,
+    sms: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.sms)).toFixed(0) : 0,
+    internet: state => state.CURRENT_USER!=null ? (parseFloat(state.CURRENT_USER.internet)/1000).toFixed(1) : 0,
     userPhone: state => state.CURRENT_USER!=null ? state.CURRENT_USER.telephone : ''
   }),
   mounted() {
