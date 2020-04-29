@@ -112,18 +112,19 @@ public class ImitatorService {
     public Boolean initBaseUsers() {
 
         try {
-            if (!tariffController.isTariffExists("DEFAULT")) {
+            boolean result = true;
+            if (!tariffController.isTariffExists("DEFAULT") && result) {
                 LOG.info("initBaseUsers.create DEFAULT tariff");
-                tariffController.createTariff(
+                result = tariffController.createTariff(
                         new CollectedTariff("DEFAULT",
                                 new TariffCall("DEFAULT", 0F, 1800L, 0.0834F),
                                 new TariffInternet("DEFAULT", 0F, 1000000L, 0.001F),
                                 new TariffSms("DEFAULT", 0F, 30L, 2F)
                         ));
             }
-            if (!tariffController.isTariffExists("ADMINISTRATOR")) {
+            if (!tariffController.isTariffExists("ADMINISTRATOR") && result) {
                 LOG.info("initBaseUsers.create ADMINISTRATOR tariff");
-                tariffController.createTariff(
+                result = tariffController.createTariff(
                         new CollectedTariff("ADMINISTRATOR",
                                 new TariffCall("ADMINISTRATOR", 0F, 0L, 0F),
                                 new TariffInternet("ADMINISTRATOR", 0F, 0L, 0F),
@@ -131,9 +132,9 @@ public class ImitatorService {
                         ));
             }
 
-            if (!accountController.isAccountExists("admin@mail.ru")) {
+            if (!accountController.isAccountExists("admin@mail.ru") && result) {
                 LOG.info("initBaseUsers.create ADMINISTRATOR account");
-                accountController.createAccount(
+                result = accountController.createAccount(
                         new Account(
                                 "admin@mail.ru", "123456", "admin",
                                 0L, "ADMINISTRATOR", "88005553535", "ADMINISTRATOR"
@@ -141,16 +142,16 @@ public class ImitatorService {
                 );
             }
 
-            if (!accountController.isAccountExists("user@mail.ru")) {
+            if (!accountController.isAccountExists("user@mail.ru") && result) {
                 LOG.info("initBaseUsers.create USER account");
-                accountController.createAccount(
+                result = accountController.createAccount(
                         new Account(
                                 "user@mail.ru", "123456", "user",
                                 0L, "DEFAULT", "88005553536", "USER"
                         )
                 );
             }
-            return true;
+            return result;
         } catch (Exception e) {
             return false;
         }
