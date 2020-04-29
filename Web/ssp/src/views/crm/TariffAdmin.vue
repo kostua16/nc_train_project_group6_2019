@@ -69,7 +69,7 @@
                 </tr>
                 </tbody>
                   <thead>
-                   <th>For Tariff</th>
+                   <th>Стоимость ресурсов по тарифу</th>
                   </thead>
                 <tbody>
                 <tr>
@@ -79,7 +79,7 @@
                 </tr>
                 </tbody>
               <thead>
-              <th>Without Tariff</th>
+              <th>Базовая стоимость ресурсов</th>
               </thead>
               <tbody>
                 <tr>
