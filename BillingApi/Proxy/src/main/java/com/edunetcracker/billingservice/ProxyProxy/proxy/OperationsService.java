@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -62,7 +63,7 @@ public class OperationsService {
             } else {
                 List<T> resultBody;
                 if(result.getBody()!=null){
-                    resultBody = Arrays.asList(result.getBody()) ;
+                    resultBody = new LinkedList<T>(Arrays.asList(result.getBody()));
                 } else {
                     resultBody = new ArrayList<>();
                 }
