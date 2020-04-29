@@ -87,9 +87,9 @@
                 </thead>
                 <tbody>
                 <tr>
-                  <td>{{parseFloat(tariff.internet/1000).toFixed(1)}} mb</td>
-                  <td>{{parseFloat(tariff.call/60).toFixed(0)}} min</td>
-                  <td>{{tariff.sms}}</td>
+                  <td>{{parseFloat(tariff.internet/1000).toFixed(1)}} Мб</td>
+                  <td>{{parseFloat(tariff.call/60).toFixed(0)}} Мин</td>
+                  <td>{{tariff.sms}} шт</td>
                 </tr>
                 </tbody>
               </table>
