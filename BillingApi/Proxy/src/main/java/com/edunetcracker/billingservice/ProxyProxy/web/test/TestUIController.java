@@ -6,6 +6,7 @@ import com.edunetcracker.billingservice.ProxyProxy.entity.CollectedTariff;
 import com.edunetcracker.billingservice.ProxyProxy.entity.History;
 import com.edunetcracker.billingservice.ProxyProxy.entity.Tariff;
 import com.edunetcracker.billingservice.ProxyProxy.proxy.*;
+import com.edunetcracker.billingservice.ProxyProxy.web.NewMonth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -38,6 +39,9 @@ public class TestUIController {
 
     @Autowired
     HistoryController historyController;
+
+    @Autowired
+    NewMonth newMonth;
 
 
     @GetMapping("users")
@@ -105,6 +109,12 @@ public class TestUIController {
     @GetMapping("imitator/init")
     public String imitatorInitSystem() {
         imitatorService.initBaseUsers();
+        return "redirect:/ui/test/imitator";
+    }
+
+    @GetMapping("imitator/bill")
+    public String imitatorBill() {
+        newMonth.newMonth();
         return "redirect:/ui/test/imitator";
     }
 }
