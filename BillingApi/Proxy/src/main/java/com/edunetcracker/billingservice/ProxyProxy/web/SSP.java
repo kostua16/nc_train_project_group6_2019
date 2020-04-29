@@ -61,13 +61,20 @@ public class SSP {
     @GetMapping("topup")
     public Boolean topup(@RequestParam("login") String login,
                          @RequestParam("amount") Long amount) {
-        return accountController.addBalance(login, amount);
+        LOG.info("topup({}, {}) => start", login, amount);
+        final Boolean result = accountController.addBalance(login, amount);
+        LOG.info("topup({}, {}) => result = {}", login, amount, result);
+        return result;
     }
     @GetMapping("topUpByTelephone")
     public Boolean topUpByTelephone(@RequestParam("telephone") String telephone,
                                     @RequestParam("amount") Long amount) {
+        LOG.info("topUpByTelephone({}, {}) => start", telephone, amount);
         final Account account = accountController.getAccountByTelephone(telephone);
-        return accountController.addBalance(account.getLogin(), amount);
+        LOG.info("topUpByTelephone({}, {}) => account = {}", telephone, amount, account);
+        final Boolean result = accountController.addBalance(account.getLogin(), amount);
+        LOG.info("topUpByTelephone({}, {}) => result = {}", telephone, amount, result);
+        return result;
     }
 
     //  http://localhost:8102/showtariff/?login=tester@mail.ru

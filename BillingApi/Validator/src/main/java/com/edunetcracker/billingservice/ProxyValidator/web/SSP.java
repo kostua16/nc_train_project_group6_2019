@@ -64,13 +64,16 @@ public class SSP {
     public ResponseEntity<Boolean> topup (@RequestParam("token") @NotNull String token,
                                           @RequestParam("amount") @NotNull Long amount ) {
         String login = checks.getLoginByTokenAndCheck(token);
+        LOG.info("topup({}, {}) => login = {}", token, amount, login);
         if(login == null) {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
+        LOG.info("topup({}, {}) => rang = {}", token, amount, rang);
         if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
             String url = helpers.getUrlProxy() + "/topup/?login=" + login + "&amount=" + amount;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
+            LOG.info("topup({}, {}) => response = {}", token, amount, response);
             if(response!=null){
                 if(response){
                     return new ResponseEntity<>(response, HttpStatus.OK);
@@ -89,13 +92,16 @@ public class SSP {
                                                      @RequestParam("telephone") @NotNull Long telephone,
                                                      @RequestParam("amount") @NotNull Long amount ) {
         String login = checks.getLoginByTokenAndCheck(token);
+        LOG.info("topUpByTelephone({}, {}, {}) => login = {}", token, telephone, amount, login);
         if(login == null) {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
         String rang = helpers.getAccount(login).getRang();
+        LOG.info("topUpByTelephone({}, {}, {}) => rang = {}", token, telephone, amount, rang);
         if(Checks.USER.equals(rang) || Checks.ADMINISTRATOR.equals(rang)) {
             String url = helpers.getUrlProxy() + "/topUpByTelephone/?telephone=" + telephone + "&amount=" + amount;
             Boolean response = new RestTemplate().exchange(url, HttpMethod.GET, new HttpEntity(new HttpHeaders()), Boolean.class).getBody();
+            LOG.info("topUpByTelephone({}, {}, {}) => response = {}", token, telephone, amount, response);
             if(response!=null){
                 if(response){
                     return new ResponseEntity<>(response, HttpStatus.OK);
