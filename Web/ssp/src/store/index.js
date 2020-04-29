@@ -145,10 +145,22 @@ export default new Vuex.Store({
       return new Promise(resolve => setTimeout(resolve, ms));
     },
     SEARCH_ACCOUNTS: async (context, query) => {
+      let compare = function(a, b) {
+        if (a.id<b.id) {
+          return -1;
+        }
+        if (a.id>b.id) {
+          return 1;
+        }
+        // a должно быть равным b
+        return 0;
+      }
       if(!context.state.STUB_MODE){
         try {
           const searchResponse = await Vue.axios.get(`${context.state.VALIDATOR_URL}/searchA/?query=${query}&token=${context.state.TOKEN}`);
-          await context.commit("SET_ACCOUNTS", searchResponse.data);
+          let data = searchResponse.data;
+          data.sort(compare);
+          await context.commit("SET_ACCOUNTS", data);
           console.log(`SEARCH_ACCOUNTS.Done(${query}, ${searchResponse.data})`);
         } catch (e) {
           console.log(`SEARCH_ACCOUNTS.Fail(${e})`);
@@ -343,6 +355,16 @@ export default new Vuex.Store({
       await context.dispatch("LOAD_HISTORY");
     },
     LOAD_HISTORY: async (context) => {
+      let compare = function(a, b) {
+        if (a.id<b.id) {
+          return -1;
+        }
+        if (a.id>b.id) {
+          return 1;
+        }
+        // a должно быть равным b
+        return 0;
+      }
       if(context.state.STUB_MODE) {
         await context.commit("SET_ACTIONS_HISTORY", []);
       } else {
@@ -352,7 +374,9 @@ export default new Vuex.Store({
             if(historyResponse==null || historyResponse.data==null){
               await context.commit("SET_ACTIONS_HISTORY", []);
             } else {
-              await context.commit("SET_ACTIONS_HISTORY", historyResponse.data);
+              let data = historyResponse.data;
+              data.sort(compare);
+              await context.commit("SET_ACTIONS_HISTORY", data);
             }
           } else {
             await context.commit("SET_ACTIONS_HISTORY", []);
