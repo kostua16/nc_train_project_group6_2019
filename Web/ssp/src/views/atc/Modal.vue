@@ -4,14 +4,15 @@
       <div class="modal-wrapper">
         <div class="modal-container">
           <slot name="body">{{text}}</slot>
-        </div>
-        <div class="modal-footer">
+          <div class="modal-footer">
           <slot name="footer">
             <button v-if="!active" @click.prevent="$emit('activate')">Запустить</button>
             <button v-if="active" @click.prevent="$emit('deactivate')">Остановить</button>
             <button @click.prevent="$emit('close')">Закрыть</button>
           </slot>
         </div>
+        </div>
+        
       </div>
     </div>
   </transition>
