@@ -38,6 +38,7 @@
       },
       async updateBalance() {
         await this.$store.dispatch("UPDATE_USER_BALANCE", {amount: this.value, phone: this.phoneNumber});
+        this.value = 0;
         await this.$emit('changed');
       },
     }
